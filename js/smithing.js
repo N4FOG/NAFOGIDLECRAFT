@@ -868,6 +868,9 @@
                 // Incrementa contador de itens criados
                 incrementItemsCrafted(1);
                 
+                // Grande Observatório
+                incrementEquipmentForged();
+                
                 addXP(skill, xpGain);
                 showNotification('✅ Equipamento criado!', `${eq.icon} ${eq.name}${hasSlots ? ' (2 Slots)' : ''} forjado!`, 'success', eq.icon);
                 if (skill === 'smithing') updateSmithingPage();

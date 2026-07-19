@@ -1161,6 +1161,15 @@
             initAchievements();
             gameState.stats.totalKills = (gameState.stats.totalKills || 0) + 1;
             
+            // GRANDE OBSERVATÓRIO - Atualiza estatísticas globais
+            incrementMonsterKilled();
+            if (enemy.isBoss) {
+                recordBossKill(enemy.id);
+            }
+            if (gameState.combat.critThisTurn && gameState.combat.critThisTurn > globalStats.maxCritDamage) {
+                recordCritDamage(gameState.combat.critThisTurn, gameState.player?.name || 'Jogador');
+            }
+            
             // Perícias de Arma (EXP) - baseado no tipo de arma equipada
             const equippedWeapon = gameState.equipment?.equipped?.weapon;
             let weaponType = 'melee'; // padrão
@@ -2046,6 +2055,10 @@ ${arenaEnemies.map((e, i) => {
             const heal = getItemHeal(found);
             gameState.inventory[found]--;
             gameState.combat.playerHealth = Math.min(gameState.combat.playerHealth + heal, gameState.combat.maxPlayerHealth);
+            
+            // Grande Observatório
+            incrementFoodUsed();
+            
             showNotification('🍖 Comida!', `Recuperou ${heal} de vida.`, 'success');
             updateUI();
         }

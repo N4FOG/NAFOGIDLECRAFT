@@ -48,6 +48,9 @@
                 gameState.alchemy.inventory[potionId] = (gameState.alchemy.inventory[potionId] || 0) + qty;
                 delete gameState.craftingTimers[timerId];
 
+                // Grande Observatório
+                incrementPotionMade();
+
                 showNotification('✅ Poção criada!', `+${qty} ${potion.name}`, 'success', potion.icon);
                 updateAlchemyPage();
                 updateUI();
@@ -192,4 +195,4 @@
             else if (tab === 'inventory') { document.querySelectorAll('#alchemyPage .shop-tab')[1].classList.add('active'); document.getElementById('alchemyInventorySection').classList.add('active'); updateAlchemyPage(); }
             else { document.querySelectorAll('#alchemyPage .shop-tab')[2].classList.add('active'); document.getElementById('alchemyActiveSection').classList.add('active'); updateAlchemyPage(); }
         }
-
+

@@ -112,9 +112,22 @@
 
             // Tracking de stats para conquistas
             initAchievements();
-            if (skill === 'woodcutting') gameState.stats.totalWood = (gameState.stats.totalWood || 0) + amount;
-            if (skill === 'mining')      gameState.stats.totalOre  = (gameState.stats.totalOre  || 0) + amount;
-            if (skill === 'fishing')     gameState.stats.totalFish = (gameState.stats.totalFish || 0) + amount;
+            if (skill === 'woodcutting') {
+                gameState.stats.totalWood = (gameState.stats.totalWood || 0) + amount;
+                incrementTreeCut(amount); // Grande Observatório
+            }
+            if (skill === 'mining') {
+                gameState.stats.totalOre  = (gameState.stats.totalOre  || 0) + amount;
+                incrementResourcesMined(amount); // Grande Observatório
+            }
+            if (skill === 'fishing') {
+                gameState.stats.totalFish = (gameState.stats.totalFish || 0) + amount;
+                incrementFishCaught(amount); // Grande Observatório
+            }
+            if (skill === 'herbalism') {
+                gameState.stats.totalHerbs = (gameState.stats.totalHerbs || 0) + amount;
+                incrementHerbsGathered(amount); // Grande Observatório
+            }
             checkAchievements();
 
             // XP: base * pet xpBoost * tech xpBoost * potion xpBoost + passiva de classe + ferramenta

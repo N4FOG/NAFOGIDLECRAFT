@@ -478,6 +478,7 @@
             else if (page === 'dungeon') updateDungeonPage();
             else if (page === 'property') updatePropertyPage();
             else if (page === 'runeforge') updateRuneforgePage();
+            else if (page === 'observatory') renderObservatory();
             else if (page === 'runar') updateRunarPage();
             else if (page === 'combat') renderArenaPage();
             else if (page === 'woodcutting' || page === 'mining' || page === 'fishing' || page === 'herbalism') updateResourcesPage(page);

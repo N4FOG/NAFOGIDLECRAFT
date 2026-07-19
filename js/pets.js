@@ -9,6 +9,10 @@
             gameState.gold -= pet.price;
             gameState.pets.owned.push(petId);
             if (!gameState.pets.active) gameState.pets.active = petId;
+            
+            // Grande Observatório
+            incrementPetAdopted();
+            
             showNotification('✨ Novo Mascote!', `${pet.name} agora é seu companheiro!`, 'success', pet.icon);
             updateUI();
             updatePetsPage();
