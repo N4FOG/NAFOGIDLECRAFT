@@ -182,7 +182,47 @@ function getAggregateStats() {
     };
 }
 
-// Iniciar coleta quando o jogo carrega
+/**
+ * Zera todas as estatísticas coletadas
+ */
+function resetStatistics() {
+    if (!confirm('⚠️ Tem certeza que deseja zerar TODAS as estatísticas?\n\nEsta ação não pode ser desfeita.')) {
+        return;
+    }
+
+    // Limpa arrays
+    statsTracker.timestamps = [];
+    statsTracker.goldPerHour = [];
+    statsTracker.xpPerHour = [];
+    statsTracker.itemsCrafted = [];
+    statsTracker.itemsGathered = [];
+    statsTracker.activePlayers = [];
+    statsTracker.workers = [];
+    statsTracker.combatWins = [];
+
+    // Reseta snapshot
+    lastSnapshot = {
+        gold: gameState.gold || 0,
+        totalXP: calculateTotalXP(),
+        totalItemsCrafted: countItemsCrafted(),
+        totalItemsGathered: countItemsGathered(),
+        combatWins: gameState.arena?.wins || 0,
+        timestamp: Date.now()
+    };
+
+    // Avisa o usuário
+    showNotification('✅ Estatísticas Zeradas', 'Todos os dados coletados foram removidos. A coleta recomeçará agora.', 'success');
+
+    // Atualiza a UI imediatamente
+    if (typeof refreshStatsDisplay === 'function') {
+        setTimeout(refreshStatsDisplay, 500);
+    }
+}
+
+// Expõe globalmente
+window.resetStatistics = resetStatistics;
+
+// Expõe globalmente
 window.addEventListener('load', () => {
     setTimeout(() => {
         if (typeof startStatsCollection === 'function') {
