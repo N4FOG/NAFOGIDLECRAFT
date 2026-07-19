@@ -203,8 +203,25 @@
                 for (const [key, elId] of Object.entries(weaponSkillsMap)) {
                     const el = document.getElementById(elId);
                     if (el) {
-                        const skill = gameState.weaponSkills[key] || { level: 1 };
+                        const skill = gameState.weaponSkills[key] || { level: 1, xp: 0 };
                         el.textContent = skill.level;
+                    }
+                    
+                    // Atualiza barras e XP
+                    const barEl = document.getElementById(`sidebarWeapon${key.charAt(0).toUpperCase() + key.slice(1)}Bar`);
+                    const xpEl = document.getElementById(`sidebarWeapon${key.charAt(0).toUpperCase() + key.slice(1)}XP`);
+                    
+                    if (barEl && gameState.weaponSkills[key]) {
+                        const skill = gameState.weaponSkills[key];
+                        const xpRequired = skill.level * 100;
+                        const xpPercent = Math.min((skill.xp / xpRequired) * 100, 100);
+                        barEl.style.width = xpPercent + '%';
+                    }
+                    
+                    if (xpEl && gameState.weaponSkills[key]) {
+                        const skill = gameState.weaponSkills[key];
+                        const xpRequired = skill.level * 100;
+                        xpEl.textContent = `${skill.xp}/${xpRequired}`;
                     }
                 }
             }
