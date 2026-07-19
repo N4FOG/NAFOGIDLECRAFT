@@ -1,0 +1,29 @@
+{
+  "name": "idle-craft",
+  "version": "1.0.0",
+  "description": "Idle Craft - RPG Medieval",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder build --win"
+  },
+  "build": {
+    "appId": "com.idlecraft.game",
+    "productName": "Idle Craft",
+    "win": {
+      "target": "portable"
+    },
+    "portable": {
+      "artifactName": "IdleCraft.exe"
+    },
+    "files": [
+      "**/*",
+      "!node_modules/electron-builder/**",
+      "!*.bat"
+    ]
+  },
+  "devDependencies": {
+    "electron": "^31.0.0",
+    "electron-builder": "^24.0.0"
+  }
+}
