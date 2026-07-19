@@ -1161,11 +1161,16 @@
             initAchievements();
             gameState.stats.totalKills = (gameState.stats.totalKills || 0) + 1;
             
-            // Perícias de Arma (EXP)
-            const playerClass = gameState.player?.classId;
-            let weaponType = 'melee';
-            if (playerClass === 'mage') weaponType = 'magic';
-            else if (playerClass === 'archer') weaponType = 'distance';
+            // Perícias de Arma (EXP) - baseado no tipo de arma equipada
+            const equippedWeapon = gameState.equipment?.equipped?.weapon;
+            let weaponType = 'melee'; // padrão
+            
+            if (equippedWeapon) {
+                const weaponData = equipmentData[equippedWeapon];
+                if (weaponData && weaponData.weaponSkillType) {
+                    weaponType = weaponData.weaponSkillType;
+                }
+            }
             
             // EXP baseada na wave
             const xpGained = Math.floor(10 + a.wave / 5);
@@ -2044,4 +2049,4 @@ ${arenaEnemies.map((e, i) => {
             showNotification('🍖 Comida!', `Recuperou ${heal} de vida.`, 'success');
             updateUI();
         }
-
+

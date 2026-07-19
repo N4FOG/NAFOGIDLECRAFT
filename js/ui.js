@@ -210,6 +210,7 @@
                     // Atualiza barras e XP
                     const barEl = document.getElementById(`sidebarWeapon${key.charAt(0).toUpperCase() + key.slice(1)}Bar`);
                     const xpEl = document.getElementById(`sidebarWeapon${key.charAt(0).toUpperCase() + key.slice(1)}XP`);
+                    const buffEl = document.getElementById(`sidebarWeapon${key.charAt(0).toUpperCase() + key.slice(1)}Buff`);
                     
                     if (barEl && gameState.weaponSkills[key]) {
                         const skill = gameState.weaponSkills[key];
@@ -222,6 +223,19 @@
                         const skill = gameState.weaponSkills[key];
                         const xpRequired = skill.level * 100;
                         xpEl.textContent = `${skill.xp}/${xpRequired}`;
+                    }
+                    
+                    // Exibe buff da perícia
+                    if (buffEl && gameState.weaponSkills[key]) {
+                        const skill = gameState.weaponSkills[key];
+                        const buffPercent = (skill.level - 1) * 0.5;
+                        let buffText = '';
+                        if (key === 'shielding') {
+                            buffText = `🛡️ +${buffPercent.toFixed(1)}% Defesa`;
+                        } else {
+                            buffText = `⚔️ +${buffPercent.toFixed(1)}% Dano`;
+                        }
+                        buffEl.textContent = buffText;
                     }
                 }
             }

@@ -9,11 +9,11 @@
         // ============================================
         const equipmentData = {
             // ARMAS (Ferraria)
-            'weapon_copper': { id: 'weapon_copper', name: 'Espada de Cobre', icon: '🗡️', slot: 'weapon', rarity: 'common', stats: { strength: 3 }, desc: 'Espada básica de cobre', craftSkill: 'smithing', craftReq: 1, ingredients: [{ type: 'bar1', qty: 2 }], price: 30 },
-            'weapon_iron':   { id: 'weapon_iron',   name: 'Espada de Ferro',  icon: '⚔️', slot: 'weapon', rarity: 'uncommon', stats: { strength: 7 }, desc: 'Espada resistente de ferro', craftSkill: 'smithing', craftReq: 20, ingredients: [{ type: 'bar2', qty: 2 }], price: 70 },
-            'weapon_silver': { id: 'weapon_silver', name: 'Lâmina de Prata',  icon: '🌙', slot: 'weapon', rarity: 'rare', stats: { strength: 14, critChance: 5 }, desc: 'Lâmina afiada de prata', craftSkill: 'smithing', craftReq: 40, ingredients: [{ type: 'bar3', qty: 2 }], price: 150 },
-            'weapon_gold':   { id: 'weapon_gold',   name: 'Sabre Dourado',    icon: '✨', slot: 'weapon', rarity: 'epic', stats: { strength: 22, critChance: 10 }, desc: 'Sabre lendário de ouro', craftSkill: 'smithing', craftReq: 65, ingredients: [{ type: 'bar4', qty: 2 }], price: 300 },
-            'weapon_mithril':{ id: 'weapon_mithril',name: 'Espada de Mitril', icon: '💫', slot: 'weapon', rarity: 'legendary', stats: { strength: 35, critChance: 15, xpBonus: 10 }, desc: 'Arma lendária de mitril', craftSkill: 'smithing', craftReq: 90, ingredients: [{ type: 'bar5', qty: 2 }], price: 600 },
+            'weapon_copper': { id: 'weapon_copper', name: 'Espada de Cobre', icon: '🗡️', slot: 'weapon', rarity: 'common', stats: { strength: 3 }, desc: 'Espada básica de cobre', craftSkill: 'smithing', craftReq: 1, ingredients: [{ type: 'bar1', qty: 2 }], price: 30, weaponSkillType: 'melee' },
+            'weapon_iron':   { id: 'weapon_iron',   name: 'Espada de Ferro',  icon: '⚔️', slot: 'weapon', rarity: 'uncommon', stats: { strength: 7 }, desc: 'Espada resistente de ferro', craftSkill: 'smithing', craftReq: 20, ingredients: [{ type: 'bar2', qty: 2 }], price: 70, weaponSkillType: 'melee' },
+            'weapon_silver': { id: 'weapon_silver', name: 'Lâmina de Prata',  icon: '🌙', slot: 'weapon', rarity: 'rare', stats: { strength: 14, critChance: 5 }, desc: 'Lâmina afiada de prata', craftSkill: 'smithing', craftReq: 40, ingredients: [{ type: 'bar3', qty: 2 }], price: 150, weaponSkillType: 'melee' },
+            'weapon_gold':   { id: 'weapon_gold',   name: 'Sabre Dourado',    icon: '✨', slot: 'weapon', rarity: 'epic', stats: { strength: 22, critChance: 10 }, desc: 'Sabre lendário de ouro', craftSkill: 'smithing', craftReq: 65, ingredients: [{ type: 'bar4', qty: 2 }], price: 300, weaponSkillType: 'melee' },
+            'weapon_mithril':{ id: 'weapon_mithril',name: 'Espada de Mitril', icon: '💫', slot: 'weapon', rarity: 'legendary', stats: { strength: 35, critChance: 15, xpBonus: 10 }, desc: 'Arma lendária de mitril', craftSkill: 'smithing', craftReq: 90, ingredients: [{ type: 'bar5', qty: 2 }], price: 600, weaponSkillType: 'melee' },
 
             // ARMADURAS (Ferraria)
             'armor_copper':  { id: 'armor_copper',  name: 'Armadura de Cobre', icon: '🥉', slot: 'armor', rarity: 'common', stats: { defense: 3 }, desc: 'Proteção básica de cobre', craftSkill: 'smithing', craftReq: 1, ingredients: [{ type: 'bar1', qty: 3 }], price: 40 },
@@ -52,10 +52,10 @@
             'amulet_dragon': { id: 'amulet_dragon', name: 'Amuleto do Dragão',  icon: '🐉', slot: 'amulet', rarity: 'legendary', stats: { maxHealth: 80, strength: 10, xpBonus: 20 }, desc: 'Amuleto lendário do dragão', craftSkill: 'crafting', craftReq: 90, ingredients: [{ type: 'wood5', qty: 2 }, { type: 'bar5', qty: 1 }], price: 700 },
 
             // EQUIPAMENTOS DA CRIAÇÃO (Arco, Cajado, Bastão, Escudo)
-            'craftedItem2': { id: 'craftedItem2', name: 'Arco Curto',     icon: '🏹', slot: 'weapon', rarity: 'uncommon', stats: { strength: 6, critChance: 2 }, desc: 'Arco feito de madeira de carvalho', craftSkill: 'crafting', craftReq: 20, ingredients: [{ type: 'wood2', qty: 2 }], price: 20 },
-            'craftedItem3': { id: 'craftedItem3', name: 'Bastão Rúnico',   icon: '🪄', slot: 'weapon', rarity: 'rare',     stats: { strength: 12, xpBonus: 5 },     desc: 'Bastão com runas gravadas',        craftSkill: 'crafting', craftReq: 40, ingredients: [{ type: 'wood3', qty: 2 }], price: 35 },
+            'craftedItem2': { id: 'craftedItem2', name: 'Arco Curto',     icon: '🏹', slot: 'weapon', rarity: 'uncommon', stats: { strength: 6, critChance: 2 }, desc: 'Arco feito de madeira de carvalho', craftSkill: 'crafting', craftReq: 20, ingredients: [{ type: 'wood2', qty: 2 }], price: 20, weaponSkillType: 'distance' },
+            'craftedItem3': { id: 'craftedItem3', name: 'Bastão Rúnico',   icon: '🪄', slot: 'weapon', rarity: 'rare',     stats: { strength: 12, xpBonus: 5 },     desc: 'Bastão com runas gravadas',        craftSkill: 'crafting', craftReq: 40, ingredients: [{ type: 'wood3', qty: 2 }], price: 35, weaponSkillType: 'magic' },
             'craftedItem4': { id: 'craftedItem4', name: 'Escudo Ébano',    icon: '🛡️', slot: 'shield', rarity: 'epic',     stats: { defense: 22 },                  desc: 'Escudo resistente feito de ébano', craftSkill: 'crafting', craftReq: 65, ingredients: [{ type: 'wood4', qty: 2 }], price: 55 },
-            'craftedItem5': { id: 'craftedItem5', name: 'Cajado Mágico',   icon: '🔮', slot: 'weapon', rarity: 'legendary',stats: { strength: 30, critChance: 8, xpBonus: 10 }, desc: 'Cajado infundido com magia poderosa', craftSkill: 'crafting', craftReq: 90, ingredients: [{ type: 'wood5', qty: 2 }], price: 85 },
+            'craftedItem5': { id: 'craftedItem5', name: 'Cajado Mágico',   icon: '🔮', slot: 'weapon', rarity: 'legendary',stats: { strength: 30, critChance: 8, xpBonus: 10 }, desc: 'Cajado infundido com magia poderosa', craftSkill: 'crafting', craftReq: 90, ingredients: [{ type: 'wood5', qty: 2 }], price: 85, weaponSkillType: 'magic' },
         };
 
         // Receitas de equipamentos para Ferraria e Criação
