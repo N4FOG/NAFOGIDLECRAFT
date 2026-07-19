@@ -226,6 +226,44 @@ window.FirebaseService = {
   },
 
   // ==========================================
+  // ADMIN — CHEFES GLOBAIS
+  // ==========================================
+
+  /**
+   * Força o spawn de um chefe específico, substituindo o atual.
+   */
+  adminForceSpawnBoss: async function(boss) {
+    const bossRef = doc(db, "worldboss", "current");
+    const lbRef  = doc(db, "worldboss", "leaderboard");
+    await setDoc(bossRef, {
+      name:      boss.name,
+      icon:      boss.icon,
+      maxHp:     boss.maxHp,
+      hp:        boss.maxHp,
+      spawnTime: Date.now(),
+      isActive:  true,
+      defeatTime: null
+    });
+    await setDoc(lbRef, { contributors: {} });
+  },
+
+  /**
+   * Define o HP (e maxHp) do chefe ativo diretamente.
+   */
+  adminSetBossHp: async function(hp, maxHp) {
+    const bossRef = doc(db, "worldboss", "current");
+    await setDoc(bossRef, { hp: hp, maxHp: maxHp }, { merge: true });
+  },
+
+  /**
+   * Encerra o chefe atual zerando o HP e registrando defeatTime.
+   */
+  adminKillBoss: async function() {
+    const bossRef = doc(db, "worldboss", "current");
+    await setDoc(bossRef, { hp: 0, defeatTime: Date.now() }, { merge: true });
+  },
+
+  // ==========================================
   // POÇO DOS DESEJOS (WISHING WELL)
   // ==========================================
 

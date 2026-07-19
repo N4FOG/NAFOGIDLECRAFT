@@ -144,12 +144,74 @@ function renderWorldBoss(boss) {
 }
 
 function renderBossShowcaseHTML(activeBoss) {
-    return worldBossesList.map(b => {
+    // Verifica se há buff ativo do world boss
+    const wb = gameState && gameState.worldBossBuff;
+    const buffActive = wb && wb.expiresAt && Date.now() < wb.expiresAt;
+
+    // Banner de buff ativo (aparece no topo do bestiário)
+    let activeBanner = '';
+    if (buffActive) {
+        const remaining = wb.expiresAt - Date.now();
+        const hLeft = Math.floor(remaining / 3600000);
+        const mLeft = Math.floor((remaining % 3600000) / 60000);
+        const sLeft = Math.floor((remaining % 60000) / 1000);
+        const timeStr = hLeft > 0 ? `${hLeft}h ${mLeft}m` : `${mLeft}m ${sLeft}s`;
+
+        // Cor da poção baseada no valor do buff
+        const buffColors = {
+            1: { from:'#555', to:'#333', border:'#888',   glow:'rgba(150,150,150,0.4)', color:'#ccc'    },
+            2: { from:'#0d3a6e', to:'#0a2a52', border:'#3a8fff', glow:'rgba(58,143,255,0.4)', color:'#78c8ff' },
+            3: { from:'#0d4a1e', to:'#0a3214', border:'#2ecc71', glow:'rgba(46,204,113,0.4)', color:'#7de87d' },
+            4: { from:'#4a3a00', to:'#322800', border:'#ffd700', glow:'rgba(255,215,0,0.4)',   color:'#ffe066' },
+            5: { from:'#4a2200', to:'#321600', border:'#ff8800', glow:'rgba(255,136,0,0.4)',   color:'#ffaa44' },
+            6: { from:'#4a0a0a', to:'#320606', border:'#ff4444', glow:'rgba(255,68,68,0.4)',   color:'#ff6666' },
+            7: { from:'#3a0a5a', to:'#28063e', border:'#d896ff', glow:'rgba(216,150,255,0.6)', color:'#d896ff' },
+        };
+        const c = buffColors[wb.value] || buffColors[1];
+
+        activeBanner = `
+            <div style="
+                grid-column: 1 / -1;
+                background: linear-gradient(135deg, ${c.from}, ${c.to});
+                border: 2px solid ${c.border};
+                border-radius: 12px;
+                padding: 16px 20px;
+                box-shadow: 0 0 20px ${c.glow};
+                display: flex;
+                align-items: center;
+                gap: 18px;
+                margin-bottom: 4px;
+                animation: wbBuffPulse 2.5s ease-in-out infinite;
+            ">
+                <div style="font-size:3em; filter: drop-shadow(0 0 10px ${c.glow});">🧪</div>
+                <div style="flex:1;">
+                    <div style="font-family:'Cinzel', serif; font-size:1.1em; color:${c.color}; font-weight:bold; margin-bottom:4px;">
+                        ⚡ Bênção do Titã ativa — <span style="font-size:1.2em;">+${wb.value}%</span> Dano · Ouro · XP
+                    </div>
+                    <div style="font-size:0.8em; color:#bbb;">Recompensa do Chefe Global · Expira em <strong style="color:${c.color};">${timeStr}</strong></div>
+                    <div style="margin-top:8px; background:rgba(0,0,0,0.3); border-radius:6px; height:6px; overflow:hidden;">
+                        <div style="width:${Math.min(100,(remaining / (4*3600000))*100).toFixed(1)}%; height:100%; background: linear-gradient(90deg, ${c.border}, ${c.color}); border-radius:6px; transition: width 1s linear;"></div>
+                    </div>
+                </div>
+                <div style="font-size:0.75em; color:${c.color}; font-weight:bold; text-align:center; white-space:nowrap;">
+                    ⏳<br>${timeStr}<br>restante
+                </div>
+            </div>
+            <style>
+                @keyframes wbBuffPulse {
+                    0%,100% { box-shadow: 0 0 15px ${c.glow}; }
+                    50%      { box-shadow: 0 0 30px ${c.glow}; }
+                }
+            </style>
+        `;
+    }
+
+    const cards = worldBossesList.map(b => {
         const isActive = activeBoss && activeBoss.name === b.name;
         const statusText = isActive ? '<span style="color:#2ecc71; font-weight:bold;">⚡ ATIVO AGORA</span>' : '<span style="color:#888;">⏳ Adormecido</span>';
         const cardBorder = isActive ? 'border: 2px solid #2ecc71; box-shadow: 0 0 15px rgba(46, 204, 113, 0.3);' : 'border: 1px solid rgba(255,255,255,0.06);';
         const cardBg = isActive ? 'background: rgba(46, 204, 113, 0.05);' : 'background: rgba(0,0,0,0.25);';
-        
+
         return `
             <div style="display:flex; flex-direction:column; justify-content:space-between; padding:15px; border-radius:10px; ${cardBg} ${cardBorder} font-family:'Outfit', sans-serif;">
                 <div>
@@ -169,18 +231,28 @@ function renderBossShowcaseHTML(activeBoss) {
                         <span>💰 Ouro:</span>
                         <span style="color:#ffd700; font-weight:bold;">25.000</span>
                     </div>
-                    <div style="display:flex; justify-content:space-between; margin-bottom:3px;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
                         <span>🔴 Loot:</span>
                         <span style="color:#f44336; font-weight:bold;">1x Ancestral</span>
                     </div>
-                    <div style="display:flex; justify-content:space-between;">
-                        <span>⚡ Buff:</span>
-                        <span style="color:#9b59b6; font-weight:bold;">+1% a 7% (Roll)</span>
+                    <div style="background:rgba(155,89,182,0.1); border:1px solid rgba(155,89,182,0.25); border-radius:8px; padding:8px 10px;">
+                        <div style="color:#d896ff; font-weight:bold; margin-bottom:6px; font-size:0.85em;">⚡ Bênção do Titã — Dano · Ouro · XP por 4h</div>
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:3px 8px;">
+                            <div style="display:flex; justify-content:space-between;"><span style="color:#888;">+1%</span><span style="color:#aaa;">22%</span></div>
+                            <div style="display:flex; justify-content:space-between;"><span style="color:#78c8ff;">+2%</span><span style="color:#aaa;">23%</span></div>
+                            <div style="display:flex; justify-content:space-between;"><span style="color:#7de87d;">+3%</span><span style="color:#aaa;">20%</span></div>
+                            <div style="display:flex; justify-content:space-between;"><span style="color:#ffe066;">+4%</span><span style="color:#aaa;">15%</span></div>
+                            <div style="display:flex; justify-content:space-between;"><span style="color:#ffaa44;">+5%</span><span style="color:#aaa;">10%</span></div>
+                            <div style="display:flex; justify-content:space-between;"><span style="color:#ff6666;">+6%</span><span style="color:#aaa;">5%</span></div>
+                            <div style="display:flex; justify-content:space-between; grid-column:span 2;"><span style="color:#d896ff; font-weight:bold;">✨ +7% (Lendário!)</span><span style="color:#d896ff; font-weight:bold;">5%</span></div>
+                        </div>
                     </div>
                 </div>
             </div>
         `;
     }).join('');
+
+    return activeBanner + cards;
 }
 
 function toggleWorldBossBattle() {
@@ -391,13 +463,13 @@ async function checkAndClaimWorldBossRewards(bossData) {
 
 function rollWorldBossBuff() {
     const rand = Math.random() * 100;
-    if (rand < 1.0) return 7;       // 1% chance
-    else if (rand < 5.0) return 6;  // 4% chance
-    else if (rand < 13.0) return 5; // 8% chance
-    else if (rand < 25.0) return 4; // 12% chance
-    else if (rand < 45.0) return 3; // 20% chance
-    else if (rand < 70.0) return 2; // 25% chance
-    else return 1;                  // 30% chance
+    if (rand < 5.0) return 7;        // 5% chance
+    else if (rand < 10.0) return 6;  // 5% chance
+    else if (rand < 20.0) return 5;  // 10% chance
+    else if (rand < 35.0) return 4;  // 15% chance
+    else if (rand < 55.0) return 3;  // 20% chance
+    else if (rand < 78.0) return 2;  // 23% chance
+    else return 1;                   // 22% chance
 }
 
 function showWorldBossRewardModal(bossName, itemName, itemIcon, buffValue) {
@@ -487,3 +559,92 @@ function applyOfflineWorldBossDamage() {
         gameState.lastWorldBossTick = now;
     }
 }
+
+// ============================================
+// FUNÇÕES ADMIN — CHEFES GLOBAIS
+// ============================================
+
+async function admRefreshWBStatus() {
+    const el = document.getElementById('admWBStatus');
+    if (!el) return;
+    if (!window.FirebaseService) {
+        el.innerHTML = '<span style="color:#ff6b6b;">Firebase não disponível.</span>';
+        return;
+    }
+    el.innerHTML = 'Carregando...';
+    try {
+        const boss = currentWorldBoss;
+        if (!boss) {
+            el.innerHTML = '<span style="color:#aaa;">⏳ Nenhum chefe ativo no momento.</span>';
+            return;
+        }
+        const hpPct = boss.maxHp > 0 ? ((boss.hp / boss.maxHp) * 100).toFixed(1) : 0;
+        const status = boss.hp <= 0 ? '<span style="color:#ff4444;">💀 Derrotado</span>' : '<span style="color:#2ecc71;">⚡ Ativo</span>';
+        el.innerHTML = `
+            <div style="display:flex; flex-wrap:wrap; gap:12px; align-items:center;">
+                <span style="font-size:1.6em;">${boss.icon || '🐉'}</span>
+                <div>
+                    <div style="font-weight:bold; color:#fff;">${boss.name}</div>
+                    <div>HP: <span style="color:#ff5555;">${formatNumber(Math.max(0, boss.hp))}</span> / <span style="color:#aaa;">${formatNumber(boss.maxHp)}</span> (${hpPct}%)</div>
+                </div>
+                <div style="margin-left:auto;">${status}</div>
+            </div>
+        `;
+        const hpInput = document.getElementById('admWBHp');
+        const maxHpInput = document.getElementById('admWBMaxHp');
+        if (hpInput) hpInput.value = Math.max(0, boss.hp);
+        if (maxHpInput) maxHpInput.value = boss.maxHp;
+    } catch (e) {
+        el.innerHTML = `<span style="color:#ff6b6b;">Erro: ${e.message}</span>`;
+    }
+}
+
+async function admForceSpawnBoss() {
+    if (!window.FirebaseService) return showNotification('❌ Erro', 'Firebase não disponível.', 'error');
+    const select = document.getElementById('admWBSpawnSelect');
+    const idx = parseInt(select?.value ?? '0');
+    const boss = worldBossesList[idx];
+    if (!boss) return;
+    if (!confirm(`Forçar spawn de "${boss.name}"?\nIsso irá substituir o chefe atual.`)) return;
+    try {
+        await window.FirebaseService.adminForceSpawnBoss(boss);
+        showNotification('✅ Spawn Forçado', `${boss.icon} ${boss.name} foi invocado!`, 'success');
+        setTimeout(admRefreshWBStatus, 1500);
+    } catch (e) {
+        showNotification('❌ Erro', e.message, 'error');
+    }
+}
+
+async function admSetBossHp() {
+    if (!window.FirebaseService) return showNotification('❌ Erro', 'Firebase não disponível.', 'error');
+    const hp = parseInt(document.getElementById('admWBHp')?.value);
+    const maxHp = parseInt(document.getElementById('admWBMaxHp')?.value);
+    if (isNaN(hp) || isNaN(maxHp) || maxHp <= 0) {
+        return showNotification('❌ Erro', 'Informe HP e Max HP válidos.', 'error');
+    }
+    try {
+        await window.FirebaseService.adminSetBossHp(hp, maxHp);
+        showNotification('✅ HP Atualizado', `HP definido para ${formatNumber(hp)} / ${formatNumber(maxHp)}`, 'success');
+        setTimeout(admRefreshWBStatus, 1000);
+    } catch (e) {
+        showNotification('❌ Erro', e.message, 'error');
+    }
+}
+
+async function admKillBoss() {
+    if (!window.FirebaseService) return showNotification('❌ Erro', 'Firebase não disponível.', 'error');
+    if (!confirm('Encerrar o chefe atual? Isso zerará o HP e iniciará o cooldown de respawn.')) return;
+    try {
+        await window.FirebaseService.adminKillBoss();
+        showNotification('💀 Chefe Encerrado', 'O chefe foi removido. Novo spawn em 2 minutos.', 'info');
+        setTimeout(admRefreshWBStatus, 1000);
+    } catch (e) {
+        showNotification('❌ Erro', e.message, 'error');
+    }
+}
+
+// Expõe globalmente para garantir acesso via onclick no HTML
+window.admRefreshWBStatus = admRefreshWBStatus;
+window.admForceSpawnBoss  = admForceSpawnBoss;
+window.admSetBossHp       = admSetBossHp;
+window.admKillBoss        = admKillBoss;

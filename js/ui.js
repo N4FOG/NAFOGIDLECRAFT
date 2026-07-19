@@ -454,6 +454,7 @@
             else if (page === 'crafting') updateCraftingPage();
             else if (page === 'smithing') updateSmithingPage();
             else if (page === 'enchanting') updateEnchantingPage();
+            else if (page === 'adminPanel') { setTimeout(() => { if(typeof admRefreshWBStatus === 'function') admRefreshWBStatus(); }, 300); }
             updateUI();
         }
 
@@ -963,4 +964,5 @@ window.donateToWell = async function() {
 }
 
 // Inicializar após carregamento
-setTimeout(initWishingWell, 3000);// =========================================
+setTimeout(initWishingWell, 3000);
+// =========================================
