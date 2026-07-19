@@ -864,6 +864,10 @@
             setTimeout(() => {
                 const finalId = addNewEquipmentToInventory(equipId);
                 const hasSlots = finalId.startsWith('inst_');
+                
+                // Incrementa contador de itens criados
+                incrementItemsCrafted(1);
+                
                 addXP(skill, xpGain);
                 showNotification('✅ Equipamento criado!', `${eq.icon} ${eq.name}${hasSlots ? ' (2 Slots)' : ''} forjado!`, 'success', eq.icon);
                 if (skill === 'smithing') updateSmithingPage();
@@ -2400,4 +2404,4 @@
             if (stats.lootLuck) parts.push(`+${stats.lootLuck}% Sorte Saq`);
             if (stats.tenacity) parts.push(`+${stats.tenacity}% Tenacidade`);
             return parts.join('<br>');
-        }
+        }

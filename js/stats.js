@@ -89,34 +89,48 @@ function calculateTotalXP() {
 }
 
 function countItemsCrafted() {
-    // Lê do localStorage se disponível, caso contrário usa proxy
+    // Lê do localStorage se disponível
     try {
         const saved = localStorage.getItem('itemsCraftedCount');
         return saved ? parseInt(saved) : 0;
     } catch {
-        let total = 0;
-        ['cooking', 'crafting', 'smithing', 'enchanting'].forEach(skill => {
-            if (gameState.skills && gameState.skills[skill]) {
-                total += (gameState.skills[skill].level || 1) * 10;
-            }
-        });
-        return total;
+        return 0;
     }
 }
 
 function countItemsGathered() {
-    // Lê do localStorage se disponível, caso contrário usa proxy
+    // Lê do localStorage se disponível
     try {
         const saved = localStorage.getItem('itemsGatheredCount');
         return saved ? parseInt(saved) : 0;
     } catch {
-        let total = 0;
-        ['woodcutting', 'mining', 'fishing', 'herbalism'].forEach(skill => {
-            if (gameState.skills && gameState.skills[skill]) {
-                total += (gameState.skills[skill].level || 1) * 10;
-            }
-        });
-        return total;
+        return 0;
+    }
+}
+
+/**
+ * Incrementa o contador de itens criados
+ */
+function incrementItemsCrafted(amount = 1) {
+    try {
+        const current = countItemsCrafted();
+        const newCount = current + amount;
+        localStorage.setItem('itemsCraftedCount', newCount.toString());
+    } catch {
+        console.error('Erro ao atualizar itemsCraftedCount');
+    }
+}
+
+/**
+ * Incrementa o contador de itens coletados
+ */
+function incrementItemsGathered(amount = 1) {
+    try {
+        const current = countItemsGathered();
+        const newCount = current + amount;
+        localStorage.setItem('itemsGatheredCount', newCount.toString());
+    } catch {
+        console.error('Erro ao atualizar itemsGatheredCount');
     }
 }
 

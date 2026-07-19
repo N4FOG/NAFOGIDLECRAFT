@@ -177,6 +177,12 @@
                 if (!activePet || !activePet.autoCollect) return;
                 if (Math.random() * 100 < activePet.autoCollectChance && hasInventorySpace()) {
                     gameState.inventory[activePet.autoCollect] = (gameState.inventory[activePet.autoCollect] || 0) + 1;
+                    
+                    // Incrementa contador de itens coletados para estatísticas
+                    if (['woodcutting', 'mining', 'fishing', 'herbalism'].includes(gameState.currentPage)) {
+                        incrementItemsGathered(1);
+                    }
+                    
                     showNotification('🐾 Coleta do Mascote!', `${activePet.name} trouxe um ${getItemName(activePet.autoCollect)}!`, 'success', activePet.icon);
                     updateUI();
                 }
@@ -231,4 +237,4 @@
             updateUI();
         }
 
-
+

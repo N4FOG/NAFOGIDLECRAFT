@@ -75,6 +75,11 @@
 
             gameState.inventory[resourceId] = (gameState.inventory[resourceId] || 0) + amount;
 
+            // Incrementa contador de itens coletados para estatísticas
+            if (['woodcutting', 'mining', 'fishing', 'herbalism'].includes(skill)) {
+                incrementItemsGathered(amount);
+            }
+
             // SERRARIA (Woodcutting) - Durabilidade, Especializações e Âmbar
             if (skill === 'woodcutting') {
                 if (gameState.property.sawmill.bladeId && gameState.property.sawmill.bladeDurability > 0) {
@@ -393,6 +398,11 @@
                     gameState.inventory[recipe.output.type] = (gameState.inventory[recipe.output.type] || 0) + totalOutput;
                 }
                 
+                // Incrementa contador de itens criados para estatísticas
+                if (['cooking', 'crafting', 'smithing', 'enchanting'].includes(skill)) {
+                    incrementItemsCrafted(totalOutput);
+                }
+                
                 const totalXPBase = recipe.xpGain * qty;
                 addXP(skill, totalXPBase);
                 delete gameState.craftingTimers[timerId];
@@ -437,4 +447,4 @@
             }, craftTime * 1000);
             updateUI();
         }
-
+

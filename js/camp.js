@@ -270,6 +270,11 @@
                                 addXP(craftSkill, xpGained);
                                 
                                 if (totalProducedWorkers > 0) {
+                                    // Incrementa contador de itens criados para estatísticas
+                                    if (['cooking', 'crafting', 'smithing', 'enchanting'].includes(craftSkill)) {
+                                        incrementItemsCrafted(totalProducedWorkers);
+                                    }
+                                    
                                     if (!isMuted) {
                                         if (equipmentData[recipe.output.type]) {
                                             let hasSlots = false;
@@ -375,6 +380,12 @@
 
 
                     gameState.inventory[resourceId] = (gameState.inventory[resourceId] || 0) + qty;
+                    
+                    // Incrementa contador de itens coletados para estatísticas
+                    if (['woodcutting', 'mining', 'fishing', 'herbalism'].includes(skill)) {
+                        incrementItemsGathered(qty);
+                    }
+                    
                     const petWorkerXP = applyPetBonus(skill, 'xpBoost');
                     const xpGain = Math.floor(resource.xpGain * count * petWorkerXP);
                     addXP(skill, xpGain);
@@ -638,6 +649,12 @@
                         const chance = propertyDefs.stable.bonusByLevel[prop.stable.level];
                         if (Math.random() * 100 < chance && hasInventorySpace()) {
                             gameState.inventory[activePet.autoCollect] = (gameState.inventory[activePet.autoCollect] || 0) + 1;
+                            
+                            // Incrementa contador de itens coletados para estatísticas
+                            if (['woodcutting', 'mining', 'fishing', 'herbalism'].includes(gameState.currentPage)) {
+                                incrementItemsGathered(1);
+                            }
+                            
                             showNotification('🐾 Mascote!', `${activePet.name} trouxe ${getItemName(activePet.autoCollect)}!`, 'success', activePet.icon);
                             updateUI();
                         }
@@ -1057,4 +1074,4 @@
             if (secs < 3600) return `${Math.floor(secs/60)}m ${secs%60}s`;
             return `${Math.floor(secs/3600)}h ${Math.floor((secs%3600)/60)}m`;
         }
-
+
