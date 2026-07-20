@@ -1969,6 +1969,9 @@ ${arenaEnemies.map((e, i) => {
                         const totalItems = Object.values(gameState.inventory).reduce((a, b) => a + b, 0);
                         if (totalItems < gameState.bankSlots) {
                             gameState.inventory[randomFish] = (gameState.inventory[randomFish] || 0) + 1;
+                            // Conta como coleta no Grande Observatório
+                            if (typeof incrementItemsGathered === 'function') incrementItemsGathered(1);
+                            if (typeof incrementFishCaught === 'function') incrementFishCaught(1);
                             const fishName = getItemName(randomFish);
                             showNotification('🎁 Vitória!', `${gameState.combat.enemyName} · ${goldStr} · 🐟 ${fishName}`, 'success', '🎁');
                         } else {

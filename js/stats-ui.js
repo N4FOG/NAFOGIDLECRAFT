@@ -10,6 +10,15 @@ function openStatsModal() {
     const modal = document.getElementById('statsModal');
     if (!modal) return;
     
+    // Captura estado inicial APENAS na primeira vez ou após reset
+    if (!window.statsSessionStart) {
+        window.statsSessionStart = {
+            gold: gameState.gold || 0,
+            totalXP: calculateTotalXP(),
+            timestamp: Date.now()
+        };
+    }
+    
     modal.style.display = 'flex';
     
     // Renderiza os gráficos
@@ -240,12 +249,28 @@ function updateStatsUI() {
     const stats = getAggregateStats();
     const data = getStatsData();
     
-    // Atualiza cards de resumo
-    document.getElementById('statGoldPerHour').textContent = formatNumber(stats.avgGoldPerHour);
-    document.getElementById('statGoldMax').textContent = formatNumber(stats.maxGoldPerHour);
+    // Calcula totais ganhos desde abertura do modal
+    const sessionGold = window.statsSessionStart ? 
+        (gameState.gold || 0) - window.statsSessionStart.gold : 0;
+    const sessionXP = window.statsSessionStart ? 
+        calculateTotalXP() - window.statsSessionStart.totalXP : 0;
+    const sessionTime = window.statsSessionStart ? 
+        (Date.now() - window.statsSessionStart.timestamp) / 1000 / 60 : 0; // em minutos
     
-    document.getElementById('statXpPerHour').textContent = formatNumber(stats.avgXpPerHour);
-    document.getElementById('statXpMax').textContent = formatNumber(stats.maxXpPerHour);
+    // Atualiza cards de resumo com totais da sessão
+    const goldEl = document.getElementById('statGoldPerHour');
+    if (goldEl) {
+        goldEl.textContent = formatNumber(Math.max(0, sessionGold));
+    }
+    
+    const xpEl = document.getElementById('statXpPerHour');
+    if (xpEl) {
+        xpEl.textContent = formatNumber(Math.max(0, sessionXP));
+    }
+    
+    // Mostra recordes nos labels "Máx"
+    document.getElementById('statGoldMax').textContent = formatNumber(stats.maxGoldPerHour) + '/h';
+    document.getElementById('statXpMax').textContent = formatNumber(stats.maxXpPerHour) + '/h';
     
     document.getElementById('statItemsCrafted').textContent = data.itemsCrafted.length > 0 ? data.itemsCrafted[data.itemsCrafted.length - 1] : 0;
     document.getElementById('statItemsCraftedTotal').textContent = formatNumber(stats.totalItemsCrafted);
@@ -258,9 +283,11 @@ function updateStatsUI() {
     document.getElementById('statPlayerActive').textContent = stats.avgPlayerActive > 0.5 ? '✓ Sim' : 'Não';
     document.getElementById('statCombatWins').textContent = stats.totalCombatWins;
     
-    // Tempo monitorado
-    const timeMonitoredMinutes = Math.floor(data.timestamps.length);
-    document.getElementById('statMonitorTime').textContent = timeMonitoredMinutes + ' min';
+    // Tempo monitorado (tempo desde abertura do dashboard)
+    const sessionTimeStr = sessionTime >= 60 ? 
+        `${Math.floor(sessionTime / 60)}h ${Math.floor(sessionTime % 60)}m` : 
+        `${Math.floor(sessionTime)}m`;
+    document.getElementById('statMonitorTime').textContent = sessionTimeStr || '0m';
     
     // Calcula eficiência global
     const efficiency = calculateEfficiency(stats, data);
@@ -271,7 +298,7 @@ function updateStatsUI() {
     }
     
     // Gera sugestões inteligentes
-    generateSmartSuggestions(stats, data);
+    generateSmartSuggestions(stats, data, sessionGold, sessionXP, sessionTime);
 }
 
 /**
@@ -384,6 +411,23 @@ function generateSmartSuggestions(stats, data) {
 }
 
 /**
+ * Reseta a contagem da sessão atual
+ */
+function resetStatsSession() {
+    window.statsSessionStart = {
+        gold: gameState.gold || 0,
+        totalXP: calculateTotalXP(),
+        timestamp: Date.now()
+    };
+    
+    // Atualiza a interface imediatamente
+    updateStatsUI();
+    renderStatsGraphs();
+    
+    showNotification('🔄 Sessão Resetada', 'Contagem de ouro e XP reiniciada!', 'success');
+}
+
+/**
  * Exporta estatísticas para arquivo CSV
  */
 function exportStatsToCSV() {
@@ -441,4 +485,5 @@ window.addEventListener('beforeunload', () => {
 
 // Expõe globalmente
 window.openStatsModal = openStatsModal;
+window.resetStatsSession = resetStatsSession;
 window.exportStatsToCSV = exportStatsToCSV;

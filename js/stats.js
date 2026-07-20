@@ -355,50 +355,214 @@ function getRandomMetrics(count = 5) {
     return shuffled.slice(0, count);
 }
 
-// Exibe o Observatório na UI
+/**
+ * Desenha gráficos de barras para o Observatório
+ */
+function drawObservatoryCharts(combatMetrics, gatheringMetrics, craftingMetrics) {
+    // Gráfico de Combate
+    drawObservatoryBarChart('chartObservatoryCombat', combatMetrics, '#ff4444', '#cc0000');
+    
+    // Gráfico de Coleta
+    drawObservatoryBarChart('chartObservatoryGathering', gatheringMetrics, '#44ff88', '#00cc44');
+    
+    // Gráfico de Crafting
+    drawObservatoryBarChart('chartObservatoryCrafting', craftingMetrics, '#44aaff', '#0088ff');
+}
+
+/**
+ * Desenha um gráfico de barras horizontal
+ */
+function drawObservatoryBarChart(canvasId, metrics, barColor, barColorDark) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas || !metrics || metrics.length === 0) return;
+    
+    const ctx = canvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+    
+    const width = rect.width;
+    const height = rect.height;
+    const padding = 10;
+    const barHeight = (height - padding * 2) / metrics.length;
+    
+    ctx.clearRect(0, 0, width, height);
+    
+    // Extrai valores numéricos das métricas
+    const values = metrics.map(m => {
+        const numStr = String(m.value).replace(/[^0-9]/g, '');
+        return parseInt(numStr) || 0;
+    });
+    
+    const maxValue = Math.max(...values, 1);
+    
+    // Desenha as barras
+    metrics.forEach((metric, i) => {
+        const value = values[i];
+        const barWidth = (value / maxValue) * (width - padding * 2);
+        const y = padding + i * barHeight;
+        
+        // Gradiente da barra
+        const gradient = ctx.createLinearGradient(padding, 0, padding + barWidth, 0);
+        gradient.addColorStop(0, barColorDark);
+        gradient.addColorStop(1, barColor);
+        
+        // Fundo da barra
+        ctx.fillStyle = 'rgba(255,255,255,0.05)';
+        ctx.fillRect(padding, y + 2, width - padding * 2, barHeight - 4);
+        
+        // Barra preenchida
+        ctx.fillStyle = gradient;
+        ctx.fillRect(padding, y + 2, barWidth, barHeight - 4);
+        
+        // Borda da barra
+        ctx.strokeStyle = barColor;
+        ctx.lineWidth = 1;
+        ctx.strokeRect(padding, y + 2, width - padding * 2, barHeight - 4);
+        
+        // Ícone e valor
+        ctx.fillStyle = '#fff';
+        ctx.font = `${barHeight * 0.5}px Arial`;
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(metric.icon, padding + 5, y + barHeight / 2);
+        
+        // Valor no final da barra
+        if (barWidth > 40) {
+            ctx.font = `bold ${barHeight * 0.4}px Outfit`;
+            ctx.textAlign = 'right';
+            ctx.fillStyle = '#000';
+            ctx.fillText(metric.value, padding + barWidth - 5, y + barHeight / 2);
+        } else {
+            ctx.font = `bold ${barHeight * 0.35}px Outfit`;
+            ctx.textAlign = 'left';
+            ctx.fillStyle = barColor;
+            ctx.fillText(metric.value, padding + barWidth + 5, y + barHeight / 2);
+        }
+    });
+}
+
+// Exibe o Observatório na UI com gráficos e visual moderno
 function renderObservatory() {
     const container = document.getElementById('observatoryContainer');
     if (!container) return;
     
-    const metrics = getRandomMetrics(5);
+    const allMetrics = getObservatoryMetrics();
+    
+    // Separa métricas em categorias
+    const combatMetrics = allMetrics.filter(m => ['⚔️', '💀', '💥', '☠️'].includes(m.icon));
+    const gatheringMetrics = allMetrics.filter(m => ['🪓', '⛏️', '🎣', '🌿'].includes(m.icon));
+    const craftingMetrics = allMetrics.filter(m => ['🔨', '⚒️', '🧪', '🍖'].includes(m.icon));
+    const generalMetrics = allMetrics.filter(m => ['⏱️', '🐕'].includes(m.icon));
     
     container.innerHTML = `
-        <div style="text-align:center; margin-bottom:20px;">
-            <div style="font-size:2em; margin-bottom:5px;">🔭</div>
-            <div style="font-size:1.3em; font-weight:bold; color:#ffd700; font-family:'Outfit', sans-serif;">
-                O Grande Observatório
-            </div>
-            <div style="font-size:0.85em; color:#888; font-family:'Outfit', sans-serif;">
-                Estatísticas do Servidor
-            </div>
-        </div>
-        
-        <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:12px; max-width:500px; margin:0 auto;">
-            ${metrics.map(m => `
-                <div style="
-                    background:rgba(0,0,0,0.3);
-                    border:1px solid ${m.color}40;
-                    border-radius:8px;
-                    padding:10px;
-                    text-align:center;
-                    transition:transform 0.2s;
-                " onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
-                    <div style="font-size:1.5em; margin-bottom:4px;">${m.icon}</div>
-                    <div style="font-size:0.75em; color:#aaa; margin-bottom:4px; font-family:'Outfit', sans-serif;">
-                        ${m.label}
-                    </div>
-                    <div style="font-size:1.1em; font-weight:bold; color:${m.color}; font-family:'Outfit', sans-serif;">
-                        ${m.value}
-                    </div>
-                    ${m.extra ? `<div style="font-size:0.7em; color:#888; margin-top:2px;">${m.extra}</div>` : ''}
+        <div style="max-width:1100px; margin:0 auto; padding:10px;">
+            
+            <!-- Header -->
+            <div style="background:linear-gradient(135deg, rgba(50,20,80,0.3), rgba(20,20,60,0.3)); border:2px solid rgba(150,100,255,0.4); border-radius:12px; padding:20px; margin-bottom:20px; text-align:center;">
+                <div style="font-size:3em; margin-bottom:8px;">🔭</div>
+                <div style="font-size:1.5em; font-weight:bold; color:#dd88ff; font-family:'Outfit', sans-serif; margin-bottom:5px;">
+                    O Grande Observatório
                 </div>
-            `).join('')}
-        </div>
-        
-        <div style="text-align:center; margin-top:15px; font-size:0.8em; color:#666;">
-            🔄 Atualize para ver novas estatísticas
+                <div style="font-size:0.95em; color:#aaa; font-family:'Outfit', sans-serif;">
+                    Estatísticas Globais de Sua Jornada
+                </div>
+            </div>
+            
+            <!-- Visão Geral em Destaque -->
+            <div style="background:linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,140,0,0.1)); border:2px solid rgba(255,215,0,0.3); border-radius:12px; padding:18px; margin-bottom:20px;">
+                <div style="font-size:1.2em; color:#ffd700; font-weight:bold; margin-bottom:15px; display:flex; align-items:center; gap:8px;">
+                    ⭐ Destaques da Jornada
+                </div>
+                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:12px;">
+                    ${generalMetrics.map(m => `
+                        <div style="background:rgba(0,0,0,0.2); border:1px solid ${m.color}40; border-radius:8px; padding:14px; text-align:center;">
+                            <div style="font-size:2em; margin-bottom:6px;">${m.icon}</div>
+                            <div style="font-size:1.3em; color:${m.color}; font-weight:bold; margin-bottom:4px;">${m.value}</div>
+                            <div style="font-size:0.8em; color:#aaa;">${m.label}</div>
+                            ${m.extra ? `<div style="font-size:0.7em; color:#888; margin-top:4px;">${m.extra}</div>` : ''}
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+            
+            <!-- Grid de Categorias -->
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:15px; margin-bottom:20px;">
+                
+                <!-- Combate -->
+                <div style="background:rgba(255,68,68,0.08); border:1px solid rgba(255,68,68,0.3); border-radius:10px; padding:16px;">
+                    <div style="font-size:1.05em; color:#ff4444; font-weight:bold; margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+                        ⚔️ Estatísticas de Combate
+                    </div>
+                    <canvas id="chartObservatoryCombat" style="width:100%; height:120px; display:block; margin-bottom:12px;"></canvas>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                        ${combatMetrics.map(m => `
+                            <div style="background:rgba(0,0,0,0.2); border-radius:6px; padding:10px; text-align:center;">
+                                <div style="font-size:1.3em; margin-bottom:3px;">${m.icon}</div>
+                                <div style="font-size:1.1em; color:${m.color}; font-weight:bold;">${m.value}</div>
+                                <div style="font-size:0.7em; color:#aaa; margin-top:2px;">${m.label}</div>
+                                ${m.extra ? `<div style="font-size:0.65em; color:#888; margin-top:2px;">${m.extra}</div>` : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                
+                <!-- Coleta -->
+                <div style="background:rgba(68,255,136,0.08); border:1px solid rgba(68,255,136,0.3); border-radius:10px; padding:16px;">
+                    <div style="font-size:1.05em; color:#44ff88; font-weight:bold; margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+                        🎣 Estatísticas de Coleta
+                    </div>
+                    <canvas id="chartObservatoryGathering" style="width:100%; height:120px; display:block; margin-bottom:12px;"></canvas>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                        ${gatheringMetrics.map(m => `
+                            <div style="background:rgba(0,0,0,0.2); border-radius:6px; padding:10px; text-align:center;">
+                                <div style="font-size:1.3em; margin-bottom:3px;">${m.icon}</div>
+                                <div style="font-size:1.1em; color:${m.color}; font-weight:bold;">${m.value}</div>
+                                <div style="font-size:0.7em; color:#aaa; margin-top:2px;">${m.label}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                
+                <!-- Crafting -->
+                <div style="background:rgba(68,170,255,0.08); border:1px solid rgba(68,170,255,0.3); border-radius:10px; padding:16px;">
+                    <div style="font-size:1.05em; color:#44aaff; font-weight:bold; margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+                        🔨 Estatísticas de Produção
+                    </div>
+                    <canvas id="chartObservatoryCrafting" style="width:100%; height:120px; display:block; margin-bottom:12px;"></canvas>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                        ${craftingMetrics.map(m => `
+                            <div style="background:rgba(0,0,0,0.2); border-radius:6px; padding:10px; text-align:center;">
+                                <div style="font-size:1.3em; margin-bottom:3px;">${m.icon}</div>
+                                <div style="font-size:1.1em; color:${m.color}; font-weight:bold;">${m.value}</div>
+                                <div style="font-size:0.7em; color:#aaa; margin-top:2px;">${m.label}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                
+            </div>
+            
+            <!-- Footer -->
+            <div style="text-align:center; padding:15px; background:rgba(0,0,0,0.2); border-radius:8px; border:1px solid rgba(255,255,255,0.1);">
+                <div style="font-size:0.85em; color:#888; margin-bottom:8px;">
+                    📊 Estatísticas atualizadas em tempo real
+                </div>
+                <button onclick="renderObservatory()" style="background:rgba(100,200,255,0.2); border:1px solid rgba(100,200,255,0.4); padding:8px 16px; border-radius:6px; color:#66ccff; cursor:pointer; font-family:'Outfit', sans-serif; font-size:0.9em;">
+                    🔄 Atualizar Estatísticas
+                </button>
+            </div>
+            
         </div>
     `;
+    
+    // Renderiza os gráficos após um pequeno delay
+    setTimeout(() => {
+        drawObservatoryCharts(combatMetrics, gatheringMetrics, craftingMetrics);
+    }, 100);
 }
 
 let lastSnapshot = {
@@ -621,6 +785,10 @@ function resetStatistics() {
 // Expõe globalmente
 window.resetStatistics = resetStatistics;
 window.renderObservatory = renderObservatory;
+window.incrementItemsCrafted = incrementItemsCrafted;
+window.incrementItemsGathered = incrementItemsGathered;
+window.getStatsData = getStatsData;
+window.getAggregateStats = getAggregateStats;
 
 // Inicia tracker de tempo jogado (Grande Observatório)
 if (typeof startPlayTimeTracker === 'function') {

@@ -866,7 +866,9 @@
                 const hasSlots = finalId.startsWith('inst_');
                 
                 // Incrementa contador de itens criados
-                incrementItemsCrafted(1);
+                if (typeof incrementItemsCrafted === 'function') {
+                    incrementItemsCrafted(1);
+                }
                 
                 // Grande Observatório
                 incrementEquipmentForged();

@@ -249,6 +249,8 @@
                                     const slagChanceWorkers = gameState.property.forge.spec === 'founder' ? 0.10 : 0.02;
                                     if (craftSkill === 'smithing' && Math.random() < slagChanceWorkers) {
                                         gameState.inventory['slag'] = (gameState.inventory['slag'] || 0) + 1;
+                                        // Conta como craft no Grande Observatório
+                                        if (typeof incrementItemsCrafted === 'function') incrementItemsCrafted(1);
                                         if (typeof addForgeLog === 'function') addForgeLog('✨ Trab. +1 Escória Brilhante!', 'zone');
                                     }
                                     // Centelha Poderosa: 10% de chance de +1 barra extra
@@ -272,7 +274,9 @@
                                 if (totalProducedWorkers > 0) {
                                     // Incrementa contador de itens criados para estatísticas
                                     if (['cooking', 'crafting', 'smithing', 'enchanting'].includes(craftSkill)) {
-                                        incrementItemsCrafted(totalProducedWorkers);
+                                        if (typeof incrementItemsCrafted === 'function') {
+                                            incrementItemsCrafted(totalProducedWorkers);
+                                        }
                                     }
                                     
                                     if (!isMuted) {
@@ -339,6 +343,8 @@
                             }
                             if (Math.random() < 0.05) { // 5% chance para âmbar
                                 gameState.inventory['amber'] = (gameState.inventory['amber'] || 0) + 1;
+                                // Conta como coleta no Grande Observatório
+                                if (typeof incrementItemsGathered === 'function') incrementItemsGathered(1);
                             }
                         } else {
                             bladePenalty = true;
@@ -383,7 +389,9 @@
                     
                     // Incrementa contador de itens coletados para estatísticas
                     if (['woodcutting', 'mining', 'fishing', 'herbalism'].includes(skill)) {
-                        incrementItemsGathered(qty);
+                        if (typeof incrementItemsGathered === 'function') {
+                            incrementItemsGathered(qty);
+                        }
                     }
                     
                     const petWorkerXP = applyPetBonus(skill, 'xpBoost');
@@ -459,6 +467,21 @@
                 const totalQty = qtyPerCycle * cycles;
                 gameState.inventory[resourceId] = (gameState.inventory[resourceId] || 0) + totalQty;
                 collected[resourceId] = (collected[resourceId] || 0) + totalQty;
+
+                // Incrementa contador para Grande Observatório
+                if (typeof incrementItemsGathered === 'function') {
+                    incrementItemsGathered(totalQty);
+                }
+                // Conta por tipo de recurso
+                if (skill === 'woodcutting' && typeof incrementTreeCut === 'function') {
+                    incrementTreeCut(totalQty);
+                } else if (skill === 'mining' && typeof incrementResourcesMined === 'function') {
+                    incrementResourcesMined(totalQty);
+                } else if (skill === 'fishing' && typeof incrementFishCaught === 'function') {
+                    incrementFishCaught(totalQty);
+                } else if (skill === 'herbalism' && typeof incrementHerbsGathered === 'function') {
+                    incrementHerbsGathered(totalQty);
+                }
 
                 // XP offline com bônus do mascote ativo
                 const petWorkerXP = applyPetBonus(skill, 'xpBoost');
@@ -541,6 +564,24 @@
             if (!crop) return;
             if (hasInventorySpace() || gameState.inventory[crop.id]) {
                 gameState.inventory[crop.id] = (gameState.inventory[crop.id] || 0) + crop.qty;
+                
+                // Incrementa contador para Grande Observatório
+                if (typeof incrementItemsGathered === 'function') {
+                    incrementItemsGathered(crop.qty);
+                }
+                // Conta árvores se for madeira
+                if (crop.id && crop.id.startsWith('wood') && typeof incrementTreeCut === 'function') {
+                    incrementTreeCut(crop.qty);
+                }
+                // Conta minérios
+                if (crop.id && crop.id.startsWith('ore') && typeof incrementResourcesMined === 'function') {
+                    incrementResourcesMined(crop.qty);
+                }
+                // Conta peixes
+                if (crop.id && crop.id.startsWith('fish') && typeof incrementFishCaught === 'function') {
+                    incrementFishCaught(crop.qty);
+                }
+                
                 showNotification(`${crop.icon} Colheita!`, `+${crop.qty} ${crop.name} da fazenda!`, 'success', crop.icon);
             }
             prop.slots[slotIdx] = null;
@@ -585,6 +626,20 @@
             const elapsed = (Date.now() - prop.queue.startedAt) / 1000;
             if (elapsed < recipe.time) { showNotification('⏳ Aguarde!', 'Ainda processando...', 'info'); return; }
             gameState.inventory[recipe.output] = (gameState.inventory[recipe.output] || 0) + 1;
+            
+            // Incrementa contador para Grande Observatório
+            if (id === 'sawmill') {
+                // Serraria processa madeira
+                if (typeof incrementItemsCrafted === 'function') {
+                    incrementItemsCrafted(1);
+                }
+            } else if (id === 'forge') {
+                // Forja processa minério em barras
+                if (typeof incrementItemsCrafted === 'function') {
+                    incrementItemsCrafted(1);
+                }
+            }
+            
             showNotification(`${def.icon} Pronto!`, `+1 ${getItemName(recipe.output)}`, 'success', def.icon);
             prop.queue = null;
             prop.progress = 0;
@@ -650,9 +705,19 @@
                         if (Math.random() * 100 < chance && hasInventorySpace()) {
                             gameState.inventory[activePet.autoCollect] = (gameState.inventory[activePet.autoCollect] || 0) + 1;
                             
-                            // Incrementa contador de itens coletados para estatísticas
-                            if (['woodcutting', 'mining', 'fishing', 'herbalism'].includes(gameState.currentPage)) {
+                            // Incrementa contadores para Grande Observatório (sem verificar currentPage)
+                            if (typeof incrementItemsGathered === 'function') {
                                 incrementItemsGathered(1);
+                            }
+                            const ac = activePet.autoCollect;
+                            if (ac.startsWith('wood') && typeof incrementTreeCut === 'function') {
+                                incrementTreeCut(1);
+                            } else if (ac.startsWith('ore') && typeof incrementResourcesMined === 'function') {
+                                incrementResourcesMined(1);
+                            } else if (ac.startsWith('fish') && typeof incrementFishCaught === 'function') {
+                                incrementFishCaught(1);
+                            } else if (ac.startsWith('herb') && typeof incrementHerbsGathered === 'function') {
+                                incrementHerbsGathered(1);
                             }
                             
                             showNotification('🐾 Mascote!', `${activePet.name} trouxe ${getItemName(activePet.autoCollect)}!`, 'success', activePet.icon);

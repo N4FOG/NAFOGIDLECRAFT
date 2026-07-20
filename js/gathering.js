@@ -64,6 +64,15 @@
                         if (higherFish.length > 0) {
                             const bonus = higherFish[Math.floor(Math.random() * higherFish.length)];
                             gameState.inventory[bonus.id] = (gameState.inventory[bonus.id] || 0) + 1;
+                            
+                            // Incrementa contador para Grande Observatório
+                            if (typeof incrementItemsGathered === 'function') {
+                                incrementItemsGathered(1);
+                            }
+                            if (typeof incrementFishCaught === 'function') {
+                                incrementFishCaught(1);
+                            }
+                            
                             showNotification('🐠 Peixe Raro!', `Peixe Dourado trouxe 1 ${bonus.name}!`, 'success', '🐠');
                             if (typeof triggerRareDropEffect === 'function') {
                                 triggerRareDropEffect('🐠', bonus.name);
@@ -77,7 +86,9 @@
 
             // Incrementa contador de itens coletados para estatísticas
             if (['woodcutting', 'mining', 'fishing', 'herbalism'].includes(skill)) {
-                incrementItemsGathered(amount);
+                if (typeof incrementItemsGathered === 'function') {
+                    incrementItemsGathered(amount);
+                }
             }
 
             // SERRARIA (Woodcutting) - Durabilidade, Especializações e Âmbar
@@ -103,6 +114,8 @@
                 const amberChance = gameState.property.sawmill.spec === 'amberMiner' ? 0.02 : 0.01;
                 if (Math.random() < amberChance) {
                     gameState.inventory['amber'] = (gameState.inventory['amber'] || 0) + 1;
+                    // Conta como coleta no Grande Observatório
+                    if (typeof incrementItemsGathered === 'function') incrementItemsGathered(1);
                     showNotification('💎 Relíquia Encontrada!', `Você encontrou Âmbar Ancestral!`, 'success', '💎');
                     if (typeof triggerRareDropEffect === 'function') {
                         triggerRareDropEffect('💎', 'Âmbar Ancestral');
@@ -379,6 +392,8 @@
                         const slagChance = gameState.property.forge.spec === 'founder' ? 0.10 : 0.02;
                         if (Math.random() < slagChance) {
                             gameState.inventory['slag'] = (gameState.inventory['slag'] || 0) + 1;
+                            // Conta como craft no Grande Observatório
+                            if (typeof incrementItemsCrafted === 'function') incrementItemsCrafted(1);
                             showNotification('✨ Escória!', 'Uma Escória Brilhante caiu das chamas!', 'success');
                             if (typeof addForgeLog === 'function') addForgeLog('✨ +1 Escória Brilhante! (craft)', 'zone');
                         }
@@ -413,7 +428,9 @@
                 
                 // Incrementa contador de itens criados para estatísticas
                 if (['cooking', 'crafting', 'smithing', 'enchanting'].includes(skill)) {
-                    incrementItemsCrafted(totalOutput);
+                    if (typeof incrementItemsCrafted === 'function') {
+                        incrementItemsCrafted(totalOutput);
+                    }
                 }
                 
                 const totalXPBase = recipe.xpGain * qty;

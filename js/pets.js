@@ -182,9 +182,19 @@
                 if (Math.random() * 100 < activePet.autoCollectChance && hasInventorySpace()) {
                     gameState.inventory[activePet.autoCollect] = (gameState.inventory[activePet.autoCollect] || 0) + 1;
                     
-                    // Incrementa contador de itens coletados para estatísticas
-                    if (['woodcutting', 'mining', 'fishing', 'herbalism'].includes(gameState.currentPage)) {
+                    // Incrementa contadores para Grande Observatório (sem verificar currentPage)
+                    if (typeof incrementItemsGathered === 'function') {
                         incrementItemsGathered(1);
+                    }
+                    const ac = activePet.autoCollect;
+                    if (ac.startsWith('wood') && typeof incrementTreeCut === 'function') {
+                        incrementTreeCut(1);
+                    } else if (ac.startsWith('ore') && typeof incrementResourcesMined === 'function') {
+                        incrementResourcesMined(1);
+                    } else if (ac.startsWith('fish') && typeof incrementFishCaught === 'function') {
+                        incrementFishCaught(1);
+                    } else if (ac.startsWith('herb') && typeof incrementHerbsGathered === 'function') {
+                        incrementHerbsGathered(1);
                     }
                     
                     showNotification('🐾 Coleta do Mascote!', `${activePet.name} trouxe um ${getItemName(activePet.autoCollect)}!`, 'success', activePet.icon);
@@ -225,6 +235,15 @@
                 const randTier = woodTiers[Math.floor(Math.random() * woodTiers.length)];
                 const woodQty = Math.floor((1 + Math.random() * 4) * levelMultiplier * petFactor);
                 gameState.inventory[randTier] = (gameState.inventory[randTier] || 0) + woodQty;
+                
+                // Incrementa contador para Grande Observatório
+                if (typeof incrementItemsGathered === 'function') {
+                    incrementItemsGathered(woodQty);
+                }
+                if (typeof incrementTreeCut === 'function') {
+                    incrementTreeCut(woodQty);
+                }
+                
                 rewardMsg = `trazendo um Pacote Misterioso com <strong>${woodQty}x ${getItemName(randTier)}</strong>!`;
                 rewardIcon = '🪵';
             } else {
