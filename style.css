@@ -313,24 +313,24 @@
 
         /* Ícones de imagem substituindo emojis */
         .game-icon {
-            width: 20px;
-            height: 20px;
+            width: 28px;
+            height: 28px;
             object-fit: contain;
             image-rendering: pixelated;
             vertical-align: middle;
             flex-shrink: 0;
         }
         .game-icon-sm {
-            width: 16px;
-            height: 16px;
+            width: 22px;
+            height: 22px;
             object-fit: contain;
             image-rendering: pixelated;
             vertical-align: middle;
             flex-shrink: 0;
         }
         .game-icon-lg {
-            width: 24px;
-            height: 24px;
+            width: 32px;
+            height: 32px;
             object-fit: contain;
             image-rendering: pixelated;
             vertical-align: middle;
