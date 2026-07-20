@@ -311,6 +311,32 @@
             margin-bottom: 20px;
         }
 
+        /* Ícones de imagem substituindo emojis */
+        .game-icon {
+            width: 20px;
+            height: 20px;
+            object-fit: contain;
+            image-rendering: pixelated;
+            vertical-align: middle;
+            flex-shrink: 0;
+        }
+        .game-icon-sm {
+            width: 16px;
+            height: 16px;
+            object-fit: contain;
+            image-rendering: pixelated;
+            vertical-align: middle;
+            flex-shrink: 0;
+        }
+        .game-icon-lg {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+            image-rendering: pixelated;
+            vertical-align: middle;
+            flex-shrink: 0;
+        }
+
         .menu-btn {
             background: #2a3a4a;
             color: #fff;

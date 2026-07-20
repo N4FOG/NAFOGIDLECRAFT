@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 
 <head>
@@ -1163,7 +1163,7 @@
     <div id="topStatsBar" class="top-stats-bar layout-editable" data-layout-label="📊 Barra Superior">
         <div class="top-bar-resources">
             <div class="top-res-item" onclick="showPage('woodcutting')">
-                <span class="top-res-icon">🌲</span>
+                <span class="top-res-icon"><img src="img/08_tree.png" class="game-icon" alt="Madeira"></span>
                 <span id="topResWood" class="top-res-qty">0</span>
                 <div class="top-bar-tooltip">
                     <div class="tooltip-header">🌲 Estoque de Madeiras</div>
@@ -1171,7 +1171,7 @@
                 </div>
             </div>
             <div class="top-res-item" onclick="showPage('mining')">
-                <span class="top-res-icon">🪨</span>
+                <span class="top-res-icon"><img src="img/11_pickaxe.png" class="game-icon" alt="Minério"></span>
                 <span id="topResOre" class="top-res-qty">0</span>
                 <div class="top-bar-tooltip">
                     <div class="tooltip-header">🪨 Estoque de Minérios</div>
@@ -1179,7 +1179,7 @@
                 </div>
             </div>
             <div class="top-res-item" onclick="showPage('fishing')">
-                <span class="top-res-icon">🐟</span>
+                <span class="top-res-icon"><img src="img/12_fishingrod.png" class="game-icon" alt="Peixe"></span>
                 <span id="topResFish" class="top-res-qty">0</span>
                 <div class="top-bar-tooltip">
                     <div class="tooltip-header">🐟 Estoque de Peixes</div>
@@ -1187,7 +1187,7 @@
                 </div>
             </div>
             <div class="top-res-item" onclick="showPage('herbalism')">
-                <span class="top-res-icon">🌿</span>
+                <span class="top-res-icon"><img src="img/13_herb.png" class="game-icon" alt="Ervas"></span>
                 <span id="topResHerbs" class="top-res-qty">0</span>
                 <div class="top-bar-tooltip">
                     <div class="tooltip-header">🌿 Estoque de Ervas</div>
@@ -1195,7 +1195,7 @@
                 </div>
             </div>
             <div class="top-res-item" onclick="showPage('smithing')">
-                <span class="top-res-icon">🔩</span>
+                <span class="top-res-icon"><img src="img/15_crossedhammers.png" class="game-icon" alt="Barras"></span>
                 <span id="topResBars" class="top-res-qty">0</span>
                 <div class="top-bar-tooltip">
                     <div class="tooltip-header">🔩 Estoque de Barras</div>
@@ -1203,7 +1203,7 @@
                 </div>
             </div>
             <div class="top-res-item" onclick="showPage('cooking')">
-                <span class="top-res-icon">🍖</span>
+                <span class="top-res-icon"><img src="img/tridente.png" class="game-icon" alt="Comida"></span>
                 <span id="topResFood" class="top-res-qty">0</span>
                 <div class="top-bar-tooltip">
                     <div class="tooltip-header">🍖 Estoque de Comidas</div>
@@ -1213,7 +1213,7 @@
         </div>
         <div class="top-bar-divider"></div>
         <div class="top-bar-item" onclick="navigateToWorkerCamp()" style="cursor: pointer;">
-            <span class="top-bar-icon">👷</span>
+            <span class="top-bar-icon"><img src="img/26_worker.png" class="game-icon" alt="Trabalhadores"></span>
             <span class="top-bar-label">Trabalhadores:</span>
             <span id="topWorkers" class="top-bar-value">0/0</span>
         </div>
@@ -1283,10 +1283,10 @@
             <!-- QUICK LINKS: botoes de atalho rapido -->
             <div class="sidebar-quick-links layout-editable" id="sidebarQuickLinks" data-layout-label="⚡ Atalhos Rápidos" style="display: none; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 14px; margin-top: 2px;">
                 <button class="menu-btn inventory layout-editable" id="qlBtnInventory" data-layout-label="📦 Botão Inventário" onclick="showPage('inventory')" style="padding: 10px 5px; justify-content: center; text-align: center; gap: 6px; font-size: 0.85em; transition: all 0.2s ease;">
-                    <span>📦</span><span>Inventário</span>
+                    <img src="img/07_chest.png" class="game-icon" alt="Inventário"><span>Inventário</span>
                 </button>
                 <button class="menu-btn property layout-editable" id="qlBtnProperty" data-layout-label="🏡 Botão Propriedade" onclick="showPage('property')" style="padding: 10px 5px; justify-content: center; text-align: center; gap: 6px; font-size: 0.85em; transition: all 0.2s ease;">
-                    <span>🏡</span><span>Propriedade</span>
+                    <img src="img/20_house.png" class="game-icon" alt="Propriedade"><span>Propriedade</span>
                 </button>
             </div>
 
@@ -1355,23 +1355,23 @@
 
             <div class="sidebar-category layout-editable" data-layout-label="🏪 Categoria Comércio">🏪 COMÉRCIO</div>
             <div class="sidebar-menu layout-editable" data-layout-label="🏪 Menu Comércio">
-                <button class="menu-btn mercado" onclick="showPage('mercado')">🏪 Mercado & Academia</button>
+                <button class="menu-btn mercado" onclick="showPage('mercado')"><img src="img/21_shop.png" class="game-icon" alt="Mercado"> Mercado & Academia</button>
             </div>
 
             <div class="sidebar-category layout-editable" data-layout-label="🌍 Cidade Multiplayer">🌍 CIDADE MULTIPLAYER</div>
             <div class="sidebar-menu layout-editable" data-layout-label="🌍 Menu Multiplayer">
-                <button class="menu-btn worldboss" onclick="showPage('worldboss')">🌍 Chefes Globais</button>
-                <button class="menu-btn wishingwell" onclick="showPage('wishingwell')">🪙 Poço dos Desejos</button>
-                <button class="menu-btn observatory" onclick="showPage('observatory')">🔭 Grande Observatório</button>
+                <button class="menu-btn worldboss" onclick="showPage('worldboss')"><img src="img/22_world.png" class="game-icon" alt="Chefes Globais"> Chefes Globais</button>
+                <button class="menu-btn wishingwell" onclick="showPage('wishingwell')"><img src="img/23_wishingwell.png" class="game-icon" alt="Poço dos Desejos"> Poço dos Desejos</button>
+                <button class="menu-btn observatory" onclick="showPage('observatory')"><img src="img/04_trophy.png" class="game-icon" alt="Observatório"> Grande Observatório</button>
             </div>
 
             <div class="sidebar-category layout-editable" data-layout-label="🐉 Categoria Especial">🐉 ESPECIAL</div>
             <div class="sidebar-menu layout-editable" data-layout-label="🐉 Menu Especial">
-                <button class="menu-btn character" onclick="showPage('character')">🧙 Personagem</button>
-                <button class="menu-btn pets" onclick="showPage('pets')">🐉 Mascotes</button>
-                <button class="menu-btn tech" onclick="showPage('tech')">🌳 Tecnologias</button>
-                <button class="menu-btn alchemy" onclick="showPage('alchemy')">🧪 Alquimia</button>
-                <button class="menu-btn runar" onclick="showPage('runar')">🌀 Runar Equipamento</button>
+                <button class="menu-btn character" onclick="showPage('character')"><img src="img/24_mage.png" class="game-icon" alt="Personagem"> Personagem</button>
+                <button class="menu-btn pets" onclick="showPage('pets')"><img src="img/25_dragon.png" class="game-icon" alt="Mascotes"> Mascotes</button>
+                <button class="menu-btn tech" onclick="showPage('tech')"><img src="img/08_tree.png" class="game-icon" alt="Tecnologias"> Tecnologias</button>
+                <button class="menu-btn alchemy" onclick="showPage('alchemy')"><img src="img/09_potion.png" class="game-icon" alt="Alquimia"> Alquimia</button>
+                <button class="menu-btn runar" onclick="showPage('runar')"><img src="img/10_portal.png" class="game-icon" alt="Runar"> Runar Equipamento</button>
             </div>
 
             <div class="sidebar-category layout-editable" data-layout-label="📦 Categoria Coleta">📦 COLETA</div>
@@ -1379,7 +1379,7 @@
                 <button class="menu-btn woodcutting" onclick="showPage('woodcutting')">
                     <div class="menu-btn-skill-container">
                         <div class="menu-btn-skill-header">
-                            <span class="menu-btn-skill-name">🌳 Corte de Lenha</span>
+                            <span class="menu-btn-skill-name"><img src="img/08_tree.png" class="game-icon-sm" alt=""> Corte de Lenha</span>
                             <span class="menu-btn-skill-level" id="sidebar-lvl-woodcutting">1</span>
                         </div>
                         <div class="menu-btn-skill-progress">
@@ -1390,7 +1390,7 @@
                 <button class="menu-btn mining" onclick="showPage('mining')">
                     <div class="menu-btn-skill-container">
                         <div class="menu-btn-skill-header">
-                            <span class="menu-btn-skill-name">⛏️ Mineração</span>
+                            <span class="menu-btn-skill-name"><img src="img/11_pickaxe.png" class="game-icon-sm" alt=""> Mineração</span>
                             <span class="menu-btn-skill-level" id="sidebar-lvl-mining">1</span>
                         </div>
                         <div class="menu-btn-skill-progress">
@@ -1401,7 +1401,7 @@
                 <button class="menu-btn fishing" onclick="showPage('fishing')">
                     <div class="menu-btn-skill-container">
                         <div class="menu-btn-skill-header">
-                            <span class="menu-btn-skill-name">🎣 Pesca</span>
+                            <span class="menu-btn-skill-name"><img src="img/12_fishingrod.png" class="game-icon-sm" alt=""> Pesca</span>
                             <span class="menu-btn-skill-level" id="sidebar-lvl-fishing">1</span>
                         </div>
                         <div class="menu-btn-skill-progress">
@@ -1412,7 +1412,7 @@
                 <button class="menu-btn herbalism" onclick="showPage('herbalism')">
                     <div class="menu-btn-skill-container">
                         <div class="menu-btn-skill-header">
-                            <span class="menu-btn-skill-name">🌿 Herbolaria</span>
+                            <span class="menu-btn-skill-name"><img src="img/13_herb.png" class="game-icon-sm" alt=""> Herbolaria</span>
                             <span class="menu-btn-skill-level" id="sidebar-lvl-herbalism">1</span>
                         </div>
                         <div class="menu-btn-skill-progress">
@@ -1427,7 +1427,7 @@
                 <button class="menu-btn crafting" onclick="showPage('crafting')">
                     <div class="menu-btn-skill-container">
                         <div class="menu-btn-skill-header">
-                            <span class="menu-btn-skill-name">🔨 Criação</span>
+                            <span class="menu-btn-skill-name"><img src="img/14_hammer.png" class="game-icon-sm" alt=""> Criação</span>
                             <span class="menu-btn-skill-level" id="sidebar-lvl-crafting">1</span>
                         </div>
                         <div class="menu-btn-skill-progress">
@@ -1438,7 +1438,7 @@
                 <button class="menu-btn smithing" onclick="showPage('smithing')">
                     <div class="menu-btn-skill-container">
                         <div class="menu-btn-skill-header">
-                            <span class="menu-btn-skill-name">⚒️ Ferraria</span>
+                            <span class="menu-btn-skill-name"><img src="img/15_crossedhammers.png" class="game-icon-sm" alt=""> Ferraria</span>
                             <span class="menu-btn-skill-level" id="sidebar-lvl-smithing">1</span>
                         </div>
                         <div class="menu-btn-skill-progress">
@@ -1449,7 +1449,7 @@
                 <button class="menu-btn cooking" onclick="showPage('cooking')">
                     <div class="menu-btn-skill-container">
                         <div class="menu-btn-skill-header">
-                            <span class="menu-btn-skill-name">🍳 Culinária</span>
+                            <span class="menu-btn-skill-name"><img src="img/06_gear.png" class="game-icon-sm" alt=""> Culinária</span>
                             <span class="menu-btn-skill-level" id="sidebar-lvl-cooking">1</span>
                         </div>
                         <div class="menu-btn-skill-progress">
@@ -1460,7 +1460,7 @@
                 <button class="menu-btn enchanting" onclick="showPage('enchanting')">
                     <div class="menu-btn-skill-container">
                         <div class="menu-btn-skill-header">
-                            <span class="menu-btn-skill-name">🔮 Encantamento</span>
+                            <span class="menu-btn-skill-name"><img src="img/16_crystalball.png" class="game-icon-sm" alt=""> Encantamento</span>
                             <span class="menu-btn-skill-level" id="sidebar-lvl-enchanting">1</span>
                         </div>
                         <div class="menu-btn-skill-progress">
@@ -1468,19 +1468,19 @@
                         </div>
                     </div>
                 </button>
-                <button class="menu-btn runeforge" onclick="showPage('runeforge')">🌀 Forja de Runas</button>
+                <button class="menu-btn runeforge" onclick="showPage('runeforge')"><img src="img/10_portal.png" class="game-icon" alt="Forja"> Forja de Runas</button>
             </div>
 
             <div class="sidebar-category layout-editable" data-layout-label="⚔️ Categoria Combate">⚔️ COMBATE</div>
             <div class="sidebar-menu layout-editable" data-layout-label="⚔️ Menu Combate">
-                <button class="menu-btn combat" onclick="showPage('combat')">⚔️ Arena de Combate</button>
-                <button class="menu-btn dungeon" onclick="showPage('dungeon')">🏰 Masmorras</button>
+                <button class="menu-btn combat" onclick="showPage('combat')"><img src="img/17_crossedswords.png" class="game-icon" alt="Arena"> Arena de Combate</button>
+                <button class="menu-btn dungeon" onclick="showPage('dungeon')"><img src="img/19_castle.png" class="game-icon" alt="Masmorras"> Masmorras</button>
             </div>
 
 
             <div class="sidebar-category">📖 GUIA</div>
             <div class="sidebar-menu">
-                <button class="menu-btn" onclick="openMiniWiki()" style="background: linear-gradient(135deg, rgba(26,42,74,0.8), rgba(42,58,106,0.8)); border: 1px solid #4a6aaa; color: #aaccff;">📖 MiniWiki</button>
+                <button class="menu-btn" onclick="openMiniWiki()" style="background: linear-gradient(135deg, rgba(26,42,74,0.8), rgba(42,58,106,0.8)); border: 1px solid #4a6aaa; color: #aaccff;"><img src="img/18_book.png" class="game-icon" alt="Wiki"> MiniWiki</button>
             </div>
 
             <div class="sidebar-category admin-only" id="adminMenuCategory" style="display: none; color: #ff6b6b; border-bottom: 1px solid rgba(255,107,107,0.15);">🛡️ ADMINISTRAÇÃO</div>
