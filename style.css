@@ -320,9 +320,28 @@
             vertical-align: middle;
             flex-shrink: 0;
         }
+
+        .game-icon-smm {
+            width: 25px;
+            height: 25px;
+            object-fit: contain;
+            image-rendering: inherit;
+            vertical-align: middle;
+            flex-shrink: 0;
+        }
+
         .game-icon-sm {
-            width: 39px;
-            height: 39px;
+            width: 38px;
+            height: 38px;
+            object-fit: contain;
+            image-rendering: inherit;
+            vertical-align: middle;
+            flex-shrink: 0;
+        }
+
+        .game-icon-sl {
+            width: 41px;
+            height: 41px;
             object-fit: contain;
             image-rendering: inherit;
             vertical-align: middle;
