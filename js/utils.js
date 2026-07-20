@@ -406,12 +406,13 @@
         // BUFFS ATIVOS NA SIDEBAR
         // ============================================
         function updateSidebarBuffs() {
-            // 1. Buffs Temporários (Poções) no rodapé global
+            // 1. Buffs Temporários (Poções, Mascote, Chefe) no rodapé global
             const globalContainer = document.getElementById('globalActiveBuffs');
             if (globalContainer) {
                 const now = Date.now();
                 const globalTags = [];
                 
+                // Poções Ativas
                 for (let id in gameState.alchemy.activePotions) {
                     const p = gameState.alchemy.activePotions[id];
                     const elapsed = (now - p.startedAt) / 1000;
@@ -440,8 +441,69 @@
                         </div>
                     `);
                 }
+
+                // Mascote Ativo
+                if (gameState.pets && gameState.pets.active) {
+                    const pet = pets.find(p => p.id === gameState.pets.active);
+                    if (pet) {
+                        const petLvl = gameState.pets.levels?.[pet.id]?.level || 1;
+                        const levelMult = 1 + (petLvl - 1) * 0.15;
+                        const val = Math.round(pet.effectValue * levelMult * 10) / 10;
+                        
+                        const effectLabel = {
+                            xpBoost:      `+${val}% XP`,
+                            doubleChance: `+${val}% duplo`,
+                            rareChance:   `+${val}% raro`,
+                            combatBoost:  `+${val}% dano`,
+                            allBoost:     `+${val}% tudo`,
+                        }[pet.effectType] || `+${val}%`;
+                        
+                        globalTags.push(`
+                            <div class="buff-tag pet" style="display:flex; align-items:center; gap:6px; padding:5px 12px; border-radius:12px; background:rgba(20,26,35,0.92); border:1px solid #4aff4a; font-size:0.82em; font-family:'Outfit'; font-weight: bold; pointer-events: auto;">
+                                <span style="font-size:1.15em;">${pet.icon}</span>
+                                <span style="color:#a8ffa8;">${pet.name} (Nv. ${petLvl}):</span>
+                                <span style="color:#eee; font-weight:normal;">${effectLabel}</span>
+                            </div>
+                        `);
+                    }
+                }
+
+                // Buff do Chefe Global (Bênção do Titã)
+                if (gameState.worldBossBuff && gameState.worldBossBuff.expiresAt) {
+                    if (now < gameState.worldBossBuff.expiresAt) {
+                        const remaining = gameState.worldBossBuff.expiresAt - now;
+                        const hours = Math.floor(remaining / 3600000);
+                        const mins = Math.floor((remaining % 3600000) / 60000);
+                        const secs = Math.floor((remaining % 60000) / 1000);
+                        let timeStr = "";
+                        if (hours > 0) {
+                            timeStr = `${hours}h ${mins}m`;
+                        } else {
+                            timeStr = `${mins}:${secs.toString().padStart(2, '0')}`;
+                        }
+                        
+                        globalTags.push(`
+                            <div class="buff-tag worldboss" style="display:flex; align-items:center; gap:6px; padding:5px 12px; border-radius:12px; background:rgba(20,26,35,0.92); border:1px solid #9b59b6; font-size:0.82em; font-family:'Outfit'; font-weight: bold; pointer-events: auto;">
+                                <span style="font-size:1.15em;">👑</span>
+                                <span style="color:#d896ff;">Bênção do Titã:</span>
+                                <span style="color:#eee; font-weight:normal;">+${gameState.worldBossBuff.value}% tudo</span>
+                                <span class="buff-timer" style="background:rgba(0,0,0,0.4); padding:1px 6px; border-radius:10px; font-size:0.9em; font-weight:bold; color:#ff9944; font-family:monospace;">${timeStr}</span>
+                            </div>
+                        `);
+                    }
+                }
                 
                 globalContainer.innerHTML = globalTags.join('');
+            }
+            
+            // Auto-refresh dos timers dos buffs na UI a cada 1s
+            if (!window._buffRefreshInterval) {
+                window._buffRefreshInterval = setInterval(() => {
+                    if (typeof gameState !== 'undefined' && gameState.player) {
+                        if (typeof checkAutoPotter === 'function') checkAutoPotter();
+                        updateSidebarBuffs();
+                    }
+                }, 1000);
             }
             
             // 2. Buffs Gerais Passivos na aba Personagem (sob o doll)

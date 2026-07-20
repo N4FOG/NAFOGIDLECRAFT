@@ -118,6 +118,10 @@
             if (gameState.player && !gameState.player.enchantments) {
                 gameState.player.enchantments = { weapon: null, armor: null };
             }
+            if (!gameState.workers) {
+                gameState.workers = { allocated: {} };
+            }
+            gameState.craftingTimers = {};
             applyCustomTheme();
             hideMenuScreens();
             startPetAutoCollect();
