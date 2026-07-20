@@ -180,6 +180,8 @@
             if (!loaded.player) loaded.player = { name: 'Herói', gender: 'M', avatar: '🧙‍♂️', classId: null };
             if (!loaded.weaponSkills) loaded.weaponSkills = { melee: { level: 1, attacks: 0 }, distance: { level: 1, attacks: 0 }, magic: { level: 1, attacks: 0 }, shielding: { level: 1, attacks: 0 } };
             if (!loaded.bestiary) loaded.bestiary = {};
+            if (!loaded.workers) loaded.workers = { allocated: {} };
+            loaded.craftingTimers = {};
             gameState = loaded;
             hideMenuScreens();
             startPetAutoCollect();
@@ -2234,6 +2236,22 @@
                         <div class="recipes-grid" id="potionsCraftGrid"></div>
                     </div>
                     <div id="alchemyInventorySection" class="shop-section">
+                        <!-- Auto-Potter Worker Allocation Panel -->
+                        <div id="autoPotterAllocationPanel" style="display:none; background: rgba(30, 42, 54, 0.6); border: 1px solid #4a9aff; border-radius: 12px; padding: 15px; margin-bottom: 15px; font-family: 'Outfit', sans-serif;">
+                            <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+                                <div>
+                                    <h4 style="margin: 0 0 4px 0; color: #4a9aff; display: flex; align-items: center; gap: 6px;">👷 Automação de Poções (Auto-Potter)</h4>
+                                    <p style="margin: 0; font-size: 0.82em; color: #aaa;">Cada trabalhador fica responsável por reativar 1 poção marcada como <strong style="color:#4a9aff;">Auto</strong> assim que ela expirar.</p>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.25); padding: 6px 12px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05);">
+                                    <button class="worker-btn" id="btnDecAutoPotter" onclick="allocateAutoPotterWorker(-1)">-</button>
+                                    <span id="autoPotterWorkerDisplay" style="font-weight: bold; color: #4aff4a; min-width: 55px; text-align: center;">0 / 7</span>
+                                    <button class="worker-btn" id="btnIncAutoPotter" onclick="allocateAutoPotterWorker(1)">+</button>
+                                </div>
+                            </div>
+                            <!-- Slots visuais dos trabalhadores -->
+                            <div id="autoPotterWorkerSlots" style="display:flex; flex-wrap:wrap; gap:8px; margin-top:12px;"></div>
+                        </div>
                         <div id="potionsInventoryGrid"></div>
                     </div>
                     <div id="alchemyActiveSection" class="shop-section">

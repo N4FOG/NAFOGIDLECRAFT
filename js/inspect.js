@@ -66,7 +66,14 @@ window.inspectCharacter = function(event, playerData) {
     if (!playerData) return;
 
     const p = playerData;
-    const snap = p.charSnapshot || {};
+    // Normaliza o snapshot: campos grandes podem vir como string JSON (para contornar limite de índices do Firestore)
+    const rawSnap = p.charSnapshot || {};
+    const snap = Object.assign({}, rawSnap, {
+        instances:    typeof rawSnap.instancesJson    === 'string' ? JSON.parse(rawSnap.instancesJson)    : (rawSnap.instances    || {}),
+        bestiary:     typeof rawSnap.bestiaryJson     === 'string' ? JSON.parse(rawSnap.bestiaryJson)     : (rawSnap.bestiary     || {}),
+        achievements: typeof rawSnap.achievementsJson === 'string' ? JSON.parse(rawSnap.achievementsJson) : (rawSnap.achievements || {}),
+        petLevels:    typeof rawSnap.petLevelsJson    === 'string' ? JSON.parse(rawSnap.petLevelsJson)    : (rawSnap.petLevels    || {})
+    });
 
     // Fechar modal existente
     const oldModal = document.getElementById('inspectModal');

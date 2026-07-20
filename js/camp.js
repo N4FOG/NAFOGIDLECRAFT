@@ -134,6 +134,7 @@
             else if (page === 'crafting') updateCraftingPage();
             else if (page === 'smithing') updateSmithingPage();
             else if (page === 'enchanting') updateEnchantingPage();
+            else if (page === 'alchemy') updateAlchemyPage();
             updateWorkerSummary();
             updateUI();
         }
@@ -176,19 +177,41 @@
                                 else {
                                     recipe = enchantingRecipes.find(r => r.id === resourceId);
                                     if (recipe) craftSkill = 'enchanting';
+                                    else {
+                                        recipe = potions.find(r => r.id === resourceId);
+                                        if (recipe) craftSkill = 'alchemy';
+                                    }
                                 }
                             }
                         }
                     }
                     
+                    if (!skill && !recipe) continue;
+
                     const finalCategory = skill || craftSkill;
                     const isMuted = gameState.notificationFilters?.workers?.[resourceId] || gameState.notificationFilters?.categories?.[finalCategory];
 
                     if (recipe && craftSkill) {
-                            if (gameState.skills[craftSkill].level < recipe.levelReq) continue;
+                            if (craftSkill === 'alchemy') {
+                                const herbLvl = (gameState.skills.herbalism && gameState.skills.herbalism.level) || 1;
+                                if (herbLvl < recipe.levelReq) continue;
+                            } else {
+                                if (gameState.skills[craftSkill].level < recipe.levelReq) continue;
+                            }
                             
-                            const available = gameState.inventory[recipe.input.type] || 0;
-                            const maxQtyPossible = Math.floor(available / recipe.input.qty);
+                            let maxQtyPossible = 999999;
+                            if (craftSkill === 'alchemy') {
+                                for (let ing of recipe.ingredients) {
+                                    const has = gameState.inventory[ing.type] || 0;
+                                    const possible = Math.floor(has / ing.qty);
+                                    if (possible < maxQtyPossible) {
+                                        maxQtyPossible = possible;
+                                    }
+                                }
+                            } else {
+                                const available = gameState.inventory[recipe.input.type] || 0;
+                                maxQtyPossible = Math.floor(available / recipe.input.qty);
+                            }
                             let realQtyToProduce = Math.min(count, maxQtyPossible);
                             
                             // FORJA: Limitar pela quantidade de calor e Zonas
@@ -214,73 +237,106 @@
                             if (realQtyToProduce > 0) {
                                 let heatConsumed = 0;
                                 let heatIdle = 0;
-                                for(let w = 0; w < realQtyToProduce; w++) {
-                                    // Consome 1 calor por item (apenas para smithing)
-                                    if (craftSkill === 'smithing') {
-                                        if (gameState.property.forge.heat <= 0) {
-                                            heatIdle++;
+                                if (craftSkill === 'alchemy') {
+                                    // Consome ingredientes de alquimia de uma vez por trabalhador/tentativa
+                                    for (let w = 0; w < realQtyToProduce; w++) {
+                                        for (let ing of recipe.ingredients) {
+                                            gameState.inventory[ing.type] -= ing.qty;
+                                        }
+                                        
+                                        let qty = 1;
+                                        const doubleChance = applyTechBonus('doublePotion') / 100;
+                                        if (Math.random() < doubleChance) qty = 4;
+                                        const cyborgChance = getCharacterClassPassive('doubleCraft');
+                                        if (cyborgChance > 0 && Math.random() * 100 < cyborgChance) {
+                                            qty *= 2;
+                                        }
+                                        totalProducedWorkers += qty;
+                                    }
+                                } else {
+                                    for(let w = 0; w < realQtyToProduce; w++) {
+                                        // Consome 1 calor por item (apenas para smithing)
+                                        if (craftSkill === 'smithing') {
+                                            if (gameState.property.forge.heat <= 0) {
+                                                heatIdle++;
+                                                continue;
+                                            }
+                                            gameState.property.forge.heat--;
+                                            heatConsumed++;
+                                            // Artesão: 30% de chance de economizar 1 calor
+                                            if (gameState.property.forge.spec === 'artisan' && Math.random() < 0.30) {
+                                                gameState.property.forge.heat++;
+                                                if (typeof addForgeLog === 'function') addForgeLog('🔧 Artesão economizou 1 Calor!', 'artisan');
+                                            }
+                                            // Mestre das Chamas: 15% de chance de economizar 1 calor
+                                            if (gameState.property.forge.spec === 'flameMaster' && Math.random() < 0.15) {
+                                                gameState.property.forge.heat++;
+                                                if (typeof addForgeLog === 'function') addForgeLog('🛡️ Mestre das Chamas economizou 1 Calor!', 'artisan');
+                                            }
+                                        }
+                                        
+                                        if (craftSkill === 'smithing' && workerForgeBurnChance > 0 && Math.random() < workerForgeBurnChance) {
+                                            if (typeof addForgeLog === 'function') addForgeLog('🔥 Trab. Zona Vermelha: 1x ' + recipe.output.name + ' perdido! (calor consumido)', 'zone');
                                             continue;
                                         }
-                                        gameState.property.forge.heat--;
-                                        heatConsumed++;
-                                        // Artesão: 30% de chance de economizar 1 calor
-                                        if (gameState.property.forge.spec === 'artisan' && Math.random() < 0.30) {
-                                            gameState.property.forge.heat++;
-                                            if (typeof addForgeLog === 'function') addForgeLog('🔧 Artesão economizou 1 Calor!', 'artisan');
+                                        finalInputConsumed += recipe.input.qty;
+                                        let outputQty = recipe.output.qty;
+                                        if (craftSkill === 'smithing' && workerForgeDoubleChance > 0 && Math.random() < workerForgeDoubleChance) {
+                                            outputQty *= 2;
+                                            if (typeof addForgeLog === 'function') addForgeLog('🟢 Trab. Zona Verde: ×2 → ' + outputQty + ' ' + getItemName(recipe.output.type) + ' (+' + (outputQty / 2) + ')', 'zone');
                                         }
-                                        // Mestre das Chamas: 15% de chance de economizar 1 calor
-                                        if (gameState.property.forge.spec === 'flameMaster' && Math.random() < 0.15) {
-                                            gameState.property.forge.heat++;
-                                            if (typeof addForgeLog === 'function') addForgeLog('🛡️ Mestre das Chamas economizou 1 Calor!', 'artisan');
+                                        // Drop de Escória Brilhante (2% base, 10% com Fundidor)
+                                        const slagChanceWorkers = gameState.property.forge.spec === 'founder' ? 0.10 : 0.02;
+                                        if (craftSkill === 'smithing' && Math.random() < slagChanceWorkers) {
+                                            gameState.inventory['slag'] = (gameState.inventory['slag'] || 0) + 1;
+                                            // Conta como craft no Grande Observatório
+                                            if (typeof incrementItemsCrafted === 'function') incrementItemsCrafted(1);
+                                            if (typeof addForgeLog === 'function') addForgeLog('✨ Trab. +1 Escória Brilhante!', 'zone');
                                         }
+                                        // Centelha Poderosa: 10% de chance de +1 barra extra
+                                        if (craftSkill === 'smithing' && gameState.property.forge.spec === 'spark' && Math.random() < 0.10) {
+                                            outputQty += 1;
+                                            if (typeof addForgeLog === 'function') addForgeLog('⚡ Trab. Centelha Poderosa: +1 ' + getItemName(recipe.output.type) + ' extra! (total: ' + outputQty + ')', 'craft');
+                                        }
+                                        totalProducedWorkers += outputQty;
+                                    }
+                                    if (heatIdle > 0 && heatConsumed === 0 && typeof addForgeLog === 'function') {
+                                        addForgeLog('🥶 Trab. pararam — Fornalha sem calor!', 'error');
+                                        if (typeof showNotification === 'function') showNotification('🥶 Fornalha Fria!', 'Trabalhadores pararam por falta de calor.', 'error');
                                     }
                                     
-                                    if (craftSkill === 'smithing' && workerForgeBurnChance > 0 && Math.random() < workerForgeBurnChance) {
-                                        if (typeof addForgeLog === 'function') addForgeLog('🔥 Trab. Zona Vermelha: 1x ' + recipe.output.name + ' perdido! (calor consumido)', 'zone');
-                                        continue;
-                                    }
-                                    finalInputConsumed += recipe.input.qty;
-                                    let outputQty = recipe.output.qty;
-                                    if (craftSkill === 'smithing' && workerForgeDoubleChance > 0 && Math.random() < workerForgeDoubleChance) {
-                                        outputQty *= 2;
-                                        if (typeof addForgeLog === 'function') addForgeLog('🟢 Trab. Zona Verde: ×2 → ' + outputQty + ' ' + getItemName(recipe.output.type) + ' (+' + (outputQty / 2) + ')', 'zone');
-                                    }
-                                    // Drop de Escória Brilhante (2% base, 10% com Fundidor)
-                                    const slagChanceWorkers = gameState.property.forge.spec === 'founder' ? 0.10 : 0.02;
-                                    if (craftSkill === 'smithing' && Math.random() < slagChanceWorkers) {
-                                        gameState.inventory['slag'] = (gameState.inventory['slag'] || 0) + 1;
-                                        // Conta como craft no Grande Observatório
-                                        if (typeof incrementItemsCrafted === 'function') incrementItemsCrafted(1);
-                                        if (typeof addForgeLog === 'function') addForgeLog('✨ Trab. +1 Escória Brilhante!', 'zone');
-                                    }
-                                    // Centelha Poderosa: 10% de chance de +1 barra extra
-                                    if (craftSkill === 'smithing' && gameState.property.forge.spec === 'spark' && Math.random() < 0.10) {
-                                        outputQty += 1;
-                                        if (typeof addForgeLog === 'function') addForgeLog('⚡ Trab. Centelha Poderosa: +1 ' + getItemName(recipe.output.type) + ' extra! (total: ' + outputQty + ')', 'craft');
-                                    }
-                                    totalProducedWorkers += outputQty;
-                                }
-                                if (heatIdle > 0 && heatConsumed === 0 && typeof addForgeLog === 'function') {
-                                    addForgeLog('🥶 Trab. pararam — Fornalha sem calor!', 'error');
-                                    if (typeof showNotification === 'function') showNotification('🥶 Fornalha Fria!', 'Trabalhadores pararam por falta de calor.', 'error');
+                                    gameState.inventory[recipe.input.type] -= finalInputConsumed;
                                 }
                                 
-                                gameState.inventory[recipe.input.type] -= finalInputConsumed;
-                                const actualAttempts = craftSkill === 'smithing' ? Math.floor(finalInputConsumed / recipe.input.qty) : realQtyToProduce;
-                                const petWorkerXP = applyPetBonus(craftSkill, 'xpBoost');
-                                const xpGained = Math.floor(recipe.xpGain * actualAttempts * petWorkerXP);
-                                addXP(craftSkill, xpGained);
+                                const actualAttempts = craftSkill === 'alchemy' ? realQtyToProduce : (craftSkill === 'smithing' ? Math.floor(finalInputConsumed / recipe.input.qty) : realQtyToProduce);
+                                const petWorkerXP = applyPetBonus(craftSkill === 'alchemy' ? 'herbalism' : craftSkill, 'xpBoost');
+                                const baseXP = recipe.xpGain || 0;
+                                const xpGained = Math.floor(baseXP * actualAttempts * petWorkerXP);
+                                if (xpGained > 0) {
+                                    // Alquimia usa herbalism como skill base (não existe skill 'alchemy' no gameState)
+                                    addXP(craftSkill === 'alchemy' ? 'herbalism' : craftSkill, xpGained);
+                                }
                                 
                                 if (totalProducedWorkers > 0) {
                                     // Incrementa contador de itens criados para estatísticas
-                                    if (['cooking', 'crafting', 'smithing', 'enchanting'].includes(craftSkill)) {
+                                    if (['cooking', 'crafting', 'smithing', 'enchanting', 'alchemy'].includes(craftSkill)) {
                                         if (typeof incrementItemsCrafted === 'function') {
                                             incrementItemsCrafted(totalProducedWorkers);
+                                        }
+                                        if (craftSkill === 'alchemy' && typeof incrementPotionMade === 'function') {
+                                            incrementPotionMade(totalProducedWorkers);
                                         }
                                     }
                                     
                                     if (!isMuted) {
-                                        if (equipmentData[recipe.output.type]) {
+                                        if (craftSkill === 'alchemy') {
+                                            gameState.alchemy.inventory[recipe.id] = (gameState.alchemy.inventory[recipe.id] || 0) + totalProducedWorkers;
+                                            showNotification(
+                                                `👷 Trabalhadores (🧪)`,
+                                                `${count} trabalhador${count > 1 ? 'es' : ''} produziu ${totalProducedWorkers}x ${recipe.name} (+${xpGained}XP)`,
+                                                'success', '🏕️'
+                                            );
+                                        } else if (equipmentData[recipe.output.type]) {
                                             let hasSlots = false;
                                             for (let k = 0; k < totalProducedWorkers; k++) {
                                                 const finalId = addNewEquipmentToInventory(recipe.output.type);
@@ -301,7 +357,9 @@
                                             );
                                         }
                                     } else {
-                                        if (!equipmentData[recipe.output.type]) {
+                                        if (craftSkill === 'alchemy') {
+                                            gameState.alchemy.inventory[recipe.id] = (gameState.alchemy.inventory[recipe.id] || 0) + totalProducedWorkers;
+                                        } else if (!equipmentData[recipe.output.type]) {
                                             gameState.inventory[recipe.output.type] = (gameState.inventory[recipe.output.type] || 0) + totalProducedWorkers;
                                         } else {
                                             for (let k = 0; k < totalProducedWorkers; k++) {
@@ -317,7 +375,8 @@
                                     if (craftSkill === 'cooking') updateCookingPage();
                                     else if (craftSkill === 'crafting') updateCraftingPage();
                                     else if (craftSkill === 'smithing') updateSmithingPage();
-                                    else if (gameState.currentPage === 'enchanting') updateEnchantingPage();
+                                    else if (craftSkill === 'enchanting') updateEnchantingPage();
+                                    else if (craftSkill === 'alchemy') updateAlchemyPage();
                                 }
                                 anyWork = true;
                             }

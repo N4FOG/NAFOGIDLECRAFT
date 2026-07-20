@@ -159,9 +159,9 @@
                         gatherDetails,
                         craftDetails,
                         // Snapshot do personagem para inspecao
+                        // Campos grandes são serializados como string para não explodir os índices do Firestore
                         charSnapshot: {
                             equipped: JSON.parse(JSON.stringify(gameState.equipment?.equipped || {})),
-                            instances: JSON.parse(JSON.stringify(gameState.equipment?.instances || {})),
                             enchantments: JSON.parse(JSON.stringify(gameState.player?.enchantments || {})),
                             petActive: gameState.pets?.active || null,
                             classId: gameState.player?.classId || null,
@@ -172,9 +172,11 @@
                             skills: Object.fromEntries(
                                 Object.entries(gameState.skills || {}).map(([k, v]) => [k, { level: v.level || 0 }])
                             ),
-                            bestiary: JSON.parse(JSON.stringify(gameState.bestiary || {})),
-                            achievements: JSON.parse(JSON.stringify(gameState.achievements || {})),
-                            petLevels: JSON.parse(JSON.stringify(gameState.pets?.levels || {}))
+                            // Campos com entradas ilimitadas ficam como string JSON para evitar "too many index entries"
+                            instancesJson: JSON.stringify(gameState.equipment?.instances || {}),
+                            bestiaryJson: JSON.stringify(gameState.bestiary || {}),
+                            achievementsJson: JSON.stringify(gameState.achievements || {}),
+                            petLevelsJson: JSON.stringify(gameState.pets?.levels || {})
                         }
                     });
                 } catch (err) {
@@ -667,6 +669,8 @@
                 if (!loaded.pets.levels) loaded.pets.levels = {};
                 if (!loaded.tools) loaded.tools = {};
                 if (!loaded.dungeons) loaded.dungeons = {};
+                if (!loaded.workers) loaded.workers = { allocated: {} };
+                loaded.craftingTimers = {};
                 if (!loaded.property) loaded.property = {
                     farm:    { level: 0, slots: [], lastTick: 0 },
                     sawmill: { level: 0, queue: null, progress: 0, lastTick: 0 },
