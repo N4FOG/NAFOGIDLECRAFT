@@ -2631,77 +2631,131 @@
 
     <!-- Modal de Estatísticas em Tempo Real -->
     <div id="statsModal" class="game-modal" style="display:none; z-index:5999; backdrop-filter:blur(6px);" onclick="if(event.target===this)this.style.display='none'">
-        <div class="modal-content" style="max-width:900px; max-height:90vh; overflow-y:auto; border:1px solid rgba(100,200,255,0.3); box-shadow:0 0 40px rgba(100,200,255,0.15);">
+        <div class="modal-content" style="max-width:1100px; max-height:90vh; overflow-y:auto; border:1px solid rgba(100,200,255,0.3); box-shadow:0 0 40px rgba(100,200,255,0.15);">
             <div class="modal-header" style="background:linear-gradient(135deg,rgba(20,40,60,0.98),rgba(10,20,40,0.98)); border-bottom:1px solid rgba(100,200,255,0.2);">
-                <span class="modal-title">📈 Estatísticas em Tempo Real</span>
+                <span class="modal-title">📊 Dashboard de Performance</span>
                 <button class="modal-close" onclick="document.getElementById('statsModal').style.display='none'">✕</button>
             </div>
             <div class="modal-body" style="padding:20px; display:flex; flex-direction:column; gap:20px;">
                 
-                <!-- Cards com resumo -->
-                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:12px;">
-                    <div style="background:rgba(0,100,200,0.1); border:1px solid rgba(100,200,255,0.3); border-radius:8px; padding:12px; text-align:center;">
-                        <div style="font-size:0.8em; color:#88ccff; margin-bottom:4px;">💰 Ouro/Hora</div>
-                        <div style="font-size:1.3em; color:#44ff44; font-weight:bold;" id="statGoldPerHour">0</div>
-                        <div style="font-size:0.7em; color:#aaa; margin-top:2px;">Máx: <span id="statGoldMax">0</span></div>
+                <!-- Seção 1: Visão Geral -->
+                <div style="background:linear-gradient(135deg, rgba(50,20,80,0.2), rgba(20,20,60,0.2)); border:2px solid rgba(150,100,255,0.4); border-radius:12px; padding:18px;">
+                    <div style="font-size:1.2em; color:#dd88ff; font-weight:bold; margin-bottom:15px; display:flex; align-items:center; gap:8px;">
+                        ⚡ Visão Geral - Última Hora
                     </div>
-                    <div style="background:rgba(100,0,200,0.1); border:1px solid rgba(200,100,255,0.3); border-radius:8px; padding:12px; text-align:center;">
-                        <div style="font-size:0.8em; color:#dd88ff; margin-bottom:4px;">⚡ XP/Hora</div>
-                        <div style="font-size:1.3em; color:#ffdd44; font-weight:bold;" id="statXpPerHour">0</div>
-                        <div style="font-size:0.7em; color:#aaa; margin-top:2px;">Máx: <span id="statXpMax">0</span></div>
-                    </div>
-                    <div style="background:rgba(200,0,100,0.1); border:1px solid rgba(255,100,150,0.3); border-radius:8px; padding:12px; text-align:center;">
-                        <div style="font-size:0.8em; color:#ff88cc; margin-bottom:4px;">🔨 Itens Criados</div>
-                        <div style="font-size:1.3em; color:#ffaa44; font-weight:bold;" id="statItemsCrafted">0</div>
-                        <div style="font-size:0.7em; color:#aaa; margin-top:2px;">Total: <span id="statItemsCraftedTotal">0</span></div>
-                    </div>
-                    <div style="background:rgba(0,150,100,0.1); border:1px solid rgba(100,255,200,0.3); border-radius:8px; padding:12px; text-align:center;">
-                        <div style="font-size:0.8em; color:#88ffcc; margin-bottom:4px;">🎣 Itens Coletados</div>
-                        <div style="font-size:1.3em; color:#44ff88; font-weight:bold;" id="statItemsGathered">0</div>
-                        <div style="font-size:0.7em; color:#aaa; margin-top:2px;">Total: <span id="statItemsGatheredTotal">0</span></div>
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:12px;">
+                        <div style="background:rgba(68,255,68,0.08); border:1px solid rgba(68,255,68,0.3); border-radius:8px; padding:12px; text-align:center;">
+                            <div style="font-size:2em; margin-bottom:4px;">💰</div>
+                            <div style="font-size:1.4em; color:#44ff44; font-weight:bold;" id="statGoldPerHour">0</div>
+                            <div style="font-size:0.75em; color:#aaa;">Ouro/Hora</div>
+                            <div style="font-size:0.65em; color:#888; margin-top:3px;">Recorde: <span id="statGoldMax" style="color:#ffdd44;">0</span></div>
+                        </div>
+                        <div style="background:rgba(255,221,68,0.08); border:1px solid rgba(255,221,68,0.3); border-radius:8px; padding:12px; text-align:center;">
+                            <div style="font-size:2em; margin-bottom:4px;">⚡</div>
+                            <div style="font-size:1.4em; color:#ffdd44; font-weight:bold;" id="statXpPerHour">0</div>
+                            <div style="font-size:0.75em; color:#aaa;">XP/Hora</div>
+                            <div style="font-size:0.65em; color:#888; margin-top:3px;">Recorde: <span id="statXpMax" style="color:#ffdd44;">0</span></div>
+                        </div>
+                        <div style="background:rgba(255,136,204,0.08); border:1px solid rgba(255,136,204,0.3); border-radius:8px; padding:12px; text-align:center;">
+                            <div style="font-size:2em; margin-bottom:4px;">🔨</div>
+                            <div style="font-size:1.4em; color:#ff88cc; font-weight:bold;" id="statItemsCrafted">0</div>
+                            <div style="font-size:0.75em; color:#aaa;">Itens Criados</div>
+                            <div style="font-size:0.65em; color:#888; margin-top:3px;">Total: <span id="statItemsCraftedTotal" style="color:#ffdd44;">0</span></div>
+                        </div>
+                        <div style="background:rgba(68,255,136,0.08); border:1px solid rgba(68,255,136,0.3); border-radius:8px; padding:12px; text-align:center;">
+                            <div style="font-size:2em; margin-bottom:4px;">🎣</div>
+                            <div style="font-size:1.4em; color:#44ff88; font-weight:bold;" id="statItemsGathered">0</div>
+                            <div style="font-size:0.75em; color:#aaa;">Itens Coletados</div>
+                            <div style="font-size:0.65em; color:#888; margin-top:3px;">Total: <span id="statItemsGatheredTotal" style="color:#ffdd44;">0</span></div>
+                        </div>
+                        <div style="background:rgba(255,100,100,0.08); border:1px solid rgba(255,100,100,0.3); border-radius:8px; padding:12px; text-align:center;">
+                            <div style="font-size:2em; margin-bottom:4px;">⚔️</div>
+                            <div style="font-size:1.4em; color:#ff6666; font-weight:bold;" id="statCombatWins">0</div>
+                            <div style="font-size:0.75em; color:#aaa;">Vitórias</div>
+                            <div style="font-size:0.65em; color:#888; margin-top:3px;">em combate</div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Gráficos -->
+                <!-- Seção 2: Gráficos de Tendência -->
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
-                    <!-- Gráfico de Ouro/Hora -->
-                    <div style="background:rgba(0,0,0,0.3); border:1px solid rgba(100,200,255,0.2); border-radius:8px; padding:12px;">
-                        <div style="font-size:0.9em; color:#88ccff; font-weight:bold; margin-bottom:10px;">💰 Ouro por Hora</div>
-                        <canvas id="chartGoldPerHour" style="width:100%; height:200px; display:block;"></canvas>
+                    <div style="background:rgba(0,0,0,0.3); border:1px solid rgba(68,255,68,0.3); border-radius:8px; padding:14px;">
+                        <div style="font-size:0.95em; color:#44ff44; font-weight:bold; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+                            <span>💰 Ouro por Hora</span>
+                            <span style="font-size:0.8em; color:#888;">Últimas 2 horas</span>
+                        </div>
+                        <canvas id="chartGoldPerHour" style="width:100%; height:180px; display:block;"></canvas>
                     </div>
                     
-                    <!-- Gráfico de XP/Hora -->
-                    <div style="background:rgba(0,0,0,0.3); border:1px solid rgba(200,100,255,0.2); border-radius:8px; padding:12px;">
-                        <div style="font-size:0.9em; color:#dd88ff; font-weight:bold; margin-bottom:10px;">⚡ XP por Hora</div>
-                        <canvas id="chartXpPerHour" style="width:100%; height:200px; display:block;"></canvas>
+                    <div style="background:rgba(0,0,0,0.3); border:1px solid rgba(255,221,68,0.3); border-radius:8px; padding:14px;">
+                        <div style="font-size:0.95em; color:#ffdd44; font-weight:bold; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+                            <span>⚡ XP por Hora</span>
+                            <span style="font-size:0.8em; color:#888;">Últimas 2 horas</span>
+                        </div>
+                        <canvas id="chartXpPerHour" style="width:100%; height:180px; display:block;"></canvas>
                     </div>
 
-                    <!-- Gráfico de Itens Criados -->
-                    <div style="background:rgba(0,0,0,0.3); border:1px solid rgba(255,150,100,0.2); border-radius:8px; padding:12px;">
-                        <div style="font-size:0.9em; color:#ff88cc; font-weight:bold; margin-bottom:10px;">🔨 Itens Criados</div>
-                        <canvas id="chartItemsCrafted" style="width:100%; height:200px; display:block;"></canvas>
+                    <div style="background:rgba(0,0,0,0.3); border:1px solid rgba(255,136,204,0.3); border-radius:8px; padding:14px;">
+                        <div style="font-size:0.95em; color:#ff88cc; font-weight:bold; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+                            <span>🔨 Produção</span>
+                            <span style="font-size:0.8em; color:#888;">Itens/Hora</span>
+                        </div>
+                        <canvas id="chartItemsCrafted" style="width:100%; height:180px; display:block;"></canvas>
                     </div>
 
-                    <!-- Gráfico de Itens Coletados -->
-                    <div style="background:rgba(0,0,0,0.3); border:1px solid rgba(100,255,200,0.2); border-radius:8px; padding:12px;">
-                        <div style="font-size:0.9em; color:#88ffcc; font-weight:bold; margin-bottom:10px;">🎣 Itens Coletados</div>
-                        <canvas id="chartItemsGathered" style="width:100%; height:200px; display:block;"></canvas>
-                    </div>
-                </div>
-
-                <!-- Informações de atividade -->
-                <div style="background:rgba(100,100,0,0.1); border:1px solid rgba(255,255,150,0.3); border-radius:8px; padding:12px;">
-                    <div style="font-size:0.9em; color:#ffff99; font-weight:bold; margin-bottom:8px;">📊 Atividade Atual</div>
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:0.85em; color:#ccc;">
-                        <div>👷 Trabalhadores Ativos: <span style="color:#44ff44;" id="statWorkersActive">0</span></div>
-                        <div>👤 Jogador em Atividade: <span style="color:#ffaa44;" id="statPlayerActive">Não</span></div>
-                        <div>⚔️ Vitórias em Combate: <span style="color:#ff6666;" id="statCombatWins">0</span></div>
-                        <div>⏰ Tempo Monitorado: <span style="color:#88ccff;" id="statMonitorTime">0 min</span></div>
+                    <div style="background:rgba(0,0,0,0.3); border:1px solid rgba(68,255,136,0.3); border-radius:8px; padding:14px;">
+                        <div style="font-size:0.95em; color:#44ff88; font-weight:bold; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+                            <span>🎣 Coleta</span>
+                            <span style="font-size:0.8em; color:#888;">Itens/Hora</span>
+                        </div>
+                        <canvas id="chartItemsGathered" style="width:100%; height:180px; display:block;"></canvas>
                     </div>
                 </div>
 
-                <!-- Botão de Zerar -->
-                <div style="display:flex; gap:12px; justify-content:center;">
+                <!-- Seção 3: Análise de Eficiência -->
+                <div style="background:rgba(100,100,0,0.1); border:1px solid rgba(255,255,100,0.3); border-radius:10px; padding:16px;">
+                    <div style="font-size:1.05em; color:#ffff88; font-weight:bold; margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+                        🎯 Análise de Eficiência
+                    </div>
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px; font-size:0.88em; color:#ddd;">
+                        <div style="background:rgba(0,0,0,0.2); padding:10px; border-radius:6px;">
+                            <div style="color:#aaa; font-size:0.85em; margin-bottom:4px;">👷 Trabalhadores Ativos</div>
+                            <div style="font-size:1.3em; color:#44ff44; font-weight:bold;" id="statWorkersActive">0</div>
+                            <div style="font-size:0.75em; color:#888; margin-top:2px;">Média da sessão</div>
+                        </div>
+                        <div style="background:rgba(0,0,0,0.2); padding:10px; border-radius:6px;">
+                            <div style="color:#aaa; font-size:0.85em; margin-bottom:4px;">👤 Atividade Manual</div>
+                            <div style="font-size:1.3em; color:#ffaa44; font-weight:bold;" id="statPlayerActive">Não</div>
+                            <div style="font-size:0.75em; color:#888; margin-top:2px;">Em ação agora</div>
+                        </div>
+                        <div style="background:rgba(0,0,0,0.2); padding:10px; border-radius:6px;">
+                            <div style="color:#aaa; font-size:0.85em; margin-bottom:4px;">⏰ Tempo Monitorado</div>
+                            <div style="font-size:1.3em; color:#88ccff; font-weight:bold;" id="statMonitorTime">0 min</div>
+                            <div style="font-size:0.75em; color:#888; margin-top:2px;">Última coleta</div>
+                        </div>
+                        <div style="background:rgba(0,0,0,0.2); padding:10px; border-radius:6px;">
+                            <div style="color:#aaa; font-size:0.85em; margin-bottom:4px;">📊 Eficiência Global</div>
+                            <div style="font-size:1.3em; color:#ff88ff; font-weight:bold;" id="statEfficiency">0%</div>
+                            <div style="font-size:0.75em; color:#888; margin-top:2px;">Score baseado em atividade</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Seção 4: Recomendações Inteligentes -->
+                <div id="statsRecommendations" style="background:rgba(68,136,255,0.08); border:1px solid rgba(68,136,255,0.3); border-radius:10px; padding:16px;">
+                    <div style="font-size:1.05em; color:#44aaff; font-weight:bold; margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+                        💡 Sugestões de Otimização
+                    </div>
+                    <div id="statsSuggestions" style="display:flex; flex-direction:column; gap:8px; font-size:0.88em; color:#ddd;">
+                        <!-- Sugestões geradas dinamicamente -->
+                    </div>
+                </div>
+
+                <!-- Botões de Ação -->
+                <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+                    <button onclick="exportStatsToCSV()" style="padding:12px 24px; background:linear-gradient(135deg, #3399ff, #0066cc); border:1px solid #44aaff; border-radius:8px; color:#fff; font-family:'Outfit'; font-weight:bold; cursor:pointer; box-shadow: 0 4px 15px rgba(51,153,255,0.3); transition: all 0.2s ease;" onmouseover="this.style.boxShadow='0 6px 20px rgba(51,153,255,0.5)'" onmouseout="this.style.boxShadow='0 4px 15px rgba(51,153,255,0.3)'">
+                        📥 Exportar Dados (CSV)
+                    </button>
                     <button onclick="resetStatistics()" style="padding:12px 24px; background:linear-gradient(135deg, #cc3333, #990000); border:1px solid #ff6666; border-radius:8px; color:#fff; font-family:'Outfit'; font-weight:bold; cursor:pointer; box-shadow: 0 4px 15px rgba(204,51,51,0.3); transition: all 0.2s ease;" onmouseover="this.style.boxShadow='0 6px 20px rgba(204,51,51,0.5)'" onmouseout="this.style.boxShadow='0 4px 15px rgba(204,51,51,0.3)'">
                         🗑️ Zerar Estatísticas
                     </button>

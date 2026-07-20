@@ -180,6 +180,158 @@ function updateStatsUI() {
     // Tempo monitorado
     const timeMonitoredMinutes = Math.floor(data.timestamps.length);
     document.getElementById('statMonitorTime').textContent = timeMonitoredMinutes + ' min';
+    
+    // Calcula eficiência global
+    const efficiency = calculateEfficiency(stats, data);
+    const effEl = document.getElementById('statEfficiency');
+    if (effEl) {
+        effEl.textContent = efficiency + '%';
+        effEl.style.color = efficiency >= 80 ? '#44ff44' : efficiency >= 50 ? '#ffdd44' : '#ff6666';
+    }
+    
+    // Gera sugestões inteligentes
+    generateSmartSuggestions(stats, data);
+}
+
+/**
+ * Calcula a eficiência global do jogador (0-100%)
+ */
+function calculateEfficiency(stats, data) {
+    let score = 0;
+    let factors = 0;
+    
+    // Fator 1: Trabalhadores ativos (30% do score)
+    if (stats.avgWorkersActive > 0) {
+        const workerScore = Math.min(stats.avgWorkersActive / 10, 1) * 30;
+        score += workerScore;
+    }
+    factors += 30;
+    
+    // Fator 2: Atividade manual (20% do score)
+    if (stats.avgPlayerActive > 0) {
+        score += stats.avgPlayerActive * 20;
+    }
+    factors += 20;
+    
+    // Fator 3: Produtividade de ouro (25% do score)
+    if (stats.avgGoldPerHour > 0) {
+        const goldScore = Math.min(stats.avgGoldPerHour / 1000, 1) * 25;
+        score += goldScore;
+    }
+    factors += 25;
+    
+    // Fator 4: Produtividade de XP (25% do score)
+    if (stats.avgXpPerHour > 0) {
+        const xpScore = Math.min(stats.avgXpPerHour / 500, 1) * 25;
+        score += xpScore;
+    }
+    factors += 25;
+    
+    return Math.round(score);
+}
+
+/**
+ * Gera sugestões inteligentes baseadas nos dados
+ */
+function generateSmartSuggestions(stats, data) {
+    const suggestionsEl = document.getElementById('statsSuggestions');
+    if (!suggestionsEl) return;
+    
+    const suggestions = [];
+    
+    // Sugestão 1: Trabalhadores
+    if (stats.avgWorkersActive < 3) {
+        suggestions.push({
+            icon: '👷',
+            text: 'Você tem poucos trabalhadores ativos. Considere alocar mais no Acampamento para produção passiva!',
+            color: '#ffaa44'
+        });
+    }
+    
+    // Sugestão 2: Produção baixa
+    if (stats.avgGoldPerHour < 100 && data.timestamps.length > 10) {
+        suggestions.push({
+            icon: '💰',
+            text: 'Sua produção de ouro está baixa. Foque em vender itens ou melhorar equipamentos para Arena!',
+            color: '#44ff44'
+        });
+    }
+    
+    // Sugestão 3: XP baixo
+    if (stats.avgXpPerHour < 200 && data.timestamps.length > 10) {
+        suggestions.push({
+            icon: '⚡',
+            text: 'Ganho de XP pode ser otimizado! Use poções de XP e equipe itens com bônus de XP.',
+            color: '#ffdd44'
+        });
+    }
+    
+    // Sugestão 4: Sem atividade manual
+    if (stats.avgPlayerActive < 0.3) {
+        suggestions.push({
+            icon: '🎮',
+            text: 'Você está muito AFK! Ações manuais dão mais XP e recursos. Que tal explorar a Arena?',
+            color: '#ff6666'
+        });
+    }
+    
+    // Sugestão 5: Muitas vitórias, baixo XP
+    if (stats.totalCombatWins > 5 && stats.avgXpPerHour < 300) {
+        suggestions.push({
+            icon: '⚔️',
+            text: 'Você está lutando muito mas ganhando pouco XP. Tente waves mais altas ou use boosts de XP!',
+            color: '#ff88ff'
+        });
+    }
+    
+    // Sugestão 6: Tudo ótimo!
+    if (suggestions.length === 0) {
+        suggestions.push({
+            icon: '🌟',
+            text: 'Excelente trabalho! Você está jogando de forma muito eficiente. Continue assim!',
+            color: '#44ff88'
+        });
+    }
+    
+    // Renderiza sugestões
+    suggestionsEl.innerHTML = suggestions.map(s => `
+        <div style="background:rgba(0,0,0,0.2); padding:12px; border-radius:6px; border-left:3px solid ${s.color}; display:flex; align-items:start; gap:10px;">
+            <span style="font-size:1.5em; flex-shrink:0;">${s.icon}</span>
+            <span style="line-height:1.5;">${s.text}</span>
+        </div>
+    `).join('');
+}
+
+/**
+ * Exporta estatísticas para arquivo CSV
+ */
+function exportStatsToCSV() {
+    const data = getStatsData();
+    const stats = getAggregateStats();
+    
+    if (data.timestamps.length === 0) {
+        showNotification('❌ Sem Dados', 'Não há estatísticas para exportar ainda.', 'error');
+        return;
+    }
+    
+    // Monta CSV
+    let csv = 'Timestamp,Ouro/Hora,XP/Hora,Itens Criados,Itens Coletados,Trabalhadores,Atividade Manual,Vitórias\n';
+    
+    for (let i = 0; i < data.timestamps.length; i++) {
+        const timestamp = new Date(data.timestamps[i]).toISOString();
+        csv += `${timestamp},${data.goldPerHour[i]},${data.xpPerHour[i]},${data.itemsCrafted[i]},${data.itemsGathered[i]},${data.workers[i]},${data.activePlayers[i]},${data.combatWins[i]}\n`;
+    }
+    
+    // Download
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `idle-craft-stats-${Date.now()}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+    
+    showNotification('✅ Exportado!', 'Estatísticas exportadas para CSV com sucesso!', 'success');
 }
 
 /**
@@ -208,3 +360,4 @@ window.addEventListener('beforeunload', () => {
 
 // Expõe globalmente
 window.openStatsModal = openStatsModal;
+window.exportStatsToCSV = exportStatsToCSV;
