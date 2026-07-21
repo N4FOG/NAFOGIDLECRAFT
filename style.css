@@ -348,6 +348,14 @@
             flex-shrink: 0;
         }
         .game-icon-lg {
+            width: 110px;
+            height: 110px;
+            object-fit: contain;
+            image-rendering: inherit;
+            vertical-align: middle;
+            flex-shrink: 0;
+        }
+        .game-icon-gg {
             width: 45px;
             height: 45px;
             object-fit: contain;
@@ -357,8 +365,8 @@
         }
         /* Ícone grande nas páginas de skill (substitui o emoji 5em) */
         .game-icon-page {
-            width: 80px;
-            height: 80px;
+            width: 180px;
+            height: 180px;
             object-fit: contain;
             image-rendering: inherit;
             display: block;
@@ -721,7 +729,7 @@
         .skill-level-large {
             color: #ffd700;
             font-size: 1.5em;
-            margin-bottom: 10px;
+            margin-bottom: 2px;
             text-align: center;
         }
 
@@ -742,8 +750,8 @@
 
         .skill-xp-large {
             color: #aaa;
-            font-size: 1.2em;
-            margin-bottom: 40px;
+            font-size: 1.9em;
+            margin-bottom: 5px;
             text-align: center;
         }
 

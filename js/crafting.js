@@ -45,12 +45,16 @@
                     }
                 }
 
+                const recipeIcon = recipe.image 
+                    ? `<img src="${recipe.image}" style="width:48px;height:48px;vertical-align:middle;margin-right:8px;" onerror="this.style.display='none';this.nextSibling.style.display='inline';" /><span style="display:none;">${recipe.icon}</span>`
+                    : recipe.icon;
+
                 if (!isUnlocked) {
                     card.innerHTML = `
                         <div class="resource-lock">🔒</div>
-                        <div class="recipe-name">
-                            ${recipe.icon} ${recipe.name}
-                            <span class="recipe-level-req">Nível ${recipe.levelReq}</span>
+                        <div class="recipe-name" style="display:flex;align-items:center;justify-content:center;flex-wrap:wrap;">
+                            ${recipeIcon} ${recipe.name}
+                            <span class="recipe-level-req" style="width:100%;text-align:center;margin-top:4px;">Nível ${recipe.levelReq}</span>
                         </div>
                         <div class="recipe-desc">${recipe.desc}</div>
                         <div class="recipe-ingredients">
@@ -71,8 +75,8 @@
                     `;
                 } else {
                     card.innerHTML = `
-                        <div class="recipe-name">
-                            ${recipe.icon} ${recipe.name}
+                        <div class="recipe-name" style="display:flex;align-items:center;justify-content:center;">
+                            ${recipeIcon} ${recipe.name}
                         </div>
                         <div class="recipe-desc">${recipe.desc}</div>
                         <div class="recipe-ingredients">
@@ -129,9 +133,12 @@
                     const has = (gameState.inventory[ing.type] || 0) >= ing.qty;
                     return `<div style="color:${has ? '#4aff4a' : '#ff4444'}">${ing.qty}x ${getItemName(ing.type)}</div>`;
                 }).join('');
+                const equipIcon = eq.image 
+                    ? `<img src="${eq.image}" style="width:48px;height:48px;vertical-align:middle;margin-right:8px;" onerror="this.style.display='none';this.nextSibling.style.display='inline';" /><span style="display:none;">${eq.icon}</span>`
+                    : eq.icon;
                 card.innerHTML = `
                     ${!isUnlocked ? '<div class="resource-lock">🔒</div>' : ''}
-                    <div class="recipe-name" style="color:#fff;">${eq.icon} ${eq.name} <span class="recipe-level-req">Nv.${eq.craftReq}</span></div>
+                    <div class="recipe-name" style="color:#fff;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;">${equipIcon} ${eq.name} <span class="recipe-level-req" style="width:100%;text-align:center;margin-top:4px;">Nv.${eq.craftReq}</span></div>
                     <div style="color:#888;font-size:0.8em;margin-bottom:8px;">[Básico] • ${slotNames[eq.slot]}</div>
                     <div class="recipe-desc">${eq.desc}</div>
                     <div style="color:#4aff4a;font-size:0.85em;margin:8px 0;">${formatStats(eq.stats)}</div>
@@ -146,4 +153,4 @@
             equipSection.appendChild(equipGrid);
             container.appendChild(equipSection);
         }
-
+
