@@ -286,6 +286,11 @@
 
             // SISTEMA DE CALOR DA FORJA
             if (skill === 'smithing') {
+                if (gameState.property.forge.enabled === false) {
+                    showNotification('❄️ Fornalha Desligada!', 'Ligue a fornalha no menu superior para usar.', 'error');
+                    if (typeof addForgeLog === 'function') addForgeLog('❄️ Fornalha desligada — craft bloqueado.', 'error');
+                    return;
+                }
                 if (gameState.property.forge.heat <= 0) {
                     showNotification('🥶 Fornalha Fria!', 'Adicione lenha para gerar calor.', 'error');
                     if (typeof addForgeLog === 'function') addForgeLog('🥶 Fornalha Fria! Craft bloqueado por falta de calor.', 'error');

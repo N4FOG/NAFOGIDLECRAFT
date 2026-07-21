@@ -61,6 +61,25 @@
 
                 updateHeatVisuals(heatBar, heatText);
                 updateHeatVisuals(topHeatBar, topHeatText);
+
+                // Sincronizar estado visual do botão toggle da fornalha
+                const forgeToggleBtn = document.getElementById('topForgeToggleBtn');
+                if (forgeToggleBtn) {
+                    const isOn = gameState.property.forge.enabled !== false;
+                    if (isOn) {
+                        forgeToggleBtn.textContent = '🔥 ON';
+                        forgeToggleBtn.style.background = 'rgba(255, 170, 0, 0.2)';
+                        forgeToggleBtn.style.borderColor = 'rgba(255, 170, 0, 0.5)';
+                        forgeToggleBtn.style.color = '#ffaa00';
+                        forgeToggleBtn.title = 'Fornalha ligada — clique para desligar';
+                    } else {
+                        forgeToggleBtn.textContent = '❄️ OFF';
+                        forgeToggleBtn.style.background = 'rgba(100, 100, 255, 0.15)';
+                        forgeToggleBtn.style.borderColor = 'rgba(100, 100, 255, 0.4)';
+                        forgeToggleBtn.style.color = '#aaaaff';
+                        forgeToggleBtn.title = 'Fornalha desligada — clique para ligar';
+                    }
+                }
                 
                 // ZONAS DA FORJA — info fixa ao lado da especialização
                 const zoneInfo = document.getElementById('forgeZoneInfo');
@@ -454,6 +473,9 @@
 
 
         function showPage(page) {
+            if (page === 'market') page = 'mercado';
+            if (page === 'dungeons') page = 'dungeon';
+            if (page === 'admin') page = 'adminPanel';
             if (typeof window.hideEquipmentComparison === 'function') {
                 window.hideEquipmentComparison();
             }
@@ -467,11 +489,17 @@
                 if (overlay) overlay.classList.remove('active');
             }
 
+            const targetPage = document.getElementById(page + 'Page');
+            if (!targetPage) {
+                console.warn('Página não encontrada:', page);
+                return;
+            }
+
             document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.remove('active'));
             const activeBtn = Array.from(document.querySelectorAll('.menu-btn')).find(btn => btn.classList.contains(page));
             if (activeBtn) activeBtn.classList.add('active');
             document.querySelectorAll('.content-page').forEach(p => p.classList.remove('active'));
-            document.getElementById(page + 'Page').classList.add('active');
+            targetPage.classList.add('active');
             if (page === 'pets') updatePetsPage();
             else if (page === 'tech') updateTechTreePage();
             else if (page === 'worldboss') { if(typeof initWorldBoss === 'function') initWorldBoss(); }
@@ -479,6 +507,8 @@
             else if (page === 'character') updateCharacterPage();
             else if (page === 'dungeon') updateDungeonPage();
             else if (page === 'property') updatePropertyPage();
+            else if (page === 'inventory') { if (typeof updateInventory === 'function') updateInventory(); if (typeof renderEquipmentInventory === 'function') renderEquipmentInventory(); }
+            else if (page === 'mercado') { if (typeof showShopTab === 'function') showShopTab(gameState.currentShopTab || 'mercado'); }
             else if (page === 'runeforge') updateRuneforgePage();
             else if (page === 'observatory') renderObservatory();
             else if (page === 'runar') updateRunarPage();

@@ -447,12 +447,17 @@ for (let i = 1; i <= 500; i++) xpRequired.push(Math.floor(xpBase * Math.pow(xpMu
                 showNotification('❌ Nível!', `Precisa de nível ${nextTier.reqLevel} em ${tool.skillLabel}.`, 'error');
                 return;
             }
-            if (gameState.gold < nextTier.cost) {
-                showNotification('❌ Ouro!', `Precisa de ${nextTier.cost} 💰.`, 'error');
+            const customCost = window.balancingConfig?.toolCosts?.[toolId]?.[currentTier];
+            const baseCost = (customCost !== undefined && customCost !== null) ? customCost : nextTier.cost;
+            const shopMult = window.balancingConfig?.shopPriceMult || 1.0;
+            const finalCost = Math.floor(baseCost * shopMult);
+
+            if (gameState.gold < finalCost) {
+                showNotification('❌ Ouro!', `Precisa de ${finalCost} 💰.`, 'error');
                 return;
             }
 
-            gameState.gold -= nextTier.cost;
+            gameState.gold -= finalCost;
             gameState.tools[toolId] = currentTier + 1;
 
             const newTierData = tool.tiers[currentTier]; // agora é o tier recém comprado
@@ -477,7 +482,13 @@ for (let i = 1; i <= 500; i++) xpRequired.push(Math.floor(xpBase * Math.pow(xpMu
                 const currentTierData = currentTier > 0 ? tool.tiers[currentTier - 1] : null;
                 const nextTierData    = !isMaxed ? tool.tiers[currentTier] : null;
                 const skillLevel      = gameState.skills[tool.skill]?.level || 1;
-                const canAfford       = nextTierData && gameState.gold >= nextTierData.cost;
+
+                const customCost = nextTierData ? window.balancingConfig?.toolCosts?.[tool.id]?.[currentTier] : null;
+                const baseCost = (customCost !== undefined && customCost !== null) ? customCost : (nextTierData ? nextTierData.cost : 0);
+                const shopMult = window.balancingConfig?.shopPriceMult || 1.0;
+                const finalCost = Math.floor(baseCost * shopMult);
+
+                const canAfford       = nextTierData && gameState.gold >= finalCost;
                 const hasLevel        = nextTierData && skillLevel >= nextTierData.reqLevel;
 
                 // Pips de tier
@@ -501,7 +512,7 @@ for (let i = 1; i <= 500; i++) xpRequired.push(Math.floor(xpBase * Math.pow(xpMu
 
                 const costHtml = isMaxed ? '' : `
                     <div class="tool-cost">
-                        💰 ${nextTierData.cost.toLocaleString('pt-BR')}
+                        💰 ${finalCost.toLocaleString('pt-BR')}
                         ${!hasLevel ? `<span style="color:#ff4444;font-size:0.8em;"> (Nv.${nextTierData.reqLevel} necessário)</span>` : ''}
                     </div>`;
 

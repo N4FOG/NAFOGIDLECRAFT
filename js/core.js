@@ -512,6 +512,61 @@
             timeMultiplier: 1.0,
             xpMultiplier: 1.0,
             sellMultiplier: 1.0,
+            // 1. Arena & Combate
+            arenaWaveScaling: 1.0,
+            arenaGoldMult: 1.0,
+            arenaCoinMult: 1.0,
+            arenaEquipDropRate: 15,
+            elementalWeaknessBonus: 20,
+            // 2. Alquimia & Poções
+            alchemyTimeMult: 1.0,
+            alchemyEffectMult: 1.0,
+            alchemyDurationMult: 1.0,
+            alchemyCostMult: 1.0,
+            // 3. Acampamento & Produção Passiva
+            campProdMult: 1.0,
+            campUpgradeCostMult: 1.0,
+            campMaxOfflineHours: 8,
+            structureCosts: {
+                workerCamp: [250, 700, 1600, 4000, 10000, 25000, 60000, 150000, 350000, 800000],
+                farm: [300, 800, 2000, 5000, 12000],
+                sawmill: [400, 1000, 2500, 6000, 14000],
+                forge: [400, 1000, 2500, 6000, 14000],
+                stable: [500, 1200, 3000, 7000, 15000],
+                library: [350, 900, 2200, 5500, 13000],
+                tavern: [300, 750, 1800, 4500, 11000]
+            },
+            // 4. Encantamento, Ferraria & Refino
+            refineSuccessBonus: 0,
+            refineCostMult: 1.0,
+            refineSafetyMode: false,
+            refineRatesByLevel: {
+                0: { rate: 90, breakChance: 0 },
+                1: { rate: 85, breakChance: 0 },
+                2: { rate: 80, breakChance: 0 },
+                3: { rate: 75, breakChance: 0 },
+                4: { rate: 70, breakChance: 5 },
+                5: { rate: 60, breakChance: 8 },
+                6: { rate: 45, breakChance: 15 },
+                7: { rate: 30, breakChance: 25 },
+                8: { rate: 18, breakChance: 35 },
+                9: { rate: 10, breakChance: 50 }
+            },
+            // 5. Masmorras Secundárias
+            dungeonTimeMult: 1.0,
+            dungeonChestDropMult: 1.0,
+            dungeonRewardMult: 1.0,
+            // 6. Mercado & Academia
+            shopPriceMult: 1.0,
+            techCostMult: 1.0,
+            bankUpgradeBaseCost: 200,
+            strengthUpgradeBaseCost: 200,
+            healthUpgradeBaseCost: 150,
+            toolCosts: {
+                axe: [300, 1500, 5000, 15000, 50000],
+                pickaxe: [300, 1500, 5000, 15000, 50000],
+                rod: [300, 1500, 5000, 15000, 50000]
+            },
             // Coleta Tiers Req
             woodcuttingTiers: [1, 15, 35, 60, 85],
             miningTiers: [1, 15, 35, 60, 85],
@@ -583,6 +638,28 @@
             document.querySelectorAll('.adm-skill-pane').forEach(el => {
                 el.style.display = el.id === 'pane_' + selected ? 'block' : 'none';
             });
+        };
+
+        window.changeAdminCampStructureTab = function() {
+            const sel = document.getElementById('admCampStructureSelect');
+            if (!sel) return;
+            const val = sel.value;
+            const structs = ['workerCamp', 'farm', 'sawmill', 'forge', 'stable', 'library', 'tavern'];
+            structs.forEach(s => {
+                const div = document.getElementById('admCampStructBlock_' + s);
+                if (div) div.style.display = (s === val) ? 'block' : 'none';
+            });
+        };
+
+        window.switchAdminTab = function(tabId, btn) {
+            document.querySelectorAll('.adm-section-tab').forEach(el => {
+                el.style.display = 'none';
+            });
+            const target = document.getElementById('admTab_' + tabId);
+            if (target) target.style.display = 'block';
+
+            document.querySelectorAll('.adm-tab-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
         };
 
         function applyBalancingConfig(config) {
@@ -764,10 +841,129 @@
             
             if (xpBaseInput) xpBaseInput.value = config.xpBase;
             if (xpMultInput) xpMultInput.value = config.xpMult;
-            if (timeMultInput) timeMultInput.value = config.timeMultiplier;
-            if (xpMultiplierInput) xpMultiplierInput.value = config.xpMultiplier;
-            if (sellMultiplierInput) sellMultiplierInput.value = config.sellMultiplier;
+            if (timeMultInput) timeMultInput.value = config.timeMultiplier || 1.0;
+            if (xpMultiplierInput) xpMultiplierInput.value = config.xpMultiplier || 1.0;
+            if (sellMultiplierInput) sellMultiplierInput.value = config.sellMultiplier || 1.0;
             
+            // Novas variáveis - 1. Arena & Combate
+            const arenaScaling = document.getElementById('admArenaWaveScaling');
+            const arenaGold = document.getElementById('admArenaGoldMult');
+            const arenaCoin = document.getElementById('admArenaCoinMult');
+            const arenaEquip = document.getElementById('admArenaEquipDropRate');
+            const elemBonus = document.getElementById('admElementalWeaknessBonus');
+
+            if (arenaScaling) arenaScaling.value = config.arenaWaveScaling || 1.0;
+            if (arenaGold) arenaGold.value = config.arenaGoldMult || 1.0;
+            if (arenaCoin) arenaCoin.value = config.arenaCoinMult || 1.0;
+            if (arenaEquip) arenaEquip.value = config.arenaEquipDropRate || 15;
+            if (elemBonus) elemBonus.value = config.elementalWeaknessBonus || 20;
+
+            // 2. Alquimia & Poções
+            const alchTime = document.getElementById('admAlchemyTimeMult');
+            const alchEff = document.getElementById('admAlchemyEffectMult');
+            const alchDur = document.getElementById('admAlchemyDurationMult');
+            const alchCost = document.getElementById('admAlchemyCostMult');
+
+            if (alchTime) alchTime.value = config.alchemyTimeMult || 1.0;
+            if (alchEff) alchEff.value = config.alchemyEffectMult || 1.0;
+            if (alchDur) alchDur.value = config.alchemyDurationMult || 1.0;
+            if (alchCost) alchCost.value = config.alchemyCostMult || 1.0;
+
+            // 3. Acampamento & Produção Passiva
+            const campProd = document.getElementById('admCampProdMult');
+            const campCost = document.getElementById('admCampUpgradeCostMult');
+            const campOff = document.getElementById('admCampMaxOfflineHours');
+
+            if (campProd) campProd.value = config.campProdMult || 1.0;
+            if (campCost) campCost.value = config.campUpgradeCostMult || 1.0;
+            if (campOff) campOff.value = config.campMaxOfflineHours || 8;
+
+            const structDefaults = {
+                workerCamp: [250, 700, 1600, 4000, 10000, 25000, 60000, 150000, 350000, 800000],
+                farm: [300, 800, 2000, 5000, 12000],
+                sawmill: [400, 1000, 2500, 6000, 14000],
+                forge: [400, 1000, 2500, 6000, 14000],
+                stable: [500, 1200, 3000, 7000, 15000],
+                library: [350, 900, 2200, 5500, 13000],
+                tavern: [300, 750, 1800, 4500, 11000]
+            };
+            const structCosts = config.structureCosts || structDefaults;
+            ['workerCamp', 'farm', 'sawmill', 'forge', 'stable', 'library', 'tavern'].forEach(sKey => {
+                const defaults = structDefaults[sKey] || [];
+                const list = structCosts[sKey] || defaults;
+                const count = sKey === 'workerCamp' ? 10 : 5;
+                for (let i = 0; i < count; i++) {
+                    const el = document.getElementById(`admCampCost_${sKey}_${i+1}`);
+                    if (el) el.value = list[i] !== undefined ? list[i] : (defaults[i] || 0);
+                }
+            });
+
+            // 4. Encantamento, Ferraria & Refino
+            const refBonus = document.getElementById('admRefineSuccessBonus');
+            const refCost = document.getElementById('admRefineCostMult');
+            const refSafe = document.getElementById('admRefineSafetyMode');
+
+            if (refBonus) refBonus.value = config.refineSuccessBonus || 0;
+            if (refCost) refCost.value = config.refineCostMult || 1.0;
+            if (refSafe) refSafe.checked = !!config.refineSafetyMode;
+
+            const defaultRefineRates = {
+                0: { rate: 90, breakChance: 0 },
+                1: { rate: 85, breakChance: 0 },
+                2: { rate: 80, breakChance: 0 },
+                3: { rate: 75, breakChance: 0 },
+                4: { rate: 70, breakChance: 5 },
+                5: { rate: 60, breakChance: 8 },
+                6: { rate: 45, breakChance: 15 },
+                7: { rate: 30, breakChance: 25 },
+                8: { rate: 18, breakChance: 35 },
+                9: { rate: 10, breakChance: 50 }
+            };
+            const refineRates = config.refineRatesByLevel || defaultRefineRates;
+            for (let lvl = 0; lvl <= 9; lvl++) {
+                const rEl = document.getElementById(`admRefineRate_${lvl}`);
+                const bEl = document.getElementById(`admRefineBreak_${lvl}`);
+                const info = refineRates[lvl] || defaultRefineRates[lvl];
+                if (rEl) rEl.value = info.rate !== undefined ? info.rate : defaultRefineRates[lvl].rate;
+                if (bEl) bEl.value = info.breakChance !== undefined ? info.breakChance : defaultRefineRates[lvl].breakChance;
+            }
+
+            // 5. Masmorras Secundárias
+            const dungTime = document.getElementById('admDungeonTimeMult');
+            const dungDrop = document.getElementById('admDungeonChestDropMult');
+            const dungRew = document.getElementById('admDungeonRewardMult');
+
+            if (dungTime) dungTime.value = config.dungeonTimeMult || 1.0;
+            if (dungDrop) dungDrop.value = config.dungeonChestDropMult || 1.0;
+            if (dungRew) dungRew.value = config.dungeonRewardMult || 1.0;
+
+            // 6. Mercado & Academia
+            const shopPrice = document.getElementById('admShopPriceMult');
+            const techCost = document.getElementById('admTechCostMult');
+            const bankCost = document.getElementById('admBankUpgradeBaseCost');
+            const strCost = document.getElementById('admStrengthUpgradeBaseCost');
+            const hpCost = document.getElementById('admHealthUpgradeBaseCost');
+
+            if (shopPrice) shopPrice.value = config.shopPriceMult || 1.0;
+            if (techCost) techCost.value = config.techCostMult || 1.0;
+            if (bankCost) bankCost.value = config.bankUpgradeBaseCost || 200;
+            if (strCost) strCost.value = config.strengthUpgradeBaseCost || 200;
+            if (hpCost) hpCost.value = config.healthUpgradeBaseCost || 150;
+
+            const toolCosts = config.toolCosts || {
+                axe: [300, 1500, 5000, 15000, 50000],
+                pickaxe: [300, 1500, 5000, 15000, 50000],
+                rod: [300, 1500, 5000, 15000, 50000]
+            };
+            ['axe', 'pickaxe', 'rod'].forEach(toolId => {
+                const list = toolCosts[toolId] || [300, 1500, 5000, 15000, 50000];
+                const prefix = toolId === 'axe' ? 'Axe' : (toolId === 'pickaxe' ? 'Pickaxe' : 'Rod');
+                for (let i = 0; i < 5; i++) {
+                    const el = document.getElementById(`admTool${prefix}${i+1}`);
+                    if (el) el.value = list[i] !== undefined ? list[i] : [300, 1500, 5000, 15000, 50000][i];
+                }
+            });
+
             // Tiers de Coleta e Craft (Nível, XP, Ouro)
             const tierMapping = {
                 woodcuttingTiers: 'Wood',
@@ -870,12 +1066,121 @@
         }
 
         async function saveAdminBalancingConfig(syncToCloud) {
+            const getVal = (id, def) => {
+                const el = document.getElementById(id);
+                return el ? (parseFloat(el.value) || def) : def;
+            };
+
             const config = {
                 xpBase: parseInt(document.getElementById('admXpBase').value) || 100,
                 xpMult: parseFloat(document.getElementById('admXpMult').value) || 1.14,
                 timeMultiplier: parseFloat(document.getElementById('admTimeMultiplier').value) || 1.0,
                 xpMultiplier: parseFloat(document.getElementById('admXpMultiplier').value) || 1.0,
                 sellMultiplier: parseFloat(document.getElementById('admSellMultiplier').value) || 1.0,
+
+                // 1. Arena & Combate
+                arenaWaveScaling: getVal('admArenaWaveScaling', 1.0),
+                arenaGoldMult: getVal('admArenaGoldMult', 1.0),
+                arenaCoinMult: getVal('admArenaCoinMult', 1.0),
+                arenaEquipDropRate: getVal('admArenaEquipDropRate', 15),
+                elementalWeaknessBonus: getVal('admElementalWeaknessBonus', 20),
+
+                // 2. Alquimia & Poções
+                alchemyTimeMult: getVal('admAlchemyTimeMult', 1.0),
+                alchemyEffectMult: getVal('admAlchemyEffectMult', 1.0),
+                alchemyDurationMult: getVal('admAlchemyDurationMult', 1.0),
+                alchemyCostMult: getVal('admAlchemyCostMult', 1.0),
+
+                // 3. Acampamento & Produção Passiva
+                campProdMult: getVal('admCampProdMult', 1.0),
+                campUpgradeCostMult: getVal('admCampUpgradeCostMult', 1.0),
+                campMaxOfflineHours: getVal('admCampMaxOfflineHours', 8),
+                structureCosts: (() => {
+                    const res = {};
+                    const defaults = {
+                        workerCamp: [250, 700, 1600, 4000, 10000, 25000, 60000, 150000, 350000, 800000],
+                        farm: [300, 800, 2000, 5000, 12000],
+                        sawmill: [400, 1000, 2500, 6000, 14000],
+                        forge: [400, 1000, 2500, 6000, 14000],
+                        stable: [500, 1200, 3000, 7000, 15000],
+                        library: [350, 900, 2200, 5500, 13000],
+                        tavern: [300, 750, 1800, 4500, 11000]
+                    };
+                    ['workerCamp', 'farm', 'sawmill', 'forge', 'stable', 'library', 'tavern'].forEach(sKey => {
+                        const count = sKey === 'workerCamp' ? 10 : 5;
+                        const arr = [];
+                        for (let i = 0; i < count; i++) {
+                            const el = document.getElementById(`admCampCost_${sKey}_${i+1}`);
+                            arr.push(el ? getNum(el.value, defaults[sKey][i]) : defaults[sKey][i]);
+                        }
+                        res[sKey] = arr;
+                    });
+                    return res;
+                })(),
+
+                // 4. Encantamento, Ferraria & Refino
+                refineSuccessBonus: getVal('admRefineSuccessBonus', 0),
+                refineCostMult: getVal('admRefineCostMult', 1.0),
+                refineSafetyMode: document.getElementById('admRefineSafetyMode') ? document.getElementById('admRefineSafetyMode').checked : false,
+                refineRatesByLevel: (() => {
+                    const defaultRefineRates = {
+                        0: { rate: 90, breakChance: 0 },
+                        1: { rate: 85, breakChance: 0 },
+                        2: { rate: 80, breakChance: 0 },
+                        3: { rate: 75, breakChance: 0 },
+                        4: { rate: 70, breakChance: 5 },
+                        5: { rate: 60, breakChance: 8 },
+                        6: { rate: 45, breakChance: 15 },
+                        7: { rate: 30, breakChance: 25 },
+                        8: { rate: 18, breakChance: 35 },
+                        9: { rate: 10, breakChance: 50 }
+                    };
+                    const res = {};
+                    for (let lvl = 0; lvl <= 9; lvl++) {
+                        const rEl = document.getElementById(`admRefineRate_${lvl}`);
+                        const bEl = document.getElementById(`admRefineBreak_${lvl}`);
+                        res[lvl] = {
+                            rate: rEl ? getNum(rEl.value, defaultRefineRates[lvl].rate) : defaultRefineRates[lvl].rate,
+                            breakChance: bEl ? getNum(bEl.value, defaultRefineRates[lvl].breakChance) : defaultRefineRates[lvl].breakChance
+                        };
+                    }
+                    return res;
+                })(),
+
+                // 5. Masmorras Secundárias
+                dungeonTimeMult: getVal('admDungeonTimeMult', 1.0),
+                dungeonChestDropMult: getVal('admDungeonChestDropMult', 1.0),
+                dungeonRewardMult: getVal('admDungeonRewardMult', 1.0),
+
+                // 6. Mercado & Academia
+                shopPriceMult: getVal('admShopPriceMult', 1.0),
+                techCostMult: getVal('admTechCostMult', 1.0),
+                bankUpgradeBaseCost: getVal('admBankUpgradeBaseCost', 200),
+                strengthUpgradeBaseCost: getVal('admStrengthUpgradeBaseCost', 200),
+                healthUpgradeBaseCost: getVal('admHealthUpgradeBaseCost', 150),
+                toolCosts: {
+                    axe: [
+                        getVal('admToolAxe1', 300),
+                        getVal('admToolAxe2', 1500),
+                        getVal('admToolAxe3', 5000),
+                        getVal('admToolAxe4', 15000),
+                        getVal('admToolAxe5', 50000)
+                    ],
+                    pickaxe: [
+                        getVal('admToolPickaxe1', 300),
+                        getVal('admToolPickaxe2', 1500),
+                        getVal('admToolPickaxe3', 5000),
+                        getVal('admToolPickaxe4', 15000),
+                        getVal('admToolPickaxe5', 50000)
+                    ],
+                    rod: [
+                        getVal('admToolRod1', 300),
+                        getVal('admToolRod2', 1500),
+                        getVal('admToolRod3', 5000),
+                        getVal('admToolRod4', 15000),
+                        getVal('admToolRod5', 50000)
+                    ]
+                },
                 
                 // Coleta & Craft Tiers Req
                 woodcuttingTiers: [
@@ -1106,6 +1411,26 @@
                 timeMultiplier: 1.0,
                 xpMultiplier: 1.0,
                 sellMultiplier: 1.0,
+                arenaWaveScaling: 1.0,
+                arenaGoldMult: 1.0,
+                arenaCoinMult: 1.0,
+                arenaEquipDropRate: 15,
+                elementalWeaknessBonus: 20,
+                alchemyTimeMult: 1.0,
+                alchemyEffectMult: 1.0,
+                alchemyDurationMult: 1.0,
+                alchemyCostMult: 1.0,
+                campProdMult: 1.0,
+                campUpgradeCostMult: 1.0,
+                campMaxOfflineHours: 8,
+                refineSuccessBonus: 0,
+                refineCostMult: 1.0,
+                refineSafetyMode: false,
+                dungeonTimeMult: 1.0,
+                dungeonChestDropMult: 1.0,
+                dungeonRewardMult: 1.0,
+                shopPriceMult: 1.0,
+                techCostMult: 1.0,
                 woodcuttingTiers: [1, 15, 35, 60, 85],
                 miningTiers: [1, 15, 35, 60, 85],
                 fishingTiers: [1, 15, 35, 60, 85],
@@ -1154,6 +1479,59 @@
             fillAdminInputsFromCurrentConfig();
             showNotification('🔄 Configurações Resetadas', 'Os parâmetros padrão do jogo foram restaurados.', 'info');
         }
+
+        // =========================================================================
+        // FERRAMENTAS DE CHEAT & DEBUG PARA DESENVOLVEDOR (ADMIN TOOLS)
+        // =========================================================================
+        window.admInjectCurrency = function(type, amountInputId) {
+            const qty = parseInt(document.getElementById(amountInputId)?.value) || 1000;
+            if (type === 'gold') {
+                gameState.gold = (gameState.gold || 0) + qty;
+                showNotification('💰 Cheat Aplicado!', `+${qty.toLocaleString()} Ouro adicionado.`, 'success');
+            } else if (type === 'arenaCoins') {
+                if (!gameState.arena) gameState.arena = {};
+                gameState.arena.arenaCoins = (gameState.arena.arenaCoins || 0) + qty;
+                showNotification('⚔️ Cheat Aplicado!', `+${qty.toLocaleString()} Moedas da Arena adicionadas.`, 'success');
+            } else if (type === 'wellPoints') {
+                gameState.wishingWellPoints = (gameState.wishingWellPoints || 0) + qty;
+                showNotification('🪙 Cheat Aplicado!', `+${qty.toLocaleString()} Pontos do Poço adicionados.`, 'success');
+            }
+            if (typeof updateUI === 'function') updateUI();
+        };
+
+        window.admInjectItem = function() {
+            const itemId = document.getElementById('admCheatItemSelect')?.value || 'log1';
+            const qty = parseInt(document.getElementById('admCheatItemQty')?.value) || 50;
+            if (typeof addItemToInventory === 'function') {
+                addItemToInventory(itemId, qty);
+                showNotification('🎁 Cheat Aplicado!', `Adicionado x${qty} de ${itemId} ao inventário.`, 'success');
+            } else {
+                if (!gameState.inventory) gameState.inventory = {};
+                gameState.inventory[itemId] = (gameState.inventory[itemId] || 0) + qty;
+                showNotification('🎁 Cheat Aplicado!', `Adicionado x${qty} de ${itemId}.`, 'success');
+            }
+            if (typeof updateUI === 'function') updateUI();
+        };
+
+        window.admSetSkillLevel = function() {
+            const skill = document.getElementById('admCheatSkillSelect')?.value || 'woodcutting';
+            const targetLevel = Math.min(500, Math.max(1, parseInt(document.getElementById('admCheatSkillLevel')?.value) || 50));
+            if (gameState.skills && gameState.skills[skill]) {
+                gameState.skills[skill].level = targetLevel;
+                if (typeof xpRequired !== 'undefined' && xpRequired[targetLevel - 1] !== undefined) {
+                    gameState.skills[skill].xp = xpRequired[targetLevel - 1];
+                }
+                showNotification('📈 Nível Alterado!', `Habilidade ${skill} definida para o nível ${targetLevel}.`, 'success');
+                if (typeof updateUI === 'function') updateUI();
+            }
+        };
+
+        window.admResetPlayerSave = function() {
+            if (confirm("⚠️ Tem certeza que deseja RESETAR TODO O SEU SALVAMENTO DE TESTE? Isso recarregará o jogo do zero.")) {
+                localStorage.removeItem('idleCraftSave');
+                location.reload();
+            }
+        };
 
         window.getWorldBossBuffBonus = function() {
             if (window.gameState && window.gameState.worldBossBuff && window.gameState.worldBossBuff.expiresAt) {

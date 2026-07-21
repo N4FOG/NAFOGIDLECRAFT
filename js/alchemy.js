@@ -11,9 +11,11 @@
                 return;
             }
 
+            const costMult = window.balancingConfig?.alchemyCostMult || 1.0;
             for (let ing of potion.ingredients) {
-                if ((gameState.inventory[ing.type] || 0) < ing.qty) {
-                    showNotification('❌ Ingredientes!', `Faltam ${ing.qty}x ${getItemName(ing.type)}.`, 'error');
+                const reqQty = Math.max(1, Math.floor(ing.qty * costMult));
+                if ((gameState.inventory[ing.type] || 0) < reqQty) {
+                    showNotification('❌ Ingredientes!', `Faltam ${reqQty}x ${getItemName(ing.type)}.`, 'error');
                     return;
                 }
             }
@@ -21,9 +23,13 @@
                 showNotification('❌ Inventário cheio!', 'Libere espaço.', 'error');
                 return;
             }
-            for (let ing of potion.ingredients) gameState.inventory[ing.type] -= ing.qty;
+            for (let ing of potion.ingredients) {
+                const reqQty = Math.max(1, Math.floor(ing.qty * costMult));
+                gameState.inventory[ing.type] -= reqQty;
+            }
 
-            const craftTime = potion.craftTime;
+            const alchTimeMult = window.balancingConfig?.alchemyTimeMult || 1.0;
+            const craftTime = potion.craftTime * alchTimeMult;
             gameState.craftingTimers[timerId] = {
                 startTime: Date.now(),
                 craftTime: craftTime,
@@ -75,7 +81,8 @@
 
             // Tech: potionPower — aumenta o valor do efeito
             const powerBonus = applyTechBonus('potionPower');
-            const boostedValue = Math.floor(potion.effectValue * (1 + powerBonus / 100));
+            const admEffectMult = window.balancingConfig?.alchemyEffectMult || 1.0;
+            const boostedValue = Math.floor(potion.effectValue * (1 + powerBonus / 100) * admEffectMult);
 
             if (potion.effectType === 'heal') {
                 const heal = Math.floor(gameState.combat.maxPlayerHealth * (boostedValue / 100));
@@ -85,7 +92,8 @@
                 let durationBonus = 1 + (applyTechBonus('potionDuration') / 100);
                 const alienBonus = getCharacterClassPassive('potionDuration');
                 if (alienBonus > 0) durationBonus += alienBonus / 100;
-                const finalDuration = potion.duration * durationBonus;
+                const admDurMult = window.balancingConfig?.alchemyDurationMult || 1.0;
+                const finalDuration = potion.duration * durationBonus * admDurMult;
                 gameState.alchemy.activePotions[potionId] = {
                     remaining: finalDuration,
                     startedAt: Date.now(),

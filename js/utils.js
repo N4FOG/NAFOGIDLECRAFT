@@ -42,6 +42,90 @@
         // 2. MAPEAMENTO DE EMOJI PARA ARQUIVO DE IMAGEM INDIVIDUAL
         //    (fallback / compatibilidade com imagens antigas)
         // --------------------------------------------------
+        
+        const itemToImagePath = {
+            // Equipamentos / Armas
+            'weapon_copper': 'img/weapons/1000_espada_de_bronze.png',
+            'weapon_iron':   'img/weapons/1001_espada_de_ferro.png',
+            'weapon_silver': 'img/weapons/1002_lamina_de_prata.png',
+            'weapon_gold':   'img/weapons/1003_sabre_dourado.png',
+            'weapon_mithril':'img/weapons/1004_espada_de_mitril.png',
+            'sword1':        'img/weapons/1000_espada_de_bronze.png',
+            'sword2':        'img/weapons/1000_espada_de_bronze.png',
+            'sword3':        'img/weapons/1001_espada_de_ferro.png',
+            'sword4':        'img/weapons/1003_sabre_dourado.png',
+            'sword5':        'img/weapons/1004_espada_de_mitril.png',
+            'craftedItem1':   'img/600_flecha_de_madeira.png',
+            'craftedItem2':   'img/weapons/100_arco_curto.png',
+            'craftedItem3':   'img/weapons/700_bastao_runico.png',
+            'craftedItem4':   'img/shields/1005_escudo_ebano.png',
+            'craftedItem5':   'img/weapons/800_cajado_magico.png',
+            'boots_wood':    'img/botas/200_botas_de_madeira.png',
+            'boots_oak':     'img/botas/201_botas_de_carvalho.png',
+            'boots_magic':   'img/botas/202_botas_magicas.png',
+            'ring_wood':     'img/aneis/300_anel_de_madeira.png',
+            'ring_ebony':    'img/aneis/301_anel_de_ebano.png',
+            'ring_magic':    'img/aneis/302_anel_magico.png',
+            'amulet_wood':   'img/amuletos/400_amuleto_de_madeira.png',
+            'amulet_rune':   'img/amuletos/401_amuleto_runico.png',
+            'amulet_dragon': 'img/amuletos/402_amuleto_do_dragrao.png',
+
+            // Barras
+            'bar1': 'img/barras/900_barra_de_cobre.png',
+            'bar2': 'img/barras/901_barra_de_ferro.png',
+            'bar3': 'img/barras/902_barra_de_prata.png',
+            'bar4': 'img/barras/903_barra_de_ouro.png',
+            'bar5': 'img/barras/904_barra_de_mitril.png',
+
+            // Poções
+            'meistre_elixir': 'img/pocao/500_elixir_do_meistre.png',
+            'speed_potion':   'img/pocao/501_pocao_de_velocidade.png',
+            'instant_heal':   'img/pocao/502_pocao_de_cura.png',
+            'xp_potion':     'img/pocao/503_pocao_do_sabio.png',
+            'builder_elixir': 'img/pocao/504_elixir_do_construcao.png',
+            'gold_potion':    'img/pocao/505_pocao_do_mercador.png',
+            'poison_oil':     'img/pocao/506_oleo_de_veneno.png',
+            'luck_potion':    'img/pocao/508_pocao_de_sorte.png',
+            'strength_potion':'img/pocao/509_oleo_de_forca.png',
+            'fire_oil':       'img/pocao/510_oleo_de_fogo.png',
+
+            // Ferramentas & Coleta
+            'pickaxe': 'img/11_pickaxe.png',
+            'pick1':   'img/11_pickaxe.png',
+            'pick2':   'img/11_pickaxe.png',
+            'pick3':   'img/11_pickaxe.png',
+            'pick4':   'img/11_pickaxe.png',
+            'pick5':   'img/11_pickaxe.png',
+            'fishingrod': 'img/12_fishingrod.png',
+            'herb':       'img/13_herb.png',
+            'wood1':      'img/08_tree.png',
+            'wood2':      'img/08_tree.png',
+
+            // Gemas
+            'gem1': 'img/gema_vermelha.png',
+            'gem2': 'img/gema_amarela.png',
+            'gem3': 'img/gema_amarela.png',
+            'gem4': 'img/gema_amarela.png',
+            'gem5': 'img/gema_vermelha.png',
+
+            // Arena Inimigos
+            'Aparição Congelada': 'img/Arena de combate/Aparição Congelada.png',
+            'Aranha de Gelo':     'img/Arena de combate/Aranha de Gelo.png',
+            'Cavaleiro de Gelo':  'img/Arena de combate/Cavaleiro de Gelo.png',
+            'Dragão Branco':      'img/Arena de combate/Dragão Branco.png',
+            'Esqueleto Glacial':  'img/Arena de combate/Esqueleto Glacial.png',
+            'Fada da Neve':       'img/Arena de combate/Fada da Neve.png',
+            'Golem de Gelo':      'img/Arena de combate/Golem de Gelo.png',
+            'Lobo Invernal':      'img/Arena de combate/Lobo Invernal.png',
+            'Rei de Gelo':        'img/Arena de combate/Rei de Gelo.png',
+            'Yeti':               'img/Arena de combate/Yeti.png',
+
+            // Profissões / UI
+            'culinaria':   'img/28_culinaria.png',
+            'tecnologia':  'img/29_tecnologias.png',
+            'masmorra':    'img/35_masmorra.png'
+        };
+
         const emojiToImagePath = {
             '🌳': 'img/tree.png',
             '🌲': 'img/tree.png',
@@ -78,32 +162,89 @@
          *
          * Ex: resolveIcon('🌳') → '<div class="emoji-icon-sprite" style="background-position: 0px 0px;"></div>'
          */
-        function resolveIcon(emoji) {
-            // 1ª opção: sprite da spritesheet
+        
+        function getItemName(key) {
+            if (!key) return '';
+            if (typeof inventoryItems !== 'undefined' && Array.isArray(inventoryItems)) {
+                const item = inventoryItems.find(i => i.key === key || i.id === key);
+                if (item) return item.name || item.nome || key;
+            }
+            if (typeof resources !== 'undefined') {
+                for (let cat in resources) {
+                    if (Array.isArray(resources[cat])) {
+                        const r = resources[cat].find(r => r.id === key);
+                        if (r) return r.name || r.nome || key;
+                    }
+                }
+            }
+            if (typeof pets !== 'undefined' && Array.isArray(pets)) {
+                const pet = pets.find(p => p.id === key);
+                if (pet) return pet.name || pet.nome || key;
+            }
+            if (typeof potions !== 'undefined' && Array.isArray(potions)) {
+                const pot = potions.find(p => p.id === key);
+                if (pot) return pot.name || pot.nome || key;
+            }
+            if (typeof RECURSOS !== 'undefined' && RECURSOS && RECURSOS[key]) return RECURSOS[key].nome || RECURSOS[key].name || key;
+            if (typeof EQUIPAMENTOS !== 'undefined' && EQUIPAMENTOS && EQUIPAMENTOS[key]) return EQUIPAMENTOS[key].nome || EQUIPAMENTOS[key].name || key;
+            if (typeof PROFISSOES !== 'undefined' && PROFISSOES && PROFISSOES[key]) return PROFISSOES[key].nome || PROFISSOES[key].name || key;
+            return key;
+        }
+
+        function getItemIcon(key) {
+            if (!key) return '📦';
+            if (typeof inventoryItems !== 'undefined' && Array.isArray(inventoryItems)) {
+                const item = inventoryItems.find(i => i.key === key || i.id === key);
+                if (item) return item.icon || item.icone || '📦';
+            }
+            if (typeof resources !== 'undefined') {
+                for (let cat in resources) {
+                    if (Array.isArray(resources[cat])) {
+                        const r = resources[cat].find(r => r.id === key);
+                        if (r) return r.icon || r.icone || '📦';
+                    }
+                }
+            }
+            if (typeof pets !== 'undefined' && Array.isArray(pets)) {
+                const pet = pets.find(p => p.id === key);
+                if (pet) return pet.icon || pet.icone || '🐾';
+            }
+            if (typeof potions !== 'undefined' && Array.isArray(potions)) {
+                const pot = potions.find(p => p.id === key);
+                if (pot) return pot.icon || pot.icone || '🧪';
+            }
+            if (typeof RECURSOS !== 'undefined' && RECURSOS && RECURSOS[key]) return RECURSOS[key].icone || RECURSOS[key].icon || '📦';
+            if (typeof EQUIPAMENTOS !== 'undefined' && EQUIPAMENTOS && EQUIPAMENTOS[key]) return EQUIPAMENTOS[key].icone || EQUIPAMENTOS[key].icon || '⚔️';
+            if (typeof PROFISSOES !== 'undefined' && PROFISSOES && PROFISSOES[key]) return PROFISSOES[key].icone || PROFISSOES[key].icon || '⚒️';
+            return '📦';
+        }
+
+        function resolveIcon(emoji, itemKey) {
+            // 1ª opção: busca por chave de item no itemToImagePath
+            if (itemKey && itemToImagePath[itemKey]) {
+                return `<img src="${itemToImagePath[itemKey]}" class="emoji-icon-img" alt="${itemKey}" loading="lazy">`;
+            }
+            // 2ª opção: busca por emoji no itemToImagePath
+            if (emoji && itemToImagePath[emoji]) {
+                return `<img src="${itemToImagePath[emoji]}" class="emoji-icon-img" alt="${emoji}" loading="lazy">`;
+            }
+            // 3ª opção: sprite da spritesheet
             const sprite = emojiSpritePositions[emoji];
             if (sprite) {
                 return getSpriteHtml(emoji, sprite);
             }
-            // 2ª opção: imagem individual
+            // 4ª opção: imagem individual antiga
             const imgPath = emojiToImagePath[emoji];
             if (imgPath) {
                 return `<img src="${imgPath}" class="emoji-icon-img" alt="${emoji}" loading="lazy">`;
             }
-            // 3ª opção: fallback para emoji
+            // 5ª opção: fallback para emoji
             return emoji;
         }
 
-        function getItemName(key) { const item = inventoryItems.find(i => i.key === key); return item ? item.name : key; }
-        function getItemIcon(key) { const item = inventoryItems.find(i => i.key === key); return item ? item.icon : '📦'; }
-        
-        /**
-         * getItemIconHtml(key)
-         * Retorna o ícone do item como HTML (<img> se houver imagem mapeada, senão emoji).
-         * Use esta função em contextos de innerHTML.
-         */
         function getItemIconHtml(key) {
             const emoji = getItemIcon(key);
-            return resolveIcon(emoji);
+            return resolveIcon(emoji, key);
         }
         function getItemPrice(key) {
             let price = 5;

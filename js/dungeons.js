@@ -323,6 +323,8 @@
             dungeonLog(`⚔️ Entrando no Andar ${floor}${isBoss ? ' — BOSS!' : ''}...`, isBoss ? 'boss' : 'info');
             dungeonLog(`Inimigo: ${enemy.icon} ${enemy.name} (${enemy.hp} HP)`, 'info');
 
+            const dungTimeMult = window.balancingConfig?.dungeonTimeMult || 1.0;
+            const intervalMs = Math.max(200, Math.floor(1000 * dungTimeMult));
             dungeonBattle.interval = setInterval(() => {
                 if (!dungeonBattle.active) { clearInterval(dungeonBattle.interval); return; }
 
@@ -364,9 +366,9 @@
                 // Vampirismo + Óleo de Veneno + Runa do Vampiro
                 const lifesteal = applyTechBonus('lifesteal') + applyPotionEffects('lifesteal_pot') + (equipBonuses.lifesteal || 0);
                 if (lifesteal > 0) {
-                    const heal = Math.max(1, Math.floor((dmg + thunderDmg) * lifesteal / 100));
-                    dungeonBattle.playerHP = Math.min(dungeonBattle.playerHP + heal, gameState.combat.maxPlayerHealth);
-                    dungeonLog(`🩸 Vampirismo: +${heal} HP (${lifesteal}% absorvido)`, 'heal');
+                    const heal = Math.max(1, Math.floor(dmg * (lifesteal / 100)));
+                    dungeonBattle.playerHP = Math.min(gameState.combat.maxPlayerHealth, dungeonBattle.playerHP + heal);
+                    dungeonLog(`🩸 Vampirismo: +${heal} de vida recuperada!`, 'heal');
                 }
 
                 updateDungeonBars();
@@ -376,19 +378,22 @@
                     clearInterval(dungeonBattle.interval);
                     dungeonBattle.active = false;
 
+                    const rewardMult = window.balancingConfig?.dungeonRewardMult || 1.0;
                     const goldMult = 1 + (applyPotionEffects('goldBoost') + getClassPassive('goldBoost')) / 100;
-                    const gold = Math.floor(dungeonBattle.enemy.gold * goldMult);
+                    const gold = Math.floor(dungeonBattle.enemy.gold * goldMult * rewardMult);
+                    const xpGain = Math.floor((dungeonBattle.enemy.xp || 20) * rewardMult);
                     gameState.gold += gold;
-                    addXP('woodcutting', Math.floor(dungeonBattle.enemy.xp / 3));
-                    addXP('mining',      Math.floor(dungeonBattle.enemy.xp / 3));
-                    addXP('fishing',     Math.floor(dungeonBattle.enemy.xp / 3));
+                    addXP('woodcutting', Math.floor(xpGain / 3));
+                    addXP('mining',      Math.floor(xpGain / 3));
+                    addXP('fishing',     Math.floor(xpGain / 3));
 
-                    dungeonLog(`✅ ${dungeonBattle.enemy.name} derrotado! +${gold}💰 +${dungeonBattle.enemy.xp}XP`, 'reward');
+                    dungeonLog(`✅ ${dungeonBattle.enemy.name} derrotado! +${gold}💰 +${xpGain}XP`, 'reward');
 
                     // Drop de equipamento
                     const isBossFloor = floor === d.floors;
                     const dropPool = isBossFloor ? d.bossDropTable : d.dropTable;
-                    const dropChance = isBossFloor ? 1.0 : 0.20;
+                    const chestDropMult = window.balancingConfig?.dungeonChestDropMult || 1.0;
+                    const dropChance = Math.min(1.0, (isBossFloor ? 1.0 : 0.20) * chestDropMult);
                     if (Math.random() < dropChance) {
                         const dropId = dropPool[Math.floor(Math.random() * dropPool.length)];
                         const dropEq = equipmentData[dropId];

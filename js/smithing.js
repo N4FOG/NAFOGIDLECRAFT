@@ -4,30 +4,39 @@
         // FUNÇÕES DE UPGRADES
         // ============================================
         function buyBankUpgrade() {
-            if (gameState.gold >= gameState.upgrades.bankUpgradeCost) {
-                gameState.gold -= gameState.upgrades.bankUpgradeCost;
+            const baseCost = window.balancingConfig?.bankUpgradeBaseCost || 200;
+            const shopMult = window.balancingConfig?.shopPriceMult || 1.0;
+            const currentCost = Math.floor((gameState.upgrades.bankUpgradeCost || baseCost) * shopMult);
+            if (gameState.gold >= currentCost) {
+                gameState.gold -= currentCost;
                 gameState.bankSlots += 2;
-                gameState.upgrades.bankUpgradeCost = Math.floor(gameState.upgrades.bankUpgradeCost * 2);
+                gameState.upgrades.bankUpgradeCost = Math.floor((gameState.upgrades.bankUpgradeCost || baseCost) * 2);
                 showNotification('📦 Banco expandido!', `+2 espaços (agora ${gameState.bankSlots})`, 'success');
                 updateUI();
             }
         }
         function buyStrengthUpgrade() {
-            if (gameState.gold >= gameState.upgrades.strengthUpgradeCost) {
-                gameState.gold -= gameState.upgrades.strengthUpgradeCost;
+            const baseCost = window.balancingConfig?.strengthUpgradeBaseCost || 200;
+            const shopMult = window.balancingConfig?.shopPriceMult || 1.0;
+            const currentCost = Math.floor((gameState.upgrades.strengthUpgradeCost || baseCost) * shopMult);
+            if (gameState.gold >= currentCost) {
+                gameState.gold -= currentCost;
                 gameState.upgrades.strengthBonus += 5;
-                gameState.upgrades.strengthUpgradeCost = Math.floor(gameState.upgrades.strengthUpgradeCost * 1.8);
+                gameState.upgrades.strengthUpgradeCost = Math.floor((gameState.upgrades.strengthUpgradeCost || baseCost) * 1.8);
                 showNotification('⚔️ Força!', 'Força permanente +5!', 'success');
                 updateUI();
             }
         }
         function buyHealthUpgrade() {
-            if (gameState.gold >= gameState.upgrades.healthUpgradeCost) {
-                gameState.gold -= gameState.upgrades.healthUpgradeCost;
+            const baseCost = window.balancingConfig?.healthUpgradeBaseCost || 150;
+            const shopMult = window.balancingConfig?.shopPriceMult || 1.0;
+            const currentCost = Math.floor((gameState.upgrades.healthUpgradeCost || baseCost) * shopMult);
+            if (gameState.gold >= currentCost) {
+                gameState.gold -= currentCost;
                 gameState.upgrades.healthBonus += 20;
                 gameState.combat.maxPlayerHealth += 20;
                 gameState.combat.playerHealth += 20;
-                gameState.upgrades.healthUpgradeCost = Math.floor(gameState.upgrades.healthUpgradeCost * 1.6);
+                gameState.upgrades.healthUpgradeCost = Math.floor((gameState.upgrades.healthUpgradeCost || baseCost) * 1.6);
                 showNotification('❤️ Vida!', 'Vida máxima +20!', 'success');
                 updateUI();
             }
@@ -1628,19 +1637,29 @@
                     const hasGold = gameState.gold >= costs.gold;
                     const hasMaterial = (gameState.inventory[costs.materialType] || 0) >= costs.materialQty;
                     
-                    const successRates = {
-                        0: { rate: 90, breakChance: 0 },
-                        1: { rate: 85, breakChance: 0 },
-                        2: { rate: 80, breakChance: 0 },
-                        3: { rate: 75, breakChance: 0 },
-                        4: { rate: 70, breakChance: 5 },
-                        5: { rate: 60, breakChance: 8 },
-                        6: { rate: 45, breakChance: 15 },
-                        7: { rate: 30, breakChance: 25 },
-                        8: { rate: 18, breakChance: 35 },
-                        9: { rate: 10, breakChance: 50 }
-                    };
-                    const rateInfo = successRates[currentLevel] || { rate: 100, breakChance: 0 };
+                    function getRefineRateInfo(lvl) {
+                        const defaultRates = {
+                            0: { rate: 90, breakChance: 0 },
+                            1: { rate: 85, breakChance: 0 },
+                            2: { rate: 80, breakChance: 0 },
+                            3: { rate: 75, breakChance: 0 },
+                            4: { rate: 70, breakChance: 5 },
+                            5: { rate: 60, breakChance: 8 },
+                            6: { rate: 45, breakChance: 15 },
+                            7: { rate: 30, breakChance: 25 },
+                            8: { rate: 18, breakChance: 35 },
+                            9: { rate: 10, breakChance: 50 }
+                        };
+                        const customConfig = window.balancingConfig?.refineRatesByLevel;
+                        if (customConfig && customConfig[lvl]) {
+                            return {
+                                rate: customConfig[lvl].rate !== undefined ? customConfig[lvl].rate : defaultRates[lvl].rate,
+                                breakChance: customConfig[lvl].breakChance !== undefined ? customConfig[lvl].breakChance : defaultRates[lvl].breakChance
+                            };
+                        }
+                        return defaultRates[lvl] || { rate: 100, breakChance: 0 };
+                    }
+                    const rateInfo = getRefineRateInfo(currentLevel);
                     
                     const antiBreakCount = gameState.inventory.potion_blacksmith || 0;
                     const useAntiBreak = gameState.useAntiBreakActive && antiBreakCount > 0;
@@ -1766,44 +1785,59 @@
             const currentLevel = inst.upgrade || 0;
             if (currentLevel >= 10) return;
             
-            const costs = getUpgradeCosts(eq);
-            
+            const refineCostMult = window.balancingConfig?.refineCostMult || 1.0;
+            const finalGoldCost = Math.floor(costs.gold * refineCostMult);
+            const finalMatCost = Math.max(1, Math.floor(costs.materialQty * refineCostMult));
+
             // Validar recursos
-            if (gameState.gold < costs.gold) {
-                showNotification('❌ Ouro Insuficiente!', 'Você precisa de mais ouro para aprimorar.', 'error');
+            if (gameState.gold < finalGoldCost) {
+                showNotification('❌ Ouro Insuficiente!', `Você precisa de ${finalGoldCost} ouro.`, 'error');
                 return;
             }
-            if ((gameState.inventory[costs.materialType] || 0) < costs.materialQty) {
-                showNotification('❌ Materiais Insuficientes!', `Você precisa de ${costs.materialQty}x ${costs.materialLabel}.`, 'error');
+            if ((gameState.inventory[costs.materialType] || 0) < finalMatCost) {
+                showNotification('❌ Materiais Insuficientes!', `Você precisa de ${finalMatCost}x ${costs.materialLabel}.`, 'error');
                 return;
             }
             
             // Cobrar custo
-            gameState.gold -= costs.gold;
-            gameState.inventory[costs.materialType] -= costs.materialQty;
+            gameState.gold -= finalGoldCost;
+            gameState.inventory[costs.materialType] -= finalMatCost;
             
-            const successRates = {
-                0: { rate: 90, breakChance: 0 },
-                1: { rate: 85, breakChance: 0 },
-                2: { rate: 80, breakChance: 0 },
-                3: { rate: 75, breakChance: 0 },
-                4: { rate: 70, breakChance: 5 },
-                5: { rate: 60, breakChance: 8 },
-                6: { rate: 45, breakChance: 15 },
-                7: { rate: 30, breakChance: 25 },
-                8: { rate: 18, breakChance: 35 },
-                9: { rate: 10, breakChance: 50 }
-            };
-            const rateInfo = successRates[currentLevel] || { rate: 100, breakChance: 0 };
+            function getRefineRateInfo(lvl) {
+                const defaultRates = {
+                    0: { rate: 90, breakChance: 0 },
+                    1: { rate: 85, breakChance: 0 },
+                    2: { rate: 80, breakChance: 0 },
+                    3: { rate: 75, breakChance: 0 },
+                    4: { rate: 70, breakChance: 5 },
+                    5: { rate: 60, breakChance: 8 },
+                    6: { rate: 45, breakChance: 15 },
+                    7: { rate: 30, breakChance: 25 },
+                    8: { rate: 18, breakChance: 35 },
+                    9: { rate: 10, breakChance: 50 }
+                };
+                const customConfig = window.balancingConfig?.refineRatesByLevel;
+                if (customConfig && customConfig[lvl]) {
+                    return {
+                        rate: customConfig[lvl].rate !== undefined ? customConfig[lvl].rate : defaultRates[lvl].rate,
+                        breakChance: customConfig[lvl].breakChance !== undefined ? customConfig[lvl].breakChance : defaultRates[lvl].breakChance
+                    };
+                }
+                return defaultRates[lvl] || { rate: 100, breakChance: 0 };
+            }
+            const rateInfo = getRefineRateInfo(currentLevel);
+            const refineBonus = window.balancingConfig?.refineSuccessBonus || 0;
+            const finalSuccessRate = Math.min(100, rateInfo.rate + refineBonus);
+            const isSafetyActive = !!window.balancingConfig?.refineSafetyMode;
             
-            const useAntiBreak = gameState.useAntiBreakActive && (gameState.inventory.potion_blacksmith || 0) > 0;
-            if (useAntiBreak) {
+            const useAntiBreak = isSafetyActive || (gameState.useAntiBreakActive && (gameState.inventory.potion_blacksmith || 0) > 0);
+            if (!isSafetyActive && gameState.useAntiBreakActive && (gameState.inventory.potion_blacksmith || 0) > 0) {
                 gameState.inventory.potion_blacksmith--;
                 if (gameState.inventory.potion_blacksmith <= 0) delete gameState.inventory.potion_blacksmith;
             }
             
             const roll = Math.random() * 100;
-            const success = useAntiBreak ? true : (roll < rateInfo.rate);
+            const success = useAntiBreak ? true : (roll < finalSuccessRate);
             
             if (success) {
                 inst.upgrade = currentLevel + 1;
@@ -1821,7 +1855,7 @@
             } else {
                 // Falha
                 const breakRoll = Math.random() * 100;
-                const itemBrokes = breakRoll < rateInfo.breakChance;
+                const itemBrokes = !isSafetyActive && (breakRoll < rateInfo.breakChance);
                 
                 if (itemBrokes) {
                     // Destruir item
@@ -2192,6 +2226,33 @@
                 if (typeof addForgeLog === 'function') addForgeLog('❌ Sem Madeira Comum para queimar!', 'error');
             }
         };
+
+        window.toggleForge = function() {
+            if (!gameState.property.forge) return;
+            // Alterna o estado ligado/desligado
+            gameState.property.forge.enabled = !(gameState.property.forge.enabled !== false);
+            const isOn = gameState.property.forge.enabled !== false;
+            const btn = document.getElementById('topForgeToggleBtn');
+            if (btn) {
+                if (isOn) {
+                    btn.textContent = '🔥 ON';
+                    btn.style.background = 'rgba(255, 170, 0, 0.2)';
+                    btn.style.borderColor = 'rgba(255, 170, 0, 0.5)';
+                    btn.style.color = '#ffaa00';
+                    btn.title = 'Fornalha ligada — clique para desligar';
+                } else {
+                    btn.textContent = '❄️ OFF';
+                    btn.style.background = 'rgba(100, 100, 255, 0.15)';
+                    btn.style.borderColor = 'rgba(100, 100, 255, 0.4)';
+                    btn.style.color = '#aaaaff';
+                    btn.title = 'Fornalha desligada — clique para ligar';
+                }
+            }
+            const msg = isOn ? 'Fornalha ligada — trabalhadores podem usar calor.' : 'Fornalha desligada — nenhum calor será consumido.';
+            if (typeof showNotification === 'function') showNotification(isOn ? '🔥 Fornalha Ligada!' : '❄️ Fornalha Desligada!', msg, isOn ? 'success' : 'info');
+            if (typeof updateUI === 'function') updateUI();
+        };
+
 
         window.openBladeSelector = function() {
             const blades = ['blade1', 'blade2', 'blade3'];

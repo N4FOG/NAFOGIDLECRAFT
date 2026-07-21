@@ -81,12 +81,23 @@
         };
 
         // --- Upgrade ---
+        function getStructureUpgradeCost(id, currentLevel) {
+            const def = propertyDefs[id];
+            if (!def) return 0;
+            const customCosts = window.balancingConfig?.structureCosts?.[id];
+            let baseCost = (customCosts && customCosts[currentLevel] !== undefined)
+                ? customCosts[currentLevel]
+                : (def.upgradeCosts[currentLevel] !== undefined ? def.upgradeCosts[currentLevel] : 100);
+            const mult = window.balancingConfig?.campUpgradeCostMult || 1.0;
+            return Math.floor(baseCost * mult);
+        }
+
         function upgradeProperty(id) {
             const def  = propertyDefs[id];
             const prop = gameState.property[id];
             if (!def || !prop) return;
             if (prop.level >= def.maxLevel) return;
-            const cost = def.upgradeCosts[prop.level];
+            const cost = getStructureUpgradeCost(id, prop.level);
             if (gameState.gold < cost) { showNotification('❌ Ouro!', `Precisa de ${cost} 💰.`, 'error'); return; }
             gameState.gold -= cost;
             prop.level++;
@@ -221,6 +232,11 @@
                             let finalInputConsumed = 0;
 
                             if (craftSkill === 'smithing') {
+                                // Se a fornalha estiver desligada, trabalhadores de smithing não produzem
+                                if (gameState.property.forge.enabled === false) {
+                                    if (typeof addForgeLog === 'function') addForgeLog('❄️ Trab. parados — Fornalha desligada.', 'error');
+                                    continue;
+                                }
                                 const currentHeat = gameState.property.forge.heat;
                                 let speedMult = 1;
 
@@ -230,8 +246,19 @@
                                 } else if (currentHeat >= 50 && currentHeat <= 80) {
                                     workerForgeDoubleChance = 0.15;
                                 }
+
+                                // Dragãozinho: -20% tempo de fundição → +produção no ciclo
+                                if (gameState.pets?.active === 'dragaozinho') {
+                                    const petState = getPetState('dragaozinho');
+                                    const levelMultiplier = 1 + (petState.level - 1) * 0.15;
+                                    const petData = typeof pets !== 'undefined' ? pets.find(p => p.id === 'dragaozinho') : null;
+                                    const baseMelt = petData ? (petData.effectValue || 20) : 20;
+                                    const petSpeedBonus = (baseMelt * levelMultiplier) / 100;
+                                    // Converte a redução de tempo em aumento de produção
+                                    speedMult = speedMult * (1 + petSpeedBonus);
+                                }
                                 
-                                realQtyToProduce = Math.min(count * speedMult, maxQtyPossible);
+                                realQtyToProduce = Math.min(Math.ceil(count * speedMult), maxQtyPossible);
                             }
                             
                             if (realQtyToProduce > 0) {
@@ -443,13 +470,38 @@
 
                     if (!hasInventorySpace() && !gameState.inventory[resourceId]) continue;
 
-
                     gameState.inventory[resourceId] = (gameState.inventory[resourceId] || 0) + qty;
                     
                     // Incrementa contador de itens coletados para estatísticas
                     if (['woodcutting', 'mining', 'fishing', 'herbalism'].includes(skill)) {
                         if (typeof incrementItemsGathered === 'function') {
                             incrementItemsGathered(qty);
+                        }
+                    }
+
+                    // Peixe Dourado: rareChance — chance de pegar peixes de tier superior
+                    if (skill === 'fishing') {
+                        const activePet = pets.find(p => p.id === gameState.pets.active);
+                        if (activePet && activePet.effectType === 'rareChance') {
+                            const petState = getPetState('golden_fish');
+                            const levelMultiplier = 1 + (petState.level - 1) * 0.15;
+                            const rareChance = activePet.effectValue * levelMultiplier;
+                            // Rola uma chance por trabalhador no ciclo
+                            for (let w = 0; w < count; w++) {
+                                if (Math.random() * 100 < rareChance) {
+                                    const fishList = resources.fishing;
+                                    const higherFish = fishList.filter(f => f.levelReq > resource.levelReq && gameState.skills.fishing.level >= f.levelReq);
+                                    if (higherFish.length > 0 && (hasInventorySpace() || gameState.inventory[higherFish[0].id])) {
+                                        const bonus = higherFish[Math.floor(Math.random() * higherFish.length)];
+                                        gameState.inventory[bonus.id] = (gameState.inventory[bonus.id] || 0) + 1;
+                                        if (typeof incrementItemsGathered === 'function') incrementItemsGathered(1);
+                                        if (typeof incrementFishCaught === 'function') incrementFishCaught(1);
+                                        if (!isMuted) {
+                                            showNotification('🐠 Peixe Raro!', `Peixe Dourado (trabalhador) trouxe 1 ${bonus.name}!`, 'success', '🐠');
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                     
@@ -473,15 +525,16 @@
         // ============================================
         // PRODUÇÃO OFFLINE DE TRABALHADORES
         // ============================================
-        const MAX_OFFLINE_SECONDS = 8 * 3600; // Limite: 8 horas
         const WORKER_INTERVAL_SECS = 3;       // Ciclo real: 3 segundos
 
         function applyOfflineWorkerProduction(lastSaveTimestamp) {
             if (!gameState.workers?.allocated) return;
             if (getWorkerTotal() === 0) return;
 
+            const maxOfflineHours = window.balancingConfig?.campMaxOfflineHours || 8;
+            const maxOfflineSecs = maxOfflineHours * 3600;
             const offlineMs  = Date.now() - (lastSaveTimestamp || Date.now());
-            const offlineSecs = Math.min(offlineMs / 1000, MAX_OFFLINE_SECONDS);
+            const offlineSecs = Math.min(offlineMs / 1000, maxOfflineSecs);
 
             // Só exibir popup se ficou offline mais de 60 segundos
             if (offlineSecs < 60) return;
@@ -523,6 +576,26 @@
                     qtyPerCycle = Math.floor(qtyPerCycle * (1 + automatonBonus / 100)) || qtyPerCycle;
                 }
 
+                // Abelha Rainha: +% de chance extra de itens por ciclo offline
+                if (gameState.pets?.active === 'abelha_rainha') {
+                    const petState = getPetState('abelha_rainha');
+                    const levelMultiplier = 1 + (petState.level - 1) * 0.15;
+                    const petData = typeof pets !== 'undefined' ? pets.find(p => p.id === 'abelha_rainha') : null;
+                    const baseAbelha = petData ? (petData.effectValue || 10) : 10;
+                    const abelhaChance = (baseAbelha * levelMultiplier) / 100;
+                    // Estima quantos ciclos acionaram o bônus (esperança = chance * ciclos)
+                    const abelhaBonusQty = Math.floor(abelhaChance * cycles * count);
+                    qtyPerCycle += abelhaBonusQty > 0 ? Math.round(abelhaBonusQty / Math.max(cycles, 1)) : 0;
+                }
+
+                // Pet doubleChance offline (ex: Salamandra de Lava para mineração)
+                const petDoubleChance = applyPetBonus(skill, 'double');
+                if (petDoubleChance > 0) {
+                    // Estima o número esperado de doubles nos ciclos offline
+                    const expectedDoubles = Math.floor(petDoubleChance * cycles * count);
+                    qtyPerCycle += expectedDoubles > 0 ? Math.round(expectedDoubles / Math.max(cycles, 1)) : 0;
+                }
+
                 const totalQty = qtyPerCycle * cycles;
                 gameState.inventory[resourceId] = (gameState.inventory[resourceId] || 0) + totalQty;
                 collected[resourceId] = (collected[resourceId] || 0) + totalQty;
@@ -540,6 +613,30 @@
                     incrementFishCaught(totalQty);
                 } else if (skill === 'herbalism' && typeof incrementHerbsGathered === 'function') {
                     incrementHerbsGathered(totalQty);
+                }
+
+                // Peixe Dourado (offline): adicionar peixes raros proporcional ao tempo
+                if (skill === 'fishing') {
+                    const activePet = typeof pets !== 'undefined' ? pets.find(p => p.id === gameState.pets?.active) : null;
+                    if (activePet && activePet.effectType === 'rareChance') {
+                        const petState = getPetState('golden_fish');
+                        const levelMultiplier = 1 + (petState.level - 1) * 0.15;
+                        const rareChance = (activePet.effectValue * levelMultiplier) / 100;
+                        const fishList = resources.fishing;
+                        const higherFish = fishList.filter(f => f.levelReq > resource.levelReq && gameState.skills.fishing.level >= f.levelReq);
+                        if (higherFish.length > 0) {
+                            // Total de tentativas = count (trabalhadores) * cycles
+                            const attempts = count * cycles;
+                            const expectedRare = Math.floor(rareChance * attempts);
+                            if (expectedRare > 0) {
+                                const bonus = higherFish[Math.floor(Math.random() * higherFish.length)];
+                                gameState.inventory[bonus.id] = (gameState.inventory[bonus.id] || 0) + expectedRare;
+                                collected[bonus.id] = (collected[bonus.id] || 0) + expectedRare;
+                                if (typeof incrementItemsGathered === 'function') incrementItemsGathered(expectedRare);
+                                if (typeof incrementFishCaught === 'function') incrementFishCaught(expectedRare);
+                            }
+                        }
+                    }
                 }
 
                 // XP offline com bônus do mascote ativo
@@ -921,7 +1018,7 @@
             const def  = propertyDefs[id];
             const prop = gameState.property[id];
             if (prop.level >= def.maxLevel) return `<button class="prop-btn maxed" disabled>✅ Máximo</button>`;
-            const cost = def.upgradeCosts[prop.level];
+            const cost = getStructureUpgradeCost(id, prop.level);
             const can  = gameState.gold >= cost;
             return `<button class="prop-btn upgrade" onclick="upgradeProperty('${id}')" ${!can ? 'disabled' : ''}>
                 ⬆️ Melhorar — ${formatNumber(cost)} 💰</button>`;

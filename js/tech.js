@@ -9,7 +9,8 @@
                 const req = category.upgrades.find(u => u.id === upgrade.required);
                 if (!req || req.currentLevel === 0) { showNotification('❌ Requisito!', `Precisa de ${req.name} primeiro.`, 'error'); return; }
             }
-            const cost = upgrade.cost * (upgrade.currentLevel + 1);
+            const techCostMult = window.balancingConfig?.techCostMult || 1.0;
+            const cost = Math.floor(upgrade.cost * (upgrade.currentLevel + 1) * techCostMult);
             if (gameState.gold < cost) { showNotification('❌ Ouro insuficiente!', `Precisa de ${cost} ouro.`, 'error'); return; }
             gameState.gold -= cost;
             upgrade.currentLevel++;

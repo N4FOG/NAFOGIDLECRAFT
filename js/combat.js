@@ -1,15 +1,15 @@
             const monsterConfigs = [
             // --- ESTÁGIO 1: GELO/NEVE (Waves 1-10) ---
-            { name: 'Golem de Gelo', icon: '🧊', element: 'ice' },
-            { name: 'Esqueleto Glacial', icon: '💀❄️', element: 'ice' },
-            { name: 'Lobo Invernal', icon: '🐺❄️', element: 'ice' },
-            { name: 'Aranha de Gelo', icon: '❄️🕷️', element: 'ice' },
-            { name: 'Aparição Congelada', icon: '❄️👻', element: 'ice' },
-            { name: 'Fada da Neve', icon: '🧚❄️', element: 'ice' },
-            { name: 'Yeti', icon: '🐻❄️', element: 'ice' },
-            { name: 'Cavaleiro de Gelo', icon: '❄️🛡️', element: 'ice' },
-            { name: 'Rei de Gelo', icon: '❄️👑', element: 'ice' },
-            { name: 'Dragão Branco', icon: '🐉❄️', element: 'ice' },
+            { name: 'Golem de Gelo', icon: '🧊', element: 'ice' , image: 'img/Arena de combate/Golem de Gelo.png'},
+            { name: 'Esqueleto Glacial', icon: '💀❄️', element: 'ice' , image: 'img/Arena de combate/Esqueleto Glacial.png'},
+            { name: 'Lobo Invernal', icon: '🐺❄️', element: 'ice' , image: 'img/Arena de combate/Lobo Invernal.png'},
+            { name: 'Aranha de Gelo', icon: '❄️🕷️', element: 'ice' , image: 'img/Arena de combate/Aranha de Gelo.png'},
+            { name: 'Aparição Congelada', icon: '❄️👻', element: 'ice' , image: 'img/Arena de combate/Aparição Congelada.png'},
+            { name: 'Fada da Neve', icon: '🧚❄️', element: 'ice' , image: 'img/Arena de combate/Fada da Neve.png'},
+            { name: 'Yeti', icon: '🐻❄️', element: 'ice' , image: 'img/Arena de combate/Yeti.png'},
+            { name: 'Cavaleiro de Gelo', icon: '❄️🛡️', element: 'ice' , image: 'img/Arena de combate/Cavaleiro de Gelo.png'},
+            { name: 'Rei de Gelo', icon: '❄️👑', element: 'ice' , image: 'img/Arena de combate/Rei de Gelo.png'},
+            { name: 'Dragão Branco', icon: '🐉❄️', element: 'ice' , image: 'img/Arena de combate/Dragão Branco.png'},
 
             // --- ESTÁGIO 2: FOGO (Waves 11-20) ---
             { name: 'Elemental de Fogo', icon: '🔥', element: 'fire' },
@@ -305,7 +305,8 @@
             // Fraqueza elemental (classe básica)
             const playerEl = getPlayerElement();
             if (enemy && enemy.weakness && enemy.weakness === playerEl) {
-                dmg = Math.floor(dmg * 1.5);
+                const elemBonus = (window.balancingConfig?.elementalWeaknessBonus !== undefined ? window.balancingConfig.elementalWeaknessBonus : 20) / 100;
+                dmg = Math.floor(dmg * (1 + elemBonus));
             }
 
             // Crítico
@@ -545,6 +546,14 @@
             const waveIndex = Math.min((a.wave - 1), arenaEnemies.length - 1);
             const enemy = { ...arenaEnemies[waveIndex] };
             
+            const arenaScaling = window.balancingConfig?.arenaWaveScaling || 1.0;
+            if (arenaScaling !== 1.0) {
+                enemy.maxHp = Math.max(1, Math.floor((enemy.maxHp || 50) * arenaScaling));
+                enemy.hp = enemy.maxHp;
+                if (enemy.atk) enemy.atk = Math.max(1, Math.floor(enemy.atk * arenaScaling));
+                if (enemy.def) enemy.def = Math.max(0, Math.floor(enemy.def * arenaScaling));
+            }
+
             // EVENTO GLOBAL: Fúria da Arena (+20% HP para inimigos da Arena)
             if (window.activeGlobalEvent === 'arena_fury') {
                 enemy.maxHp = Math.floor(enemy.maxHp * 1.2);
@@ -1075,9 +1084,12 @@
                 petGoldMult += (baseGold * levelMultiplier) / 100;
             }
 
-            let goldReward = Math.floor(enemy.gold * goldMult * streakMult * petGoldMult);
+            const admGoldMult = window.balancingConfig?.arenaGoldMult || 1.0;
+            const admCoinMult = window.balancingConfig?.arenaCoinMult || 1.0;
 
-            let coinsReward = Math.floor(enemy.coins * streakMult);
+            let goldReward = Math.floor(enemy.gold * goldMult * streakMult * petGoldMult * admGoldMult);
+
+            let coinsReward = Math.floor(enemy.coins * streakMult * admCoinMult);
             let xpReward = Math.floor(enemy.xp * streakMult);
 
             // World Boss Buff (Bênção do Titã)
@@ -1138,10 +1150,11 @@
                 triggerCombatVictoryEffect();
             }
 
-            // Drop de equipamento (20% chance, 35% para boss)
+            // Drop de equipamento (base rate configurável, 1.75x para boss)
             const equipBonuses = getEquipmentBonuses();
             const lootLuckBonus = (equipBonuses.lootLuck || 0) / 100;
-            const dropChance = (enemy.isBoss ? 0.35 : 0.20) + lootLuckBonus;
+            const admBaseDropRate = (window.balancingConfig?.arenaEquipDropRate !== undefined ? window.balancingConfig.arenaEquipDropRate : 15) / 100;
+            const dropChance = (enemy.isBoss ? admBaseDropRate * 1.75 : admBaseDropRate) + lootLuckBonus;
             const drops = enemyEquipDrops[gameState.combat.enemyType] || enemyEquipDrops['goblin'] || [];
             if (drops.length > 0 && Math.random() < dropChance) {
                 const dropId = drops[Math.floor(Math.random() * drops.length)];
