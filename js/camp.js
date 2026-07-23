@@ -374,43 +374,46 @@
                                         }
                                     }
                                     
+                                    const targetOutputId = recipe.output?.type || recipe.id;
+                                    const targetOutputName = recipe.name || recipe.output?.name || getItemName(targetOutputId) || 'Item';
+
                                     if (!isMuted) {
                                         if (craftSkill === 'alchemy') {
                                             gameState.alchemy.inventory[recipe.id] = (gameState.alchemy.inventory[recipe.id] || 0) + totalProducedWorkers;
                                             showNotification(
                                                 `👷 Trabalhadores (🧪)`,
-                                                `${count} trabalhador${count > 1 ? 'es' : ''} produziu ${totalProducedWorkers}x ${recipe.name} (+${xpGained}XP)`,
+                                                `${count} trabalhador${count > 1 ? 'es' : ''} produziu ${totalProducedWorkers}x ${targetOutputName} (+${xpGained}XP)`,
                                                 'success', '🏕️'
                                             );
-                                        } else if (equipmentData[recipe.output.type]) {
+                                        } else if (typeof equipmentData !== 'undefined' && equipmentData[targetOutputId]) {
                                             let hasSlots = false;
                                             for (let k = 0; k < totalProducedWorkers; k++) {
-                                                const finalId = addNewEquipmentToInventory(recipe.output.type);
-                                                if (finalId && finalId.startsWith('inst_')) hasSlots = true;
+                                                const finalId = addNewEquipmentToInventory(targetOutputId);
+                                                if (finalId && String(finalId).startsWith('inst_')) hasSlots = true;
                                             }
                                             const slotMsg = hasSlots ? ' (com slots de runa!)' : '';
                                             showNotification(
                                                 `👷 Trabalhadores (${craftSkill === 'smithing' ? '⚒️' : '🔨'})`,
-                                                `${count} trabalhador${count > 1 ? 'es' : ''} produziu ${totalProducedWorkers}x ${recipe.output.name}${slotMsg} (+${xpGained}XP)`,
+                                                `${count} trabalhador${count > 1 ? 'es' : ''} produziu ${totalProducedWorkers}x ${targetOutputName}${slotMsg} (+${xpGained}XP)`,
                                                 'success', '🏕️'
                                             );
                                         } else {
-                                            gameState.inventory[recipe.output.type] = (gameState.inventory[recipe.output.type] || 0) + totalProducedWorkers;
+                                            gameState.inventory[targetOutputId] = (gameState.inventory[targetOutputId] || 0) + totalProducedWorkers;
                                             showNotification(
                                                 `👷 Trabalhadores (${craftSkill === 'cooking' ? '🍳' : craftSkill === 'crafting' ? '🔨' : craftSkill === 'smithing' ? '⚒️' : '🔮'})`,
-                                                `${count} trabalhador${count > 1 ? 'es' : ''} produziu ${totalProducedWorkers}x ${recipe.output.name} (+${xpGained}XP)`,
+                                                `${count} trabalhador${count > 1 ? 'es' : ''} produziu ${totalProducedWorkers}x ${targetOutputName} (+${xpGained}XP)`,
                                                 'success', '🏕️'
                                             );
                                         }
                                     } else {
                                         if (craftSkill === 'alchemy') {
                                             gameState.alchemy.inventory[recipe.id] = (gameState.alchemy.inventory[recipe.id] || 0) + totalProducedWorkers;
-                                        } else if (!equipmentData[recipe.output.type]) {
-                                            gameState.inventory[recipe.output.type] = (gameState.inventory[recipe.output.type] || 0) + totalProducedWorkers;
-                                        } else {
+                                        } else if (typeof equipmentData !== 'undefined' && equipmentData[targetOutputId]) {
                                             for (let k = 0; k < totalProducedWorkers; k++) {
-                                                addNewEquipmentToInventory(recipe.output.type);
+                                                addNewEquipmentToInventory(targetOutputId);
                                             }
+                                        } else {
+                                            gameState.inventory[targetOutputId] = (gameState.inventory[targetOutputId] || 0) + totalProducedWorkers;
                                         }
                                     }
                                 } else if (craftSkill === 'smithing' && workerForgeBurnChance > 0 && !isMuted) {
