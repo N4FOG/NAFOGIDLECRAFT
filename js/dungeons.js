@@ -340,6 +340,7 @@
                 dmg = Math.floor(dmg * petMult);
                 const classCombat = getClassPassive('combatBoost');
                 if (classCombat > 0) dmg = Math.floor(dmg * (1 + classCombat / 100));
+                if (window.getWorldBossBuffBonus) dmg = Math.floor(dmg * (1 + window.getWorldBossBuffBonus()));
                 dmg += Math.floor(applyPotionEffects('strength'));
 
                 const critChance = applyTechBonus('criticalChance') + (equipBonuses.critChance || 0) + applyPotionEffects('luck') + getClassPassive('critChance');
@@ -380,7 +381,8 @@
 
                     const rewardMult = window.balancingConfig?.dungeonRewardMult || 1.0;
                     const goldMult = 1 + (applyPotionEffects('goldBoost') + getClassPassive('goldBoost')) / 100;
-                    const gold = Math.floor(dungeonBattle.enemy.gold * goldMult * rewardMult);
+                    let gold = Math.floor(dungeonBattle.enemy.gold * goldMult * rewardMult);
+                    if (window.getWorldBossBuffBonus) gold = Math.floor(gold * (1 + window.getWorldBossBuffBonus()));
                     const xpGain = Math.floor((dungeonBattle.enemy.xp || 20) * rewardMult);
                     gameState.gold += gold;
                     addXP('woodcutting', Math.floor(xpGain / 3));

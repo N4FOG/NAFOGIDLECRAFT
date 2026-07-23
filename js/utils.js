@@ -657,6 +657,50 @@
                     }
                 }
                 
+                // Evento Global Ativo (Poço dos Desejos)
+                if (window.activeGlobalEvent && window._globalEventEndTime) {
+                    let endTime = window._globalEventEndTime;
+                    if (typeof endTime === 'object' && endTime.toMillis) endTime = endTime.toMillis();
+                    else if (typeof endTime === 'object' && endTime.seconds) endTime = endTime.seconds * 1000;
+
+                    if (now < endTime) {
+                        const remaining = endTime - now;
+                        const hours = Math.floor(remaining / 3600000);
+                        const mins = Math.floor((remaining % 3600000) / 60000);
+                        const secs = Math.floor((remaining % 60000) / 1000);
+                        let timeStr = "";
+                        if (hours > 0) {
+                            timeStr = `${hours}h ${mins}m`;
+                        } else {
+                            timeStr = `${mins}:${secs.toString().padStart(2, '0')}`;
+                        }
+
+                        const eventMapName = {
+                            'star_shower': 'Chuva de Estrelas',
+                            'gaia_blessing': 'Bênção de Gaia',
+                            'frenzy_forge': 'Forja Frenética',
+                            'arena_fury': 'Fúria da Arena'
+                        }[window.activeGlobalEvent] || 'Evento Global';
+
+                        let icon = '✨';
+                        if (window.activeGlobalEvent === 'star_shower') icon = '🌠';
+                        else if (window.activeGlobalEvent === 'gaia_blessing') icon = '🍃';
+                        else if (window.activeGlobalEvent === 'frenzy_forge') icon = '🔥';
+                        else if (window.activeGlobalEvent === 'arena_fury') icon = '👺';
+
+                        globalTags.push(`
+                            <div class="buff-tag globalevent" style="display:flex; align-items:center; gap:6px; padding:5px 12px; border-radius:12px; background:rgba(20,26,35,0.92); border:1px solid #ffd700; font-size:0.82em; font-family:'Outfit'; font-weight: bold; pointer-events: auto;">
+                                <span style="font-size:1.15em;">${icon}</span>
+                                <span style="color:#ffd700;">${eventMapName}:</span>
+                                <span class="buff-timer" style="background:rgba(0,0,0,0.4); padding:1px 6px; border-radius:10px; font-size:0.9em; font-weight:bold; color:#ff9944; font-family:monospace;">${timeStr}</span>
+                            </div>
+                        `);
+                    } else {
+                        window.activeGlobalEvent = null;
+                        window._globalEventEndTime = 0;
+                    }
+                }
+                
                 globalContainer.innerHTML = globalTags.join('');
             }
             

@@ -45,7 +45,43 @@ function initWorldBoss() {
         renderWorldBoss(bossData);
         refreshWorldBossLeaderboard();
 
-        // Se o chefe morreu e o jogador estava lutando, desativa localmente e avisa
+        // 1. BUFF GLOBAL DO SERVIDOR: Ativa automaticamente a Bênção do Titã para TODOS os jogadores
+        let globalBuff = bossData.activeBuff;
+        if (globalBuff && globalBuff.expiresAt) {
+            let exp = globalBuff.expiresAt;
+            if (typeof exp === 'object' && exp.toMillis) exp = exp.toMillis();
+            else if (typeof exp === 'object' && exp.seconds) exp = exp.seconds * 1000;
+
+            if (Date.now() < exp) {
+                gameState.worldBossBuff = {
+                    name: globalBuff.name || "Bênção do Titã",
+                    value: globalBuff.value || 5,
+                    expiresAt: exp,
+                    bossName: globalBuff.bossName || bossData.name
+                };
+                if (typeof updateSidebarBuffs === 'function') updateSidebarBuffs();
+            }
+        } else if (bossData.hp <= 0 && bossData.defeatTime) {
+            // Fallback se o chefe foi derrotado recentemente (nas últimas 4h)
+            let defTime = bossData.defeatTime;
+            if (typeof defTime === 'object' && defTime.toMillis) defTime = defTime.toMillis();
+            else if (typeof defTime === 'object' && defTime.seconds) defTime = defTime.seconds * 1000;
+
+            const buffDuration = 4 * 60 * 60 * 1000;
+            if (Date.now() - defTime < buffDuration) {
+                if (!gameState.worldBossBuff || gameState.worldBossBuff.expiresAt < defTime + buffDuration) {
+                    gameState.worldBossBuff = {
+                        name: "Bênção do Titã",
+                        value: 5,
+                        expiresAt: defTime + buffDuration,
+                        bossName: bossData.name
+                    };
+                    if (typeof updateSidebarBuffs === 'function') updateSidebarBuffs();
+                }
+            }
+        }
+
+        // 2. Se o chefe morreu e o jogador estava lutando, encerra a luta local e entrega recompensas de loot pessoais
         if (bossData.hp <= 0) {
             if (gameState.isFightingWorldBoss) {
                 gameState.isFightingWorldBoss = false;
@@ -111,7 +147,7 @@ function renderWorldBoss(boss) {
 
             <div style="margin-top: 10px; display:flex; gap:10px;">
                 ${isDead 
-                    ? `<button class="menu-btn" disabled style="background:#444; cursor:not-allowed; color:#ff8888;">Derrotado (Aguardando Novo Spawn)</button>` 
+                    ? `<button class="menu-btn" onclick="forceClaimCurrentBossReward()" style="background:linear-gradient(135deg, #ffd700, #b8860b); color:#000; font-weight:bold; font-size:1.15em; padding: 12px 28px; border-radius:8px; cursor:pointer; box-shadow:0 0 15px rgba(255,215,0,0.4);">🎁 Reivindicar Bênção do Titã (+Dano, Ouro e XP)</button>` 
                     : `<button class="menu-btn" id="btnToggleWBBattle" onclick="toggleWorldBossBattle()" style="background:linear-gradient(135deg, ${gameState.isFightingWorldBoss ? '#555, #333' : '#a00, #600'}); border:1px solid #f55; color:#fff; font-size:1.2em; padding: 10px 30px;">${gameState.isFightingWorldBoss ? '⚔️ Lutando (Sair da Batalha)' : '🔥 Entrar na Batalha'}</button>`
                 }
             </div>
@@ -259,6 +295,7 @@ function toggleWorldBossBattle() {
     gameState.isFightingWorldBoss = !gameState.isFightingWorldBoss;
     
     if (gameState.isFightingWorldBoss) {
+        gameState.hasParticipatedInWorldBoss = true;
         lastTickTime = Date.now();
         gameState.lastWorldBossTick = Date.now();
         if (worldBossCombatInterval) clearInterval(worldBossCombatInterval);
@@ -286,6 +323,7 @@ function worldBossCombatTick() {
         return;
     }
 
+    gameState.hasParticipatedInWorldBoss = true;
     const now = Date.now();
     const elapsedSeconds = Math.floor((now - lastTickTime) / 1000);
     if (elapsedSeconds <= 0) return;
@@ -337,35 +375,29 @@ function calculatePlayerDamage() {
     };
 }
 
-function showWorldBossHit(dmg, isAccumulated) {
-    const display = document.getElementById('wbDamageDisplay');
-    if (!display) return;
+function showWorldBossHit(dmg, isOffline = false) {
+    const el = document.getElementById('wbDamageDisplay');
+    if (!el) return;
     
-    const text = isAccumulated ? `⚔️ ${formatNumber(dmg)} Dano Acumulado` : `⚔️ ${formatNumber(dmg)} Dano`;
-    display.innerHTML = `<span style="color:#ffffff; animation: fadeUp 1s ease forwards;">${text}</span>`;
+    el.innerHTML = `<span style="color:#ff4444; animation: popText 0.3s ease;">💥 -${formatNumber(dmg)} dano ao Chefe Global!</span>`;
     
-    if (!document.getElementById('wbKeyframes')) {
-        const style = document.createElement('style');
-        style.id = 'wbKeyframes';
-        style.innerHTML = `
-            @keyframes fadeUp {
-                0% { opacity: 1; transform: translateY(0); }
-                100% { opacity: 0; transform: translateY(-20px); }
-            }
-        `;
-        document.head.appendChild(style);
-    }
+    setTimeout(() => {
+        if (el) el.innerHTML = '';
+    }, 2000);
 }
 
 function syncWorldBossDamage() {
-    if (accumulatedDamage <= 0 || !gameState.player || !gameState.player.name) return;
+    const pName = gameState.player?.name || gameState.name || 'Herói';
+    if (accumulatedDamage <= 0 || !pName) return;
     
     const dmgToSend = accumulatedDamage;
     accumulatedDamage = 0; 
     lastDamageSync = Date.now();
     
-    const avatar = gameState.player.avatar || 'knight';
-    window.FirebaseService.submitWorldBossDamage(dmgToSend, gameState.player.name, avatar);
+    const avatar = gameState.player?.avatar || 'knight';
+    if (window.FirebaseService && typeof window.FirebaseService.submitWorldBossDamage === 'function') {
+        window.FirebaseService.submitWorldBossDamage(dmgToSend, pName, avatar);
+    }
     
     refreshWorldBossLeaderboard();
 }
@@ -412,17 +444,35 @@ async function refreshWorldBossLeaderboard() {
 // Lógica de reivindicação de recompensas
 async function checkAndClaimWorldBossRewards(bossData) {
     if (!bossData || bossData.hp > 0) return;
-    if (!gameState.player || !gameState.player.name) return;
     
+    const pName = gameState.player?.name || gameState.name || 'Herói';
+    
+    // Normalizar ID único da luta para evitar colisão por 'undefined'
+    let bossKey = bossData.spawnTime || bossData.defeatTime || (bossData.name + '_' + (bossData.maxHp || 10000));
+    if (typeof bossKey === 'object') {
+        bossKey = bossKey.toMillis ? bossKey.toMillis() : (bossKey.seconds ? bossKey.seconds * 1000 : JSON.stringify(bossKey));
+    }
+    bossKey = String(bossKey);
+
     gameState.claimedWorldBossRewards = gameState.claimedWorldBossRewards || {};
-    if (gameState.claimedWorldBossRewards[bossData.spawnTime]) return;
     
-    const lbData = await window.FirebaseService.getWorldBossLeaderboard();
-    if (!lbData) return;
+    // Limpa chave 'undefined' ou nula se existir de tentativas antigas
+    if (gameState.claimedWorldBossRewards['undefined']) delete gameState.claimedWorldBossRewards['undefined'];
+    if (gameState.claimedWorldBossRewards['null']) delete gameState.claimedWorldBossRewards['null'];
+
+    if (gameState.claimedWorldBossRewards[bossKey]) return;
     
-    const playerContribution = lbData.find(p => p.name === gameState.player.name);
-    if (playerContribution && playerContribution.damage > 0) {
-        gameState.claimedWorldBossRewards[bossData.spawnTime] = true;
+    let lbData = [];
+    if (window.FirebaseService && typeof window.FirebaseService.getWorldBossLeaderboard === 'function') {
+        lbData = await window.FirebaseService.getWorldBossLeaderboard();
+    }
+    
+    const playerContribution = lbData ? lbData.find(p => p.name === pName) : null;
+    const hasParticipated = gameState.hasParticipatedInWorldBoss || (playerContribution && playerContribution.damage > 0) || (typeof accumulatedDamage !== 'undefined' && accumulatedDamage > 0) || gameState.isFightingWorldBoss || !window.FirebaseService || window.FirebaseService.isFallback;
+    
+    if (hasParticipated) {
+        gameState.claimedWorldBossRewards[bossKey] = true;
+        gameState.hasParticipatedInWorldBoss = false;
         
         // 1. Ouro
         gameState.gold = (gameState.gold || 0) + 25000;
@@ -451,6 +501,7 @@ async function checkAndClaimWorldBossRewards(bossData) {
         };
         
         localStorage.setItem('idleCraftSave', JSON.stringify(gameState));
+        if (typeof updateSidebarBuffs === 'function') updateSidebarBuffs();
         
         // Exibir modal premium de recompensa
         const baseItem = equipmentData[randomId];
@@ -460,6 +511,45 @@ async function checkAndClaimWorldBossRewards(bossData) {
         showWorldBossRewardModal(bossData.name, itemName, itemIcon, buffValue);
     }
 }
+
+window.forceClaimCurrentBossReward = function() {
+    const bossName = currentWorldBoss ? currentWorldBoss.name : "Chefe Global";
+    const buffValue = rollWorldBossBuff();
+    
+    gameState.worldBossBuff = {
+        name: "Bênção do Titã",
+        value: buffValue,
+        expiresAt: Date.now() + 4 * 60 * 60 * 1000 // 4 horas
+    };
+    
+    const ancestralLootPool = [
+        'weapon_mithril', 'armor_mithril', 'helmet_mithril',
+        'shield_mithril', 'pants_mithril', 'boots_magic',
+        'ring_magic', 'amulet_dragon', 'craftedItem5'
+    ];
+    const randomId = ancestralLootPool[Math.floor(Math.random() * ancestralLootPool.length)];
+    addNewEquipmentToInventory(randomId, 'ancient');
+    gameState.gold = (gameState.gold || 0) + 25000;
+    
+    if (currentWorldBoss) {
+        let bossKey = currentWorldBoss.spawnTime || currentWorldBoss.defeatTime || (currentWorldBoss.name + '_' + (currentWorldBoss.maxHp || 10000));
+        if (typeof bossKey === 'object') {
+            bossKey = bossKey.toMillis ? bossKey.toMillis() : (bossKey.seconds ? bossKey.seconds * 1000 : JSON.stringify(bossKey));
+        }
+        gameState.claimedWorldBossRewards = gameState.claimedWorldBossRewards || {};
+        gameState.claimedWorldBossRewards[String(bossKey)] = true;
+    }
+    
+    localStorage.setItem('idleCraftSave', JSON.stringify(gameState));
+    if (typeof updateSidebarBuffs === 'function') updateSidebarBuffs();
+    
+    const baseItem = equipmentData[randomId];
+    const itemName = baseItem ? baseItem.name : "Equipamento Ancestral";
+    const itemIcon = baseItem ? baseItem.icon : "⚔️";
+    
+    showWorldBossRewardModal(bossName, itemName, itemIcon, buffValue);
+    showNotification('👑 Bênção do Titã Reivindicada!', `Você ativou a Bênção do Titã (+${buffValue}% Dano, Ouro e XP por 4h)!`, 'success');
+};
 
 function rollWorldBossBuff() {
     const rand = Math.random() * 100;
@@ -519,7 +609,7 @@ function showWorldBossRewardModal(bossName, itemName, itemIcon, buffValue) {
                 </div>
             </div>
             
-            <button onclick="document.getElementById('${modalId}').remove(); if(typeof updateUI==='function')updateUI();" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #ffd700, #b8860b); border: none; border-radius: 8px; color: #000; font-family: 'Outfit'; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3); font-size: 1.1em;">Reivindicar Recompensas</button>
+            <button onclick="document.getElementById('${modalId}').remove(); if(typeof updateUI==='function')updateUI(); if(typeof updateSidebarBuffs==='function')updateSidebarBuffs();" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #ffd700, #b8860b); border: none; border-radius: 8px; color: #000; font-family: 'Outfit'; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3); font-size: 1.1em;">Reivindicar Recompensas</button>
         </div>
         
         <style>

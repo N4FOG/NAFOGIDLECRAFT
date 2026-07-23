@@ -1535,7 +1535,11 @@
 
         window.getWorldBossBuffBonus = function() {
             if (window.gameState && window.gameState.worldBossBuff && window.gameState.worldBossBuff.expiresAt) {
-                if (Date.now() < window.gameState.worldBossBuff.expiresAt) {
+                let expiresAt = window.gameState.worldBossBuff.expiresAt;
+                if (typeof expiresAt === 'object' && expiresAt.toMillis) expiresAt = expiresAt.toMillis();
+                else if (typeof expiresAt === 'object' && expiresAt.seconds) expiresAt = expiresAt.seconds * 1000;
+
+                if (Date.now() < expiresAt) {
                     return (window.gameState.worldBossBuff.value || 0) / 100;
                 }
             }

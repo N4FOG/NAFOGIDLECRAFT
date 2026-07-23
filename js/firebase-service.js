@@ -129,9 +129,19 @@ window.FirebaseService = {
         } else {
           const data = bossDoc.data();
           if (data.hp <= 0) {
-            // Se o chefe morreu e não tem defeatTime registrado, define agora
-            if (!data.defeatTime) {
-              transaction.update(bossRef, { defeatTime: now });
+            // Se o chefe morreu e não tem defeatTime registrado, define agora e gera o Buff Global do Servidor
+            if (!data.defeatTime || !data.activeBuff) {
+              const buffVal = Math.floor(Math.random() * 7) + 1;
+              const defTime = data.defeatTime || now;
+              transaction.update(bossRef, {
+                defeatTime: defTime,
+                activeBuff: {
+                  name: "Bênção do Titã",
+                  value: buffVal,
+                  expiresAt: defTime + (4 * 60 * 60 * 1000),
+                  bossName: data.name
+                }
+              });
             } else if (now - data.defeatTime > 2 * 60 * 1000) {
               // 2 minutos se passaram desde a derrota, spawn um novo chefe!
               needsSpawn = true;
@@ -160,7 +170,8 @@ window.FirebaseService = {
             maxHp: randomBoss.maxHp,
             hp: randomBoss.maxHp,
             spawnTime: now,
-            isActive: true
+            isActive: true,
+            activeBuff: null
           });
           
           // Limpa o placar de contribuições

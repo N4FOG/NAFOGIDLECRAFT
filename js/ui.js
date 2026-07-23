@@ -939,8 +939,43 @@
 // =========================================
 
 window.activeGlobalEvent = null; // Cache local do evento ativo
+window._globalEventEndTime = 0;
+
+function updateWishingWellUI() {
+    const statusDiv = document.getElementById('wellActiveEventStatus');
+    const nameSpan = document.getElementById('wellEventName');
+    const timeSpan = document.getElementById('wellEventTime');
+
+    let endTime = window._globalEventEndTime;
+    if (endTime && typeof endTime === 'object' && endTime.toMillis) {
+        endTime = endTime.toMillis();
+    } else if (endTime && typeof endTime === 'object' && endTime.seconds) {
+        endTime = endTime.seconds * 1000;
+    }
+
+    if (window.activeGlobalEvent && endTime && endTime > Date.now()) {
+        if (statusDiv) statusDiv.style.display = 'block';
+        if (nameSpan) nameSpan.innerText = getEventName(window.activeGlobalEvent);
+        
+        const remaining = Math.max(0, endTime - Date.now());
+        const hours = Math.floor(remaining / 3600000);
+        const mins = Math.floor((remaining % 3600000) / 60000);
+        const secs = Math.floor((remaining % 60000) / 1000);
+        
+        const timeStr = `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        if (timeSpan) timeSpan.innerText = timeStr;
+    } else {
+        window.activeGlobalEvent = null;
+        window._globalEventEndTime = 0;
+        if (statusDiv) statusDiv.style.display = 'none';
+    }
+}
 
 function initWishingWell() {
+    if(!window._wishingWellInterval) {
+        window._wishingWellInterval = setInterval(updateWishingWellUI, 1000);
+    }
+
     if(window.FirebaseService && window.FirebaseService.listenToWishingWell) {
         window.FirebaseService.listenToWishingWell((data) => {
             if(!data) return;
@@ -954,20 +989,24 @@ function initWishingWell() {
                 wellProgressBar.style.width = `${percentage}%`;
             }
 
+            let endTime = data.eventEndTime;
+            if (endTime && typeof endTime === 'object' && endTime.toMillis) {
+                endTime = endTime.toMillis();
+            } else if (endTime && typeof endTime === 'object' && endTime.seconds) {
+                endTime = endTime.seconds * 1000;
+            }
+
             // Atualizar Buffs Ativos
-            if(data.activeEvent && data.eventEndTime > Date.now()) {
+            if(data.activeEvent && endTime > Date.now()) {
                 window.activeGlobalEvent = data.activeEvent;
-                window._globalEventEndTime = data.eventEndTime;
-                updateGlobalBuffUI(data.activeEvent, data.eventEndTime);
-                const statusDiv = document.getElementById('wellActiveEventStatus');
-                if(statusDiv) statusDiv.style.display = 'block';
-                const nameSpan = document.getElementById('wellEventName');
-                if(nameSpan) nameSpan.innerText = getEventName(data.activeEvent);
+                window._globalEventEndTime = endTime;
+                updateWishingWellUI();
+                if (typeof updateSidebarBuffs === 'function') updateSidebarBuffs();
             } else {
                 window.activeGlobalEvent = null;
-                clearGlobalBuffUI();
-                const statusDiv = document.getElementById('wellActiveEventStatus');
-                if(statusDiv) statusDiv.style.display = 'none';
+                window._globalEventEndTime = 0;
+                updateWishingWellUI();
+                if (typeof updateSidebarBuffs === 'function') updateSidebarBuffs();
             }
         });
     }
@@ -984,21 +1023,11 @@ function getEventName(id) {
 }
 
 function updateGlobalBuffUI(eventId, endTime) {
-    const container = document.getElementById('globalActiveBuffs');
-    if(!container) return;
-    
-    let icon = '✨';
-    if(eventId === 'star_shower') icon = '🌠';
-    if(eventId === 'gaia_blessing') icon = '🍃';
-    if(eventId === 'frenzy_forge') icon = '🔥';
-    if(eventId === 'arena_fury') icon = '👺';
-
-    container.innerHTML = `<div class="active-buff-icon" data-tooltip="${getEventName(eventId)}">${icon}</div>`;
+    if (typeof updateSidebarBuffs === 'function') updateSidebarBuffs();
 }
 
 function clearGlobalBuffUI() {
-    const container = document.getElementById('globalActiveBuffs');
-    if(container) container.innerHTML = '';
+    if (typeof updateSidebarBuffs === 'function') updateSidebarBuffs();
 }
 
 window.donateToWell = async function() {
@@ -1022,13 +1051,46 @@ window.donateToWell = async function() {
     showNotification('🪙 Poço dos Desejos', `Você jogou ${typeof formatNumber === 'function' ? formatNumber(amount) : amount} Ouro no poço.`, 'success');
     
     const playerName = gameState.name || 'Herói Anônimo';
-    const triggeredEvent = await window.FirebaseService.donateToWishingWell(amount, playerName);
+    let triggeredEvent = null;
+    if (window.FirebaseService && typeof window.FirebaseService.donateToWishingWell === 'function') {
+        triggeredEvent = await window.FirebaseService.donateToWishingWell(amount, playerName);
+    }
     
+    // Suporte local se offline ou fallback
+    if (!triggeredEvent && gameState) {
+        if (!gameState.wishingWell) {
+            gameState.wishingWell = { currentGold: 0, targetGold: 100000, activeEvent: null, eventEndTime: 0 };
+        }
+        gameState.wishingWell.currentGold = (gameState.wishingWell.currentGold || 0) + amount;
+        if (gameState.wishingWell.currentGold >= gameState.wishingWell.targetGold) {
+            gameState.wishingWell.currentGold = 0;
+            const events = ['star_shower', 'gaia_blessing', 'frenzy_forge', 'arena_fury'];
+            triggeredEvent = events[Math.floor(Math.random() * events.length)];
+            const newEndTime = Date.now() + (3 * 60 * 60 * 1000); // 3 horas
+            gameState.wishingWell.activeEvent = triggeredEvent;
+            gameState.wishingWell.eventEndTime = newEndTime;
+            window.activeGlobalEvent = triggeredEvent;
+            window._globalEventEndTime = newEndTime;
+        }
+        
+        const wellProgressText = document.getElementById('wellProgressText');
+        const wellProgressBar = document.getElementById('wellProgressBar');
+        if (wellProgressText && wellProgressBar) {
+            const cur = gameState.wishingWell.currentGold;
+            const tgt = gameState.wishingWell.targetGold;
+            const percentage = Math.min(100, (cur / tgt) * 100);
+            wellProgressText.innerText = `${typeof formatNumber === 'function' ? formatNumber(cur) : cur} / ${typeof formatNumber === 'function' ? formatNumber(tgt) : tgt} Ouro`;
+            wellProgressBar.style.width = `${percentage}%`;
+        }
+    }
+
     if(triggeredEvent) {
         showNotification('🌋 ERUPÇÃO MÍSTICA!', `A meta foi atingida! Evento Global Iniciado: ${getEventName(triggeredEvent)}`, 'success');
+        updateWishingWellUI();
+        if (typeof updateSidebarBuffs === 'function') updateSidebarBuffs();
     }
 }
 
 // Inicializar após carregamento
-setTimeout(initWishingWell, 3000);
+setTimeout(initWishingWell, 1000);
 // =========================================
