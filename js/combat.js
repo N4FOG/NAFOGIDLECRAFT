@@ -1191,7 +1191,9 @@
             let weaponType = 'melee'; // padrão
             
             if (equippedWeapon) {
-                const weaponData = equipmentData[equippedWeapon];
+                const weaponData = typeof getEquipmentItemData === 'function'
+                    ? getEquipmentItemData(equippedWeapon)
+                    : (equipmentData[equippedWeapon] || (typeof getBaseEquipmentKey === 'function' ? equipmentData[getBaseEquipmentKey(equippedWeapon)] : null));
                 if (weaponData && weaponData.weaponSkillType) {
                     weaponType = weaponData.weaponSkillType;
                 }
