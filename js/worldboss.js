@@ -13,16 +13,106 @@ let leaderboardInterval = null;
 
 // Bestiário estático dos 10 chefes para o showcase
 const worldBossesList = [
-    { name: "Dragão Ancestral de Ouro", icon: "🐉", maxHp: 10000, desc: "Um antigo dragão dourado cujo sopro derrete montanhas." },
-    { name: "Beholder do Vazio", icon: "👁️", maxHp: 10000, desc: "Sua mera presença distorce a realidade e a sanidade." },
-    { name: "Fênix de Magma", icon: "🔥", maxHp: 10000, desc: "Ressurge das cinzas vulcânicas espalhando fogo eterno." },
-    { name: "Golem de Mitril Silencioso", icon: "🗿", maxHp: 10000, desc: "Um guardião titânico feito do mais puro metal mitril." },
-    { name: "Lich do Cataclismo", icon: "💀", maxHp: 10000, desc: "Um lorde necromante supremo que comanda o exército dos mortos." },
-    { name: "Kraken dos Abismos", icon: "🐙", maxHp: 10000, desc: "A lendária criatura marinha que arrasta frotas inteiras ao fundo." },
-    { name: "Quimera da Tempestade", icon: "🦁⚡", maxHp: 10000, desc: "Um monstro híbrido envolto em raios e ventanias destrutivas." },
-    { name: "Titã de Pedra Ancestral", icon: "⛰️", maxHp: 10000, desc: "Uma montanha viva despertada da hibernação dos séculos." },
-    { name: "Lorde Vampiro Drácula", icon: "🧛", maxHp: 10000, desc: "O soberano das sombras que se alimenta do sangue dos guerreiros." },
-    { name: "Rei Slime Corrompido", icon: "👑💧", maxHp: 10000, desc: "Uma massa gelatinosa titânica que consome tudo em seu caminho." }
+    {
+        name: "Dragão Ancestral de Ouro",
+        icon: "🐉",
+        maxHp: 10000,
+        desc: "Um antigo dragão dourado cujo sopro derrete montanhas.",
+        rewardEquip: "wb_dragon_crown",
+        rewardGold: 100000,
+        rewardExtraItem: { type: "bar4", qty: 10, name: "10x Barras de Ouro" },
+        buff: { id: "dragon_wealth", name: "Fortuna do Dragão", icon: "💰", desc: "+40% Ouro em Batalhas e +50% Venda no Mercado", value: 40 }
+    },
+    {
+        name: "Beholder do Vazio",
+        icon: "👁️",
+        maxHp: 10000,
+        desc: "Sua mera presença distorce a realidade e a sanidade.",
+        rewardEquip: "wb_void_amulet",
+        rewardGold: 30000,
+        rewardExtraItem: { type: "wood5", qty: 5, name: "5x Madeira Mística" },
+        buff: { id: "void_knowledge", name: "Conhecimento do Vazio", icon: "🌀", desc: "+50% XP em TODAS as Skills e Perícias de Arma", value: 50 }
+    },
+    {
+        name: "Fênix de Magma",
+        icon: "🔥",
+        maxHp: 10000,
+        desc: "Ressurge das cinzas vulcânicas espalhando fogo eterno.",
+        rewardEquip: "wb_phoenix_staff",
+        rewardGold: 35000,
+        rewardExtraItem: { type: "slag", qty: 50, name: "50x Escória Brilhante" },
+        buff: { id: "forge_eruption", name: "Erupção da Forja", icon: "🔥", desc: "Forja sem calor + 100% chance de duplicar lingotes", value: 100 }
+    },
+    {
+        name: "Golem de Mitril Silencioso",
+        icon: "🗿",
+        maxHp: 10000,
+        desc: "Um guardião titânico feito do mais puro metal mitril.",
+        rewardEquip: "wb_golem_shield",
+        rewardGold: 40000,
+        rewardExtraItem: { type: "bar5", qty: 15, name: "15x Barras de Mitril" },
+        buff: { id: "mythril_bulwark", name: "Baluarte de Mitril", icon: "🛡️", desc: "+40% Armadura, Defesa e Redução de Dano em Batalhas", value: 40 }
+    },
+    {
+        name: "Lich do Cataclismo",
+        icon: "💀",
+        maxHp: 10000,
+        desc: "Um lorde necromante supremo que comanda o exército dos mortos.",
+        rewardEquip: "wb_lich_ring",
+        rewardGold: 45000,
+        rewardExtraItem: { type: "bar3", qty: 10, name: "10x Barras de Prata Rúnicas" },
+        buff: { id: "cataclysm_vampirism", name: "Vampirismo do Cataclismo", icon: "🩸", desc: "+15% Roubo de Vida e +30% Dano Crítico", value: 30 }
+    },
+    {
+        name: "Kraken dos Abismos",
+        icon: "🐙",
+        maxHp: 10000,
+        desc: "A lendária criatura marinha que arrasta frotas inteiras ao fundo.",
+        rewardEquip: "wb_kraken_trident",
+        rewardGold: 50000,
+        rewardExtraItem: { type: "fish5", qty: 10, name: "10x Peixes Míticos Abissais" },
+        buff: { id: "abyss_treasures", name: "Tesouros do Abismo", icon: "🌊", desc: "+50% Pesca Rara e +30% Loot em Baús de Masmorra", value: 50 }
+    },
+    {
+        name: "Quimera da Tempestade",
+        icon: "🦁⚡",
+        maxHp: 10000,
+        desc: "Um monstro híbrido envolto em raios e ventanias destrutivas.",
+        rewardEquip: "wb_chimera_boots",
+        rewardGold: 35000,
+        rewardExtraItem: { type: "wood4", qty: 20, name: "20x Madeira de Ébano" },
+        buff: { id: "gale_fury", name: "Fúria dos Ventos", icon: "⚡", desc: "+35% Vel. Ataque e +50% Vel. no Corte de Madeira", value: 35 }
+    },
+    {
+        name: "Titã de Pedra Ancestral",
+        icon: "⛰️",
+        maxHp: 10000,
+        desc: "Uma montanha viva despertada da hibernação dos séculos.",
+        rewardEquip: "wb_stone_helm",
+        rewardGold: 40000,
+        rewardExtraItem: { type: "bar5", qty: 10, name: "10x Minérios Raros" },
+        buff: { id: "earth_voice", name: "Voz da Terra", icon: "💎", desc: "+50% Chance de Minérios Raros e Gemas Preciosas", value: 50 }
+    },
+    {
+        name: "Lorde Vampiro Drácula",
+        icon: "🧛",
+        maxHp: 10000,
+        desc: "O soberano das sombras que se alimenta do sangue dos guerreiros.",
+        rewardEquip: "wb_dracula_cloak",
+        rewardGold: 60000,
+        rewardExtraItem: { type: "arena_coins", qty: 1000, name: "1.000 Moedas da Arena" },
+        buff: { id: "blood_banquet", name: "Banquete de Sangue", icon: "🩸", desc: "+25% Taxa Crítica e +100% Moedas na Arena", value: 25 }
+    },
+    {
+        name: "Rei Slime Corrompido",
+        icon: "👑💧",
+        maxHp: 10000,
+        desc: "Uma massa gelatinosa titânica que consome tudo em seu caminho.",
+        rewardEquip: "wb_slime_crown",
+        rewardGold: 30000,
+        rewardExtraItem: { type: "wood1", qty: 100, name: "100x Ervas Especiais" },
+        buff: { id: "slime_transmutation", name: "Transmutação Gelatinosa", icon: "🧪", desc: "Criação de Poções e Alquimia rendem 3x mais poções", value: 300 }
+    }
 ];
 
 function initWorldBoss() {
@@ -265,23 +355,15 @@ function renderBossShowcaseHTML(activeBoss) {
                     </div>
                     <div style="display:flex; justify-content:space-between; margin-bottom:3px;">
                         <span>💰 Ouro:</span>
-                        <span style="color:#ffd700; font-weight:bold;">25.000</span>
+                        <span style="color:#ffd700; font-weight:bold;">+${formatNumber(b.rewardGold)}</span>
                     </div>
-                    <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-                        <span>🔴 Loot:</span>
-                        <span style="color:#f44336; font-weight:bold;">1x Ancestral</span>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                        <span>🗡️ Item Único:</span>
+                        <span style="color:#ff44aa; font-weight:bold; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:120px;" title="${equipmentData[b.rewardEquip]?.name || 'Item Ancestral'}">${equipmentData[b.rewardEquip]?.name || 'Item Ancestral'}</span>
                     </div>
-                    <div style="background:rgba(155,89,182,0.1); border:1px solid rgba(155,89,182,0.25); border-radius:8px; padding:8px 10px;">
-                        <div style="color:#d896ff; font-weight:bold; margin-bottom:6px; font-size:0.85em;">⚡ Bênção do Titã — Dano · Ouro · XP por 4h</div>
-                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:3px 8px;">
-                            <div style="display:flex; justify-content:space-between;"><span style="color:#888;">+1%</span><span style="color:#aaa;">22%</span></div>
-                            <div style="display:flex; justify-content:space-between;"><span style="color:#78c8ff;">+2%</span><span style="color:#aaa;">23%</span></div>
-                            <div style="display:flex; justify-content:space-between;"><span style="color:#7de87d;">+3%</span><span style="color:#aaa;">20%</span></div>
-                            <div style="display:flex; justify-content:space-between;"><span style="color:#ffe066;">+4%</span><span style="color:#aaa;">15%</span></div>
-                            <div style="display:flex; justify-content:space-between;"><span style="color:#ffaa44;">+5%</span><span style="color:#aaa;">10%</span></div>
-                            <div style="display:flex; justify-content:space-between;"><span style="color:#ff6666;">+6%</span><span style="color:#aaa;">5%</span></div>
-                            <div style="display:flex; justify-content:space-between; grid-column:span 2;"><span style="color:#d896ff; font-weight:bold;">✨ +7% (Lendário!)</span><span style="color:#d896ff; font-weight:bold;">5%</span></div>
-                        </div>
+                    <div style="background:rgba(155,89,182,0.1); border:1px solid rgba(155,89,182,0.25); border-radius:8px; padding:8px 10px; margin-top:6px;">
+                        <div style="color:#d896ff; font-weight:bold; margin-bottom:3px; font-size:0.85em;">${b.buff.icon} ${b.buff.name} (4h)</div>
+                        <div style="color:#aaa; font-size:0.75em; line-height:1.2;">${b.buff.desc}</div>
                     </div>
                 </div>
             </div>
@@ -446,7 +528,8 @@ async function checkAndClaimWorldBossRewards(bossData) {
     if (!bossData || bossData.hp > 0) return;
     
     const pName = gameState.player?.name || gameState.name || 'Herói';
-    
+    const bInfo = worldBossesList.find(b => b.name === bossData.name) || worldBossesList[0];
+
     // Normalizar ID único da luta para evitar colisão por 'undefined'
     let bossKey = bossData.spawnTime || bossData.defeatTime || (bossData.name + '_' + (bossData.maxHp || 10000));
     if (typeof bossKey === 'object') {
@@ -474,62 +557,75 @@ async function checkAndClaimWorldBossRewards(bossData) {
         gameState.claimedWorldBossRewards[bossKey] = true;
         gameState.hasParticipatedInWorldBoss = false;
         
-        // 1. Ouro
-        gameState.gold = (gameState.gold || 0) + 25000;
+        // 1. Ouro Único por Chefe
+        const goldGain = bInfo.rewardGold || 50000;
+        gameState.gold = (gameState.gold || 0) + goldGain;
         
-        // 2. Equipamento Ancestral Aleatório
-        const ancestralLootPool = [
-            'weapon_mithril',
-            'armor_mithril',
-            'helmet_mithril',
-            'shield_mithril',
-            'pants_mithril',
-            'boots_magic',
-            'ring_magic',
-            'amulet_dragon',
-            'craftedItem5'
-        ];
-        const randomId = ancestralLootPool[Math.floor(Math.random() * ancestralLootPool.length)];
-        addNewEquipmentToInventory(randomId, 'ancient');
+        // 2. Equipamento Ancestral Único por Chefe
+        const equipId = bInfo.rewardEquip || 'wb_dragon_crown';
+        addNewEquipmentToInventory(equipId, 'ancient');
         
-        // 3. Buff (Raridade do Buff: 1% a 7%)
-        const buffValue = rollWorldBossBuff();
+        // 3. Item/Recurso Extra Único
+        if (bInfo.rewardExtraItem) {
+            const exType = bInfo.rewardExtraItem.type;
+            const exQty = bInfo.rewardExtraItem.qty;
+            if (exType === 'arena_coins') {
+                gameState.arenaCoins = (gameState.arenaCoins || 0) + exQty;
+            } else {
+                gameState.inventory[exType] = (gameState.inventory[exType] || 0) + exQty;
+            }
+        }
+        
+        // 4. Buff Server-Wide / Local Único
         gameState.worldBossBuff = {
-            name: "Bênção do Titã",
-            value: buffValue,
+            name: bInfo.buff.name,
+            icon: bInfo.buff.icon,
+            desc: bInfo.buff.desc,
+            value: bInfo.buff.value,
+            bossName: bInfo.name,
             expiresAt: Date.now() + 4 * 60 * 60 * 1000 // 4 horas
         };
         
         localStorage.setItem('idleCraftSave', JSON.stringify(gameState));
         if (typeof updateSidebarBuffs === 'function') updateSidebarBuffs();
         
-        // Exibir modal premium de recompensa
-        const baseItem = equipmentData[randomId];
+        // Exibir modal premium de recompensa única
+        const baseItem = equipmentData[equipId];
         const itemName = baseItem ? baseItem.name : "Equipamento Ancestral";
         const itemIcon = baseItem ? baseItem.icon : "⚔️";
         
-        showWorldBossRewardModal(bossData.name, itemName, itemIcon, buffValue);
+        showWorldBossRewardModal(bossData.name, itemName, itemIcon, goldGain, bInfo.rewardExtraItem, bInfo.buff);
     }
 }
 
 window.forceClaimCurrentBossReward = function() {
-    const bossName = currentWorldBoss ? currentWorldBoss.name : "Chefe Global";
-    const buffValue = rollWorldBossBuff();
+    const bossName = currentWorldBoss ? currentWorldBoss.name : "Dragão Ancestral de Ouro";
+    const bInfo = worldBossesList.find(b => b.name === bossName) || worldBossesList[0];
+    
+    const goldGain = bInfo.rewardGold || 50000;
+    const equipId = bInfo.rewardEquip || 'wb_dragon_crown';
+    
+    gameState.gold = (gameState.gold || 0) + goldGain;
+    addNewEquipmentToInventory(equipId, 'ancient');
+    
+    if (bInfo.rewardExtraItem) {
+        const exType = bInfo.rewardExtraItem.type;
+        const exQty = bInfo.rewardExtraItem.qty;
+        if (exType === 'arena_coins') {
+            gameState.arenaCoins = (gameState.arenaCoins || 0) + exQty;
+        } else {
+            gameState.inventory[exType] = (gameState.inventory[exType] || 0) + exQty;
+        }
+    }
     
     gameState.worldBossBuff = {
-        name: "Bênção do Titã",
-        value: buffValue,
+        name: bInfo.buff.name,
+        icon: bInfo.buff.icon,
+        desc: bInfo.buff.desc,
+        value: bInfo.buff.value,
+        bossName: bInfo.name,
         expiresAt: Date.now() + 4 * 60 * 60 * 1000 // 4 horas
     };
-    
-    const ancestralLootPool = [
-        'weapon_mithril', 'armor_mithril', 'helmet_mithril',
-        'shield_mithril', 'pants_mithril', 'boots_magic',
-        'ring_magic', 'amulet_dragon', 'craftedItem5'
-    ];
-    const randomId = ancestralLootPool[Math.floor(Math.random() * ancestralLootPool.length)];
-    addNewEquipmentToInventory(randomId, 'ancient');
-    gameState.gold = (gameState.gold || 0) + 25000;
     
     if (currentWorldBoss) {
         let bossKey = currentWorldBoss.spawnTime || currentWorldBoss.defeatTime || (currentWorldBoss.name + '_' + (currentWorldBoss.maxHp || 10000));
@@ -543,26 +639,15 @@ window.forceClaimCurrentBossReward = function() {
     localStorage.setItem('idleCraftSave', JSON.stringify(gameState));
     if (typeof updateSidebarBuffs === 'function') updateSidebarBuffs();
     
-    const baseItem = equipmentData[randomId];
+    const baseItem = equipmentData[equipId];
     const itemName = baseItem ? baseItem.name : "Equipamento Ancestral";
     const itemIcon = baseItem ? baseItem.icon : "⚔️";
     
-    showWorldBossRewardModal(bossName, itemName, itemIcon, buffValue);
-    showNotification('👑 Bênção do Titã Reivindicada!', `Você ativou a Bênção do Titã (+${buffValue}% Dano, Ouro e XP por 4h)!`, 'success');
+    showWorldBossRewardModal(bossName, itemName, itemIcon, goldGain, bInfo.rewardExtraItem, bInfo.buff);
+    showNotification(`👑 Recompensa de ${bossName}!`, `Você recebeu ${itemName} + ${bInfo.buff.name}!`, 'success');
 };
 
-function rollWorldBossBuff() {
-    const rand = Math.random() * 100;
-    if (rand < 5.0) return 7;        // 5% chance
-    else if (rand < 10.0) return 6;  // 5% chance
-    else if (rand < 20.0) return 5;  // 10% chance
-    else if (rand < 35.0) return 4;  // 15% chance
-    else if (rand < 55.0) return 3;  // 20% chance
-    else if (rand < 78.0) return 2;  // 23% chance
-    else return 1;                   // 22% chance
-}
-
-function showWorldBossRewardModal(bossName, itemName, itemIcon, buffValue) {
+function showWorldBossRewardModal(bossName, itemName, itemIcon, goldGain, extraItem, buff) {
     const modalId = 'wbRewardModal_' + Date.now();
     const overlay = document.createElement('div');
     overlay.id = modalId;
@@ -571,7 +656,7 @@ function showWorldBossRewardModal(bossName, itemName, itemIcon, buffValue) {
     overlay.style.left = '0';
     overlay.style.width = '100vw';
     overlay.style.height = '100vh';
-    overlay.style.background = 'rgba(0, 0, 0, 0.8)';
+    overlay.style.background = 'rgba(0, 0, 0, 0.85)';
     overlay.style.display = 'flex';
     overlay.style.justifyContent = 'center';
     overlay.style.alignItems = 'center';
@@ -579,32 +664,43 @@ function showWorldBossRewardModal(bossName, itemName, itemIcon, buffValue) {
     overlay.style.fontFamily = "'Outfit', sans-serif";
     overlay.style.backdropFilter = 'blur(10px)';
     
+    const extraHtml = extraItem ? `
+        <div style="display: flex; align-items: center; gap: 15px; background: rgba(74, 255, 74, 0.08); padding: 12px 15px; border-radius: 8px; border: 1px solid rgba(74, 255, 74, 0.2);">
+            <span style="font-size: 1.5em;">🎁</span>
+            <div>
+                <div style="font-weight: bold; color: #4aff4a;">+${extraItem.name}</div>
+                <div style="font-size: 0.75em; color: #888;">Recursos Temáticos Exclusivos</div>
+            </div>
+        </div>
+    ` : '';
+
     overlay.innerHTML = `
-        <div style="background: linear-gradient(135deg, #1b263b, #0d1b2a); border: 2px solid #ffd700; border-radius: 16px; padding: 30px; width: 90%; max-width: 450px; text-align: center; box-shadow: 0 10px 30px rgba(255, 215, 0, 0.2); animation: scaleUp 0.3s ease-out;">
-            <div style="font-size: 3em; margin-bottom: 10px;">🏆</div>
-            <h2 style="font-family: 'Cinzel', serif; color: #ffd700; margin-top: 0; margin-bottom: 5px;">Recompensas Recebidas!</h2>
-            <p style="color: #aaa; font-size: 0.9em; margin-bottom: 25px;">O Chefe Global <strong>${bossName}</strong> foi derrotado e você ajudou na batalha!</p>
+        <div style="background: linear-gradient(135deg, #1b263b, #0d1b2a); border: 2px solid #ffd700; border-radius: 16px; padding: 30px; width: 90%; max-width: 480px; text-align: center; box-shadow: 0 10px 30px rgba(255, 215, 0, 0.2); animation: scaleUp 0.3s ease-out;">
+            <div style="font-size: 3.2em; margin-bottom: 10px;">🏆</div>
+            <h2 style="font-family: 'Cinzel', serif; color: #ffd700; margin-top: 0; margin-bottom: 5px;">Recompensas Únicas!</h2>
+            <p style="color: #aaa; font-size: 0.9em; margin-bottom: 25px;">O Titã <strong>${bossName}</strong> foi derrotado!</p>
             
             <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 30px; text-align: left;">
                 <div style="display: flex; align-items: center; gap: 15px; background: rgba(255, 255, 255, 0.05); padding: 12px 15px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.08);">
                     <span style="font-size: 1.5em;">💰</span>
                     <div>
-                        <div style="font-weight: bold; color: #fff;">+25.000 Ouro</div>
-                        <div style="font-size: 0.75em; color: #888;">Adicionado ao seu saldo</div>
+                        <div style="font-weight: bold; color: #fff;">+${formatNumber(goldGain)} Ouro</div>
+                        <div style="font-size: 0.75em; color: #888;">Recompensa de Ouro do Titã</div>
                     </div>
                 </div>
-                <div style="display: flex; align-items: center; gap: 15px; background: rgba(244, 67, 54, 0.08); padding: 12px 15px; border-radius: 8px; border: 1px solid rgba(244, 67, 54, 0.2);">
-                    <span style="font-size: 1.5em; filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.3));">${itemIcon}</span>
+                <div style="display: flex; align-items: center; gap: 15px; background: rgba(255, 68, 170, 0.08); padding: 12px 15px; border-radius: 8px; border: 1px solid rgba(255, 68, 170, 0.3);">
+                    <span style="font-size: 1.6em; filter: drop-shadow(0 0 5px rgba(255, 68, 170, 0.5));">${itemIcon}</span>
                     <div>
-                        <div style="font-weight: bold; color: #ff5050;">${itemName} [Ancestral]</div>
-                        <div style="font-size: 0.75em; color: #ff8888;">Item Supremo com bônus de stats elevados!</div>
+                        <div style="font-weight: bold; color: #ff44aa;">${itemName} [Ancestral Exclusivo]</div>
+                        <div style="font-size: 0.75em; color: #ff88cc;">Equipamento Supremo de ${bossName}!</div>
                     </div>
                 </div>
+                ${extraHtml}
                 <div style="display: flex; align-items: center; gap: 15px; background: rgba(155, 89, 182, 0.08); padding: 12px 15px; border-radius: 8px; border: 1px solid rgba(155, 89, 182, 0.2);">
-                    <span style="font-size: 1.5em;">⚡</span>
+                    <span style="font-size: 1.5em;">${buff.icon || '⚡'}</span>
                     <div>
-                        <div style="font-weight: bold; color: #d896ff;">Bênção do Titã (+${buffValue}%)</div>
-                        <div style="font-size: 0.75em; color: #c080f0;">Bônus global de Dano, Ouro e XP por 4 horas</div>
+                        <div style="font-weight: bold; color: #d896ff;">${buff.name}</div>
+                        <div style="font-size: 0.75em; color: #c080f0;">${buff.desc} (4 Horas de Duração)</div>
                     </div>
                 </div>
             </div>

@@ -1887,6 +1887,15 @@ ${arenaEnemies.map((e, i) => {
             gameState.combat.hasRevivedThisCombat = false;
             updateUI();
 
+            const initialEquipBonuses = getEquipmentBonuses();
+            const equipSpeed = initialEquipBonuses.speedBonus || 0;
+            const classSpeed = typeof getClassPassive === 'function' ? getClassPassive('speedBonus') : 0;
+            const potionSpeed = typeof applyPotionEffects === 'function' ? applyPotionEffects('speed') : 0;
+            const totalSpeedPct = equipSpeed + classSpeed + potionSpeed;
+
+            // Intervalo base de 1500ms reduzido pela velocidade (mínimo 300ms)
+            const combatDelay = Math.max(300, Math.floor(1500 / (1 + totalSpeedPct / 100)));
+
             gameState.combat.combatInterval = setInterval(() => {
                 const equipBonuses = getEquipmentBonuses();
 
@@ -1978,7 +1987,6 @@ ${arenaEnemies.map((e, i) => {
                     if (goldFromPot > 0) goldParts.push(`+${goldFromPot}💰🧪`);
                     if (goldFromCls > 0) goldParts.push(`+${goldFromCls}💰${clsIcon3}`);
                     if (goldParts.length > 0) goldStr += ` (${goldParts.join(' ')})`;
-                    const goldBonusMsg = goldParts.length > 0 ? ` [${goldParts.join(' ')}]` : '';
 
                     // Chance de drop de peixe
                     if (Math.random() < 0.3) {
@@ -1987,7 +1995,6 @@ ${arenaEnemies.map((e, i) => {
                         const totalItems = Object.values(gameState.inventory).reduce((a, b) => a + b, 0);
                         if (totalItems < gameState.bankSlots) {
                             gameState.inventory[randomFish] = (gameState.inventory[randomFish] || 0) + 1;
-                            // Conta como coleta no Grande Observatório
                             if (typeof incrementItemsGathered === 'function') incrementItemsGathered(1);
                             if (typeof incrementFishCaught === 'function') incrementFishCaught(1);
                             const fishName = getItemName(randomFish);
@@ -2053,7 +2060,7 @@ ${arenaEnemies.map((e, i) => {
                         updateUI();
                     }
                 }
-            }, 1500);
+            }, combatDelay);
         }
 
         function resetCombat() {
