@@ -125,7 +125,17 @@
             craftingEquipRecipes.forEach(eq => {
                 const isUnlocked = skillData.level >= eq.craftReq;
                 const hasAll = eq.ingredients.every(ing => (gameState.inventory[ing.type] || 0) >= ing.qty);
-                const inInv = gameState.equipment.inventory[eq.id] || 0;
+                const workerCount = gameState.workers?.allocated?.[eq.id] || 0;
+                const workerTotal = getWorkerTotal();
+                const workerHtml = (workerTotal > 0 && isUnlocked) ? `
+                    <div class="worker-control" style="margin-top: 10px; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; justify-content: center;">
+                        <button class="worker-btn" onclick="allocateWorker('${eq.id}', -1)" ${workerCount <= 0 ? 'disabled' : ''}>-</button>
+                        <span class="worker-count" style="font-size: 0.9em; font-family:'Outfit', sans-serif;">👷 ${workerCount}</span>
+                        <button class="worker-btn" onclick="allocateWorker('${eq.id}', 1)" ${getWorkerFree() <= 0 ? 'disabled' : ''}>+</button>
+                        <button class="worker-btn" style="background:none;border:none;cursor:pointer;font-size:1.1em;padding:0;margin-left:5px;box-shadow:none;transition:transform 0.2s;" onclick="toggleWorkerNotification('${eq.id}')" title="Alternar notificações">${(gameState.notificationFilters?.workers?.[eq.id]) ? '🔕' : '🔔'}</button>
+                    </div>
+                ` : '';
+
                 const card = document.createElement('div');
                 card.className = `recipe-card ${isUnlocked ? 'unlocked' : ''}`;
                 card.style.cssText = 'border-color:#4a5a6a;';
@@ -143,7 +153,7 @@
                     <div class="recipe-desc">${eq.desc}</div>
                     <div style="color:#4aff4a;font-size:0.85em;margin:8px 0;">${formatStats(eq.stats)}</div>
                     <div class="recipe-ingredients">${ingHtml}</div>
-                    <div style="color:#aaa;font-size:0.85em;margin-bottom:8px;">No inventário: <span style="color:#ffd700">${inInv}</span></div>
+                    ${workerHtml}
                     <button class="craft-btn" onclick="craftEquipment('${eq.id}')" ${!isUnlocked || !hasAll ? 'disabled' : ''}>
                         ${!isUnlocked ? '🔒 Bloqueado' : '🔨 Craftar'}
                     </button>`;

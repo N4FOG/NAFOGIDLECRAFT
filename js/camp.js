@@ -191,6 +191,13 @@
                                     else {
                                         recipe = potions.find(r => r.id === resourceId);
                                         if (recipe) craftSkill = 'alchemy';
+                                        else if (typeof equipmentData !== 'undefined' && equipmentData[resourceId]) {
+                                            const eq = equipmentData[resourceId];
+                                            if (eq.craftSkill) {
+                                                recipe = eq;
+                                                craftSkill = eq.craftSkill;
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -203,15 +210,16 @@
                     const isMuted = gameState.notificationFilters?.workers?.[resourceId] || gameState.notificationFilters?.categories?.[finalCategory];
 
                     if (recipe && craftSkill) {
+                            const reqLvl = recipe.levelReq || recipe.craftReq || 1;
                             if (craftSkill === 'alchemy') {
                                 const herbLvl = (gameState.skills.herbalism && gameState.skills.herbalism.level) || 1;
-                                if (herbLvl < recipe.levelReq) continue;
+                                if (herbLvl < reqLvl) continue;
                             } else {
-                                if (gameState.skills[craftSkill].level < recipe.levelReq) continue;
+                                if (gameState.skills[craftSkill].level < reqLvl) continue;
                             }
                             
                             let maxQtyPossible = 999999;
-                            if (craftSkill === 'alchemy') {
+                            if (recipe.ingredients && Array.isArray(recipe.ingredients)) {
                                 for (let ing of recipe.ingredients) {
                                     const has = gameState.inventory[ing.type] || 0;
                                     const possible = Math.floor(has / ing.qty);
@@ -219,7 +227,7 @@
                                         maxQtyPossible = possible;
                                     }
                                 }
-                            } else {
+                            } else if (recipe.input) {
                                 const available = gameState.inventory[recipe.input.type] || 0;
                                 maxQtyPossible = Math.floor(available / recipe.input.qty);
                             }
@@ -302,15 +310,24 @@
                                             }
                                         }
                                         
+                                        const outputName = recipe.name || recipe.output?.name || 'Item';
                                         if (craftSkill === 'smithing' && workerForgeBurnChance > 0 && Math.random() < workerForgeBurnChance) {
-                                            if (typeof addForgeLog === 'function') addForgeLog('🔥 Trab. Zona Vermelha: 1x ' + recipe.output.name + ' perdido! (calor consumido)', 'zone');
+                                            if (typeof addForgeLog === 'function') addForgeLog('🔥 Trab. Zona Vermelha: 1x ' + outputName + ' perdido! (calor consumido)', 'zone');
                                             continue;
                                         }
-                                        finalInputConsumed += recipe.input.qty;
-                                        let outputQty = recipe.output.qty;
+                                        if (recipe.ingredients && Array.isArray(recipe.ingredients)) {
+                                            for (let ing of recipe.ingredients) {
+                                                gameState.inventory[ing.type] = (gameState.inventory[ing.type] || 0) - ing.qty;
+                                            }
+                                        } else if (recipe.input) {
+                                            finalInputConsumed += recipe.input.qty;
+                                        }
+
+                                        let outputQty = recipe.output?.qty || 1;
+                                        const outputType = recipe.output?.type || recipe.id;
                                         if (craftSkill === 'smithing' && workerForgeDoubleChance > 0 && Math.random() < workerForgeDoubleChance) {
                                             outputQty *= 2;
-                                            if (typeof addForgeLog === 'function') addForgeLog('🟢 Trab. Zona Verde: ×2 → ' + outputQty + ' ' + getItemName(recipe.output.type) + ' (+' + (outputQty / 2) + ')', 'zone');
+                                            if (typeof addForgeLog === 'function') addForgeLog('🟢 Trab. Zona Verde: ×2 → ' + outputQty + ' ' + getItemName(outputType) + ' (+' + (outputQty / 2) + ')', 'zone');
                                         }
                                         // Drop de Escória Brilhante (2% base, 10% com Fundidor)
                                         const slagChanceWorkers = gameState.property.forge.spec === 'founder' ? 0.10 : 0.02;
@@ -323,7 +340,7 @@
                                         // Centelha Poderosa: 10% de chance de +1 barra extra
                                         if (craftSkill === 'smithing' && gameState.property.forge.spec === 'spark' && Math.random() < 0.10) {
                                             outputQty += 1;
-                                            if (typeof addForgeLog === 'function') addForgeLog('⚡ Trab. Centelha Poderosa: +1 ' + getItemName(recipe.output.type) + ' extra! (total: ' + outputQty + ')', 'craft');
+                                            if (typeof addForgeLog === 'function') addForgeLog('⚡ Trab. Centelha Poderosa: +1 ' + getItemName(outputType) + ' extra! (total: ' + outputQty + ')', 'craft');
                                         }
                                         totalProducedWorkers += outputQty;
                                     }
@@ -332,12 +349,14 @@
                                         if (typeof showNotification === 'function') showNotification('🥶 Fornalha Fria!', 'Trabalhadores pararam por falta de calor.', 'error');
                                     }
                                     
-                                    gameState.inventory[recipe.input.type] -= finalInputConsumed;
+                                    if (recipe.input && finalInputConsumed > 0) {
+                                        gameState.inventory[recipe.input.type] -= finalInputConsumed;
+                                    }
                                 }
                                 
-                                const actualAttempts = craftSkill === 'alchemy' ? realQtyToProduce : (craftSkill === 'smithing' ? Math.floor(finalInputConsumed / recipe.input.qty) : realQtyToProduce);
+                                const actualAttempts = (craftSkill === 'alchemy' || recipe.ingredients) ? realQtyToProduce : Math.floor(finalInputConsumed / (recipe.input?.qty || 1));
                                 const petWorkerXP = applyPetBonus(craftSkill === 'alchemy' ? 'herbalism' : craftSkill, 'xpBoost');
-                                const baseXP = recipe.xpGain || 0;
+                                const baseXP = recipe.xpGain || (recipe.craftReq ? recipe.craftReq * 4 : 15);
                                 const xpGained = Math.floor(baseXP * actualAttempts * petWorkerXP);
                                 if (xpGained > 0) {
                                     // Alquimia usa herbalism como skill base (não existe skill 'alchemy' no gameState)
