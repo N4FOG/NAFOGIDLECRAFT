@@ -5793,7 +5793,7 @@ body.layout-editor-active .le-toggle-btn:hover {
     display: inline-block;
     width: 32px;
     height: 32px;
-    background-image: url('img/iconestodos.png');
+    /* background-image: url('img/iconestodos.png'); */
     background-repeat: no-repeat;
     background-size: auto;
     vertical-align: middle;
@@ -6506,3 +6506,29 @@ body.layout-editor-active .le-toggle-btn:hover {
     color: #666;
     font-style: italic;
 }
+
+
+/* Tamanhos contextuais para imagens de inventário, equipamentos e poções */
+.inventory-item .item-icon .emoji-icon-img,
+.item-icon .emoji-icon-img {
+    width: 2em;
+    height: 2em;
+    object-fit: contain;
+}
+
+.equipped-item-icon .emoji-icon-img,
+.equip-option-icon .emoji-icon-img,
+.runar-option-icon .emoji-icon-img,
+.slot-icon .emoji-icon-img {
+    width: 1.5em;
+    height: 1.5em;
+    object-fit: contain;
+}
+
+.potion-icon .emoji-icon-img,
+.modal-icon .emoji-icon-img {
+    width: 2.2em;
+    height: 2.2em;
+    object-fit: contain;
+}
+

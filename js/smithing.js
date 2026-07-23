@@ -167,7 +167,7 @@
                         slot.classList.add('filled');
                         slot.innerHTML += `
                             <div class="inventory-item">
-                                <div class="item-icon">${item.icon}</div>
+                                <div class="item-icon">${typeof getItemIconHtml === 'function' ? getItemIconHtml(item.key) : item.icon}</div>
                                 <div class="item-name">${item.name}</div>
                                 <div class="item-amount">${item.amount}</div>
                             </div>
@@ -313,7 +313,7 @@
                         
                         card.innerHTML = `
                             <div class="inventory-item" style="margin-bottom: 5px;">
-                                <div class="item-icon" style="font-size: 1.8em; margin-bottom: 4px;">${eq.icon}</div>
+                                <div class="item-icon" style="font-size: 1.8em; margin-bottom: 4px;">${eq.image ? `<img src="${eq.image}" class="emoji-icon-img" alt="${eq.name}" loading="lazy">` : (typeof getItemIconHtml === 'function' ? getItemIconHtml(item.id) : eq.icon)}</div>
                                 <div class="item-name" style="color:${rarityColors[eq.rarity]}; font-weight:bold; font-family:'Outfit', sans-serif; font-size:0.9em; min-height: 28px; line-height: 1.2;">${eq.name}</div>
                                 <div style="font-size: 0.75em; color: #aaa; margin-top: 4px; font-family:'Outfit', sans-serif;">${formatStats(eq)}</div>
                             </div>
@@ -956,7 +956,7 @@
                     const rarityClass = getEquipmentRarityClass(item.id);
                     html += `<div class="equip-option ${isCurrent ? 'equipped-current' : ''} ${rarityClass}">
                         <div class="equip-option-left">
-                            <span class="equip-option-icon">${eq.icon}</span>
+                            <span class="equip-option-icon">${typeof getItemIconHtml === 'function' ? getItemIconHtml(eq.id) : eq.icon}</span>
                             <div>
                                 <div class="equip-option-name" style="color:${rarityColors[eq.rarity]}">${eq.name} <span style="color:#888;font-size:0.8em;">[${rarityNames[eq.rarity]}]</span></div>
                                 <div class="equip-option-stats">${formatStats(eq)}</div>
@@ -1259,7 +1259,7 @@
                     slotEl.classList.add('filled');
                     const hasRunes = id.startsWith('inst_') && gameState.equipment.instances?.[id]?.runas?.some(r => r !== null);
                     const runeIndicator = hasRunes ? '<span style="position:absolute;top:2px;right:2px;font-size:0.7em;text-shadow:0 0 4px #dca8ff;">🟣</span>' : '';
-                    slotEl.innerHTML = `${runeIndicator}<span class="slot-icon">${eq.icon}</span><span class="slot-label" style="color:${rarityColors[eq.rarity]};font-size:0.7em;">${eq.name.split(' ')[0]}</span>`;
+                    slotEl.innerHTML = `${runeIndicator}<span class="slot-icon">${typeof getItemIconHtml === 'function' ? getItemIconHtml(id) : eq.icon}</span><span class="slot-label" style="color:${rarityColors[eq.rarity]};font-size:0.7em;">${eq.name.split(' ')[0]}</span>`;
                 } else {
                     slotEl.classList.remove('filled');
                     const icons = { helmet:'🪖', amulet:'📿', weapon:'⚔️', armor:'🛡️', shield:'🔰', ring:'💍', pants:'👖', boots:'👢' };
@@ -1284,7 +1284,7 @@
                 row.className = `equipped-item-row ${rarityClass}`;
                 const runesHtml = getEquipmentRunesHtml(id);
                 row.innerHTML = `<div class="equipped-item-info">
-                    <span class="equipped-item-icon">${eq.icon}</span>
+                    <span class="equipped-item-icon">${typeof getItemIconHtml === 'function' ? getItemIconHtml(eqId) : eq.icon}</span>
                     <div>
                         <div class="equipped-item-name" style="color:${rarityColors[eq.rarity]}">${eq.name}</div>
                         <div class="equipped-item-stats">${formatStats(eq)}</div>
@@ -1597,7 +1597,7 @@
                     return `
                         <div onclick="selectUpgradeItem('${item.id}')" style="display:flex; justify-content:space-between; align-items:center; padding: 10px; margin-bottom: 8px; border-radius: 8px; background: rgba(255,255,255,0.02); cursor:pointer; ${borderStyle} transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.05)';" onmouseout="this.style.background='rgba(255,255,255,0.02)';">
                             <div style="display:flex; align-items:center; gap: 10px;">
-                                <span style="font-size: 1.6em;">${eq.icon}</span>
+                                <span style="font-size: 1.6em;">${typeof getItemIconHtml === "function" ? getItemIconHtml(eq.id) : eq.icon}</span>
                                 <div>
                                     <div style="font-weight:bold; font-size:0.9em; color:${rarityColors[eq.rarity]}">${eq.name}${upgradeBadge}</div>
                                     <div style="font-size:0.75em; color:#888;">${slotNames[eq.slot]} · ${item.location}</div>
@@ -2039,7 +2039,7 @@
                         
                         card.innerHTML = `
                             <div class="runar-option-header">
-                                <span class="runar-option-icon">${eq.icon}</span>
+                                <span class="runar-option-icon">${typeof getItemIconHtml === 'function' ? getItemIconHtml(eq.id) : eq.icon}</span>
                                 <div>
                                     <div class="runar-option-name" style="color:${rarityColors[eq.rarity]}">${eq.name}</div>
                                     <div style="font-size:0.75em;color:#aaa;">${formatStats(eq)}</div>
@@ -2102,7 +2102,7 @@
                         
                         card.innerHTML = `
                             <div class="runar-option-header">
-                                <span class="runar-option-icon">${eq.icon}</span>
+                                <span class="runar-option-icon">${typeof getItemIconHtml === 'function' ? getItemIconHtml(eq.id) : eq.icon}</span>
                                 <div>
                                     <div class="runar-option-name" style="color:${rarityColors[eq.rarity]}">${eq.name} <span style="color:#ffd700;font-size:0.8em;">[${cand.location}]</span></div>
                                     <div style="font-size:0.75em;color:#aaa;">${formatStats(eq)}</div>

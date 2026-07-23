@@ -166,7 +166,7 @@
                     const card = document.createElement('div');
                     card.className = `potion-card ${isCrafting ? 'crafting' : ''}`;
                     card.innerHTML = `
-                        <div class="potion-icon">${p.icon}</div>
+                        <div class="potion-icon">${typeof getItemIconHtml === "function" ? getItemIconHtml(p.id) : p.icon}</div>
                         <div class="potion-name">${p.name}</div>
                         <div class="potion-desc">${p.description}</div>
                         <div class="potion-duration">⏱️ ${Math.floor(p.duration / 60)}min</div>

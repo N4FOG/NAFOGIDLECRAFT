@@ -626,7 +626,7 @@
                     <h3>ℹ️ Informações do Item</h3>
                     <button class="close-modal" onclick="closeItemInfo()">×</button>
                 </div>
-                <div class="modal-icon">${item.icon}</div>
+                <div class="modal-icon">${typeof getItemIconHtml === "function" ? getItemIconHtml(item.key || item.id) : item.icon}</div>
                 <div class="modal-description">
                     <strong>${item.name}</strong><br>
                     ${description}

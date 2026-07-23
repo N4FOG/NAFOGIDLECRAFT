@@ -74,3 +74,6 @@
         const rarityColors = { common: '#fff', uncommon: '#4aff4a', rare: '#4a9aff', epic: '#c96ac9', legendary: '#ffd700' };
         const rarityNames  = { common: 'Comum', uncommon: 'Incomum', rare: 'Raro', epic: 'Épico', legendary: 'Lendário' };
         const slotNames    = { helmet: 'Capacete', amulet: 'Amuleto', weapon: 'Arma', armor: 'Armadura', shield: 'Escudo', ring: 'Anel', pants: 'Calças', boots: 'Botas' };
+
+
+if (typeof window !== "undefined") { window.equipmentData = equipmentData; }

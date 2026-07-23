@@ -11,28 +11,12 @@
         // ============================================
         // SISTEMA DE ÍCONES: EMOJIS → IMAGENS / SPRITESHEET
         // ============================================
-
-        // --------------------------------------------------
-        // 1. MAPEAMENTO DE EMOJI PARA SPRITESHEET (iconestodos.png)
-        //    Grid: 32x32 pixels por ícone, 43 colunas, 36 linhas
-        //    Preencha com {col, row} baseado na posição visual.
-        //    Use a ferramenta img/iconestodos-visual.html para descobrir as coordenadas.
-        //    Ex: { col: 0, row: 0 } = primeiro ícone no canto superior esquerdo
-        // --------------------------------------------------
-        const SP_TILE = 32; // 32px por tile
-        const emojiSpritePositions = {
-            // 🌳 Árvore — Col 22, Row 19 (1 tile)
-            '🌳': { col: 22, row: 19 },
-            '🌲': { col: 22, row: 19 },
-            // 🔱 Agora usa imagem individual (img/tridente.png)
-            // Adicione mais abaixo!
-            // Ex (1 tile):  '🌾': { col: X, row: Y },
-            // Ex (vários):  '🏰': { col: X, row: Y, w: 3, h: 2 },
-        };
+        const SP_TILE = 32;
+        const emojiSpritePositions = {};
 
         function getSpriteHtml(emoji, sprite) {
-            const x = sprite.col * SP_TILE;
-            const y = sprite.row * SP_TILE;
+            const x = (sprite.col || 0) * SP_TILE;
+            const y = (sprite.row || 0) * SP_TILE;
             const w = (sprite.w || 1) * SP_TILE;
             const h = (sprite.h || 1) * SP_TILE;
             return `<div class="emoji-icon-sprite" style="width:${w}px;height:${h}px;background-position:-${x}px -${y}px;" title="${emoji}"></div>`;
@@ -40,7 +24,6 @@
 
         // --------------------------------------------------
         // 2. MAPEAMENTO DE EMOJI PARA ARQUIVO DE IMAGEM INDIVIDUAL
-        //    (fallback / compatibilidade com imagens antigas)
         // --------------------------------------------------
         
         const itemToImagePath = {
@@ -123,7 +106,6 @@
             // Profissões / UI
             'culinaria':   'img/28_culinaria.png',
             'tecnologia':  'img/29_tecnologias.png',
-            'masmorra':    'img/35_masmorra.png'
         };
 
         const emojiToImagePath = {
@@ -135,13 +117,6 @@
         // Cache de imagens pré-carregadas
         const _imageCache = new Set();
         function preloadIconImages() {
-            // Pré-carregar spritesheet
-            if (!_imageCache.has('img/iconestodos.png')) {
-                _imageCache.add('img/iconestodos.png');
-                const img = new Image();
-                img.src = 'img/iconestodos.png';
-            }
-            // Pré-carregar imagens individuais
             for (const path of Object.values(emojiToImagePath)) {
                 if (!_imageCache.has(path)) {
                     _imageCache.add(path);
@@ -150,73 +125,124 @@
                 }
             }
         }
-        // Pré-carregar assim que o script executar
         setTimeout(preloadIconImages, 100);
-
-        /**
-         * resolveIcon(emoji)
-         * Retorna HTML substituindo o emoji por uma imagem:
-         * 1º — sprite da spritesheet (se mapeado em emojiSpritePositions)
-         * 2º — imagem individual (se mapeado em emojiToImagePath)
-         * 3º — próprio emoji (fallback)
-         *
-         * Ex: resolveIcon('🌳') → '<div class="emoji-icon-sprite" style="background-position: 0px 0px;"></div>'
-         */
         
+        
+        
+        
+        
+        function getBaseEquipmentKey(key) {
+            if (!key || typeof key !== 'string') return key;
+            if (typeof gameState !== 'undefined' && gameState?.equipment?.instances?.[key]) {
+                return gameState.equipment.instances[key].id;
+            }
+            let k = key;
+            if (k.startsWith('inst_anc_')) k = k.replace('inst_anc_', '');
+            else if (k.startsWith('inst_')) k = k.replace('inst_', '');
+            k = k.replace(/_temp.*$/, '');
+            const parts = k.split('_');
+            while (parts.length > 1 && !isNaN(parts[parts.length - 1])) {
+                parts.pop();
+            }
+            return parts.join('_');
+        }
+
         function getItemName(key) {
             if (!key) return '';
+            const baseKey = getBaseEquipmentKey(key);
+            const eqDataObj = (typeof window !== 'undefined' && window.equipmentData) || (typeof equipmentData !== 'undefined' ? equipmentData : null);
+            if (eqDataObj && eqDataObj[baseKey]) {
+                return eqDataObj[baseKey].name || baseKey;
+            }
             if (typeof inventoryItems !== 'undefined' && Array.isArray(inventoryItems)) {
-                const item = inventoryItems.find(i => i.key === key || i.id === key);
-                if (item) return item.name || item.nome || key;
+                const item = inventoryItems.find(i => i.key === baseKey || i.id === baseKey);
+                if (item) return item.name || item.nome || baseKey;
             }
             if (typeof resources !== 'undefined') {
                 for (let cat in resources) {
                     if (Array.isArray(resources[cat])) {
-                        const r = resources[cat].find(r => r.id === key);
-                        if (r) return r.name || r.nome || key;
+                        const r = resources[cat].find(r => r.id === baseKey);
+                        if (r) return r.name || r.nome || baseKey;
                     }
                 }
             }
             if (typeof pets !== 'undefined' && Array.isArray(pets)) {
-                const pet = pets.find(p => p.id === key);
-                if (pet) return pet.name || pet.nome || key;
+                const pet = pets.find(p => p.id === baseKey);
+                if (pet) return pet.name || pet.nome || baseKey;
             }
             if (typeof potions !== 'undefined' && Array.isArray(potions)) {
-                const pot = potions.find(p => p.id === key);
-                if (pot) return pot.name || pot.nome || key;
+                const pot = potions.find(p => p.id === baseKey);
+                if (pot) return pot.name || pot.nome || baseKey;
             }
-            if (typeof RECURSOS !== 'undefined' && RECURSOS && RECURSOS[key]) return RECURSOS[key].nome || RECURSOS[key].name || key;
-            if (typeof EQUIPAMENTOS !== 'undefined' && EQUIPAMENTOS && EQUIPAMENTOS[key]) return EQUIPAMENTOS[key].nome || EQUIPAMENTOS[key].name || key;
-            if (typeof PROFISSOES !== 'undefined' && PROFISSOES && PROFISSOES[key]) return PROFISSOES[key].nome || PROFISSOES[key].name || key;
+            if (typeof RECURSOS !== 'undefined' && RECURSOS && RECURSOS[baseKey]) return RECURSOS[baseKey].nome || RECURSOS[baseKey].name || baseKey;
+            if (typeof EQUIPAMENTOS !== 'undefined' && EQUIPAMENTOS && EQUIPAMENTOS[baseKey]) return EQUIPAMENTOS[baseKey].nome || EQUIPAMENTOS[baseKey].name || baseKey;
+            if (typeof PROFISSOES !== 'undefined' && PROFISSOES && PROFISSOES[baseKey]) return PROFISSOES[baseKey].nome || PROFISSOES[baseKey].name || baseKey;
             return key;
         }
 
         function getItemIcon(key) {
             if (!key) return '📦';
+            const baseKey = getBaseEquipmentKey(key);
+            const eqDataObj = (typeof window !== 'undefined' && window.equipmentData) || (typeof equipmentData !== 'undefined' ? equipmentData : null);
+            if (eqDataObj && eqDataObj[baseKey]) {
+                return eqDataObj[baseKey].icon || '⚔️';
+            }
             if (typeof inventoryItems !== 'undefined' && Array.isArray(inventoryItems)) {
-                const item = inventoryItems.find(i => i.key === key || i.id === key);
+                const item = inventoryItems.find(i => i.key === baseKey || i.id === baseKey);
                 if (item) return item.icon || item.icone || '📦';
             }
             if (typeof resources !== 'undefined') {
                 for (let cat in resources) {
                     if (Array.isArray(resources[cat])) {
-                        const r = resources[cat].find(r => r.id === key);
+                        const r = resources[cat].find(r => r.id === baseKey);
                         if (r) return r.icon || r.icone || '📦';
                     }
                 }
             }
             if (typeof pets !== 'undefined' && Array.isArray(pets)) {
-                const pet = pets.find(p => p.id === key);
+                const pet = pets.find(p => p.id === baseKey);
                 if (pet) return pet.icon || pet.icone || '🐾';
             }
             if (typeof potions !== 'undefined' && Array.isArray(potions)) {
-                const pot = potions.find(p => p.id === key);
+                const pot = potions.find(p => p.id === baseKey);
                 if (pot) return pot.icon || pot.icone || '🧪';
             }
-            if (typeof RECURSOS !== 'undefined' && RECURSOS && RECURSOS[key]) return RECURSOS[key].icone || RECURSOS[key].icon || '📦';
-            if (typeof EQUIPAMENTOS !== 'undefined' && EQUIPAMENTOS && EQUIPAMENTOS[key]) return EQUIPAMENTOS[key].icone || EQUIPAMENTOS[key].icon || '⚔️';
-            if (typeof PROFISSOES !== 'undefined' && PROFISSOES && PROFISSOES[key]) return PROFISSOES[key].icone || PROFISSOES[key].icon || '⚒️';
+            if (typeof RECURSOS !== 'undefined' && RECURSOS && RECURSOS[baseKey]) return RECURSOS[baseKey].icone || RECURSOS[baseKey].icon || '📦';
+            if (typeof EQUIPAMENTOS !== 'undefined' && EQUIPAMENTOS && EQUIPAMENTOS[baseKey]) return EQUIPAMENTOS[baseKey].icone || EQUIPAMENTOS[baseKey].icon || '⚔️';
+            if (typeof PROFISSOES !== 'undefined' && PROFISSOES && PROFISSOES[baseKey]) return PROFISSOES[baseKey].icone || PROFISSOES[baseKey].icon || '⚒️';
             return '📦';
+        }
+
+        function getItemIconHtml(key) {
+            if (!key) return '📦';
+            const baseKey = getBaseEquipmentKey(key);
+
+            // 1. getEquipmentItemData ou equipmentData
+            if (typeof getEquipmentItemData === 'function') {
+                const eq = getEquipmentItemData(key) || getEquipmentItemData(baseKey);
+                if (eq && eq.image) {
+                    return `<img src="${eq.image}" class="emoji-icon-img" alt="${eq.name || baseKey}" loading="lazy">`;
+                }
+            }
+            const eqDataObj = (typeof window !== 'undefined' && window.equipmentData) || (typeof equipmentData !== 'undefined' ? equipmentData : null);
+            if (eqDataObj && eqDataObj[baseKey] && eqDataObj[baseKey].image) {
+                const eq = eqDataObj[baseKey];
+                return `<img src="${eq.image}" class="emoji-icon-img" alt="${eq.name || baseKey}" loading="lazy">`;
+            }
+
+            // 2. itemToImagePath
+            if (typeof itemToImagePath !== 'undefined') {
+                if (itemToImagePath[baseKey]) {
+                    return `<img src="${itemToImagePath[baseKey]}" class="emoji-icon-img" alt="${baseKey}" loading="lazy">`;
+                }
+                if (itemToImagePath[key]) {
+                    return `<img src="${itemToImagePath[key]}" class="emoji-icon-img" alt="${key}" loading="lazy">`;
+                }
+            }
+
+            // 3. Fallback emoji + resolveIcon
+            const emoji = getItemIcon(baseKey);
+            return resolveIcon(emoji, baseKey);
         }
 
         function resolveIcon(emoji, itemKey) {
@@ -242,10 +268,7 @@
             return emoji;
         }
 
-        function getItemIconHtml(key) {
-            const emoji = getItemIcon(key);
-            return resolveIcon(emoji, key);
-        }
+
         function getItemPrice(key) {
             let price = 5;
             let found = false;

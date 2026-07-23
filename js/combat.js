@@ -337,7 +337,10 @@
                 isCrit = Math.random() * 100 < critChance;
             }
 
-            if (isCrit) dmg = Math.floor(dmg * 2 * pBlackCatCritDmg);
+            if (isCrit) {
+                const critDamageBonus = equipBonuses.critDamage || 0;
+                dmg = Math.floor(dmg * (2 + critDamageBonus / 100) * pBlackCatCritDmg);
+            }
 
 
             // Subtrai defesa do inimigo (se não ignorar)
@@ -1994,9 +1997,12 @@ ${arenaEnemies.map((e, i) => {
                         showNotification('🎁 Vitória!', `${gameState.combat.enemyName} · ${goldStr}`, 'success', '🎁');
                     }
 
-                    // Chance de drop de equipamento (15%)
+                    // Chance de drop de equipamento (15% base + Sorte do Saqueador)
+                    const lootLuckBonus = (equipBonuses.lootLuck || 0) / 100;
+                    const admBaseDropRate = (window.balancingConfig?.arenaEquipDropRate !== undefined ? window.balancingConfig.arenaEquipDropRate : 15) / 100;
+                    const dropChance = admBaseDropRate + lootLuckBonus;
                     const drops = enemyEquipDrops[gameState.combat.enemyType] || [];
-                    if (drops.length > 0 && Math.random() < 0.15) {
+                    if (drops.length > 0 && Math.random() < dropChance) {
                         const dropId = drops[Math.floor(Math.random() * drops.length)];
                         const dropEq = equipmentData[dropId];
                         if (dropEq) {

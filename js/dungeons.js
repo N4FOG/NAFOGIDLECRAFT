@@ -393,7 +393,8 @@
                     const isBossFloor = floor === d.floors;
                     const dropPool = isBossFloor ? d.bossDropTable : d.dropTable;
                     const chestDropMult = window.balancingConfig?.dungeonChestDropMult || 1.0;
-                    const dropChance = Math.min(1.0, (isBossFloor ? 1.0 : 0.20) * chestDropMult);
+                    const lootLuckBonus = (equipBonuses.lootLuck || 0) / 100;
+                    const dropChance = Math.min(1.0, ((isBossFloor ? 1.0 : 0.20) * chestDropMult) + lootLuckBonus);
                     if (Math.random() < dropChance) {
                         const dropId = dropPool[Math.floor(Math.random() * dropPool.length)];
                         const dropEq = equipmentData[dropId];
