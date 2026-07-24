@@ -229,6 +229,22 @@
                 const eq = eqDataObj[baseKey];
                 return `<img src="${eq.image}" class="emoji-icon-img" alt="${eq.name || baseKey}" loading="lazy">`;
             }
+            if (typeof resources !== 'undefined') {
+                for (let cat in resources) {
+                    if (Array.isArray(resources[cat])) {
+                        const res = resources[cat].find(r => r.id === baseKey || r.id === key);
+                        if (res && res.image) {
+                            return `<img src="${res.image}" class="emoji-icon-img" alt="${res.name || baseKey}" loading="lazy">`;
+                        }
+                    }
+                }
+            }
+            if (typeof smithingRecipes !== 'undefined' && Array.isArray(smithingRecipes)) {
+                const sRecipe = smithingRecipes.find(r => r.id === baseKey || r.id === key);
+                if (sRecipe && sRecipe.image) {
+                    return `<img src="${sRecipe.image}" class="emoji-icon-img" alt="${sRecipe.name || baseKey}" loading="lazy">`;
+                }
+            }
 
             // 2. itemToImagePath
             if (typeof itemToImagePath !== 'undefined') {
@@ -246,6 +262,7 @@
         }
 
         function resolveIcon(emoji, itemKey) {
+            if (!emoji && !itemKey) return '';
             // 1ª opção: busca por chave de item no itemToImagePath
             if (itemKey && itemToImagePath[itemKey]) {
                 return `<img src="${itemToImagePath[itemKey]}" class="emoji-icon-img" alt="${itemKey}" loading="lazy">`;
@@ -255,17 +272,26 @@
                 return `<img src="${itemToImagePath[emoji]}" class="emoji-icon-img" alt="${emoji}" loading="lazy">`;
             }
             // 3ª opção: sprite da spritesheet
-            const sprite = emojiSpritePositions[emoji];
-            if (sprite) {
-                return getSpriteHtml(emoji, sprite);
+            if (emoji && emojiSpritePositions[emoji]) {
+                return getSpriteHtml(emoji, emojiSpritePositions[emoji]);
             }
             // 4ª opção: imagem individual antiga
-            const imgPath = emojiToImagePath[emoji];
-            if (imgPath) {
-                return `<img src="${imgPath}" class="emoji-icon-img" alt="${emoji}" loading="lazy">`;
+            if (emoji && emojiToImagePath[emoji]) {
+                return `<img src="${emojiToImagePath[emoji]}" class="emoji-icon-img" alt="${emoji}" loading="lazy">`;
             }
             // 5ª opção: fallback para emoji
-            return emoji;
+            return (emoji && emoji !== 'undefined') ? emoji : '';
+        }
+
+        function resolveResourceIcon(resource) {
+            if (!resource) return '';
+            if (resource.image) {
+                return `<img src="${resource.image}" class="emoji-icon-img" style="width:32px; height:32px; object-fit:contain; vertical-align:middle; border-radius:4px;" alt="${resource.name}">`;
+            }
+            if (resource.icon) {
+                return resolveIcon(resource.icon, resource.id);
+            }
+            return '';
         }
 
 
@@ -885,6 +911,7 @@
         }
 
         function updateResourcesPage(skill) {
+            if (window.isUIPaused) return;
             const container = document.getElementById(skill + 'Resources');
             if (!container) return;
 
@@ -901,7 +928,7 @@
                     card.innerHTML = `
                         <div class="resource-lock">🔒</div>
                         <div class="resource-name">
-                            ${resolveIcon(resource.icon)} ${resource.name}
+                            ${resolveResourceIcon(resource)} ${resource.name}
                             <span class="resource-level-req">Nível ${resource.levelReq}</span>
                         </div>
                         <div class="resource-desc">${resource.desc}</div>
@@ -926,7 +953,7 @@
                         </div>` : '';
                     card.innerHTML = `
                         <div class="resource-name">
-                            ${resolveIcon(resource.icon)} ${resource.name}
+                            ${resolveResourceIcon(resource)} ${resource.name}
                         </div>
                         <div class="resource-desc">${resource.desc}</div>
                         <div class="resource-stats">

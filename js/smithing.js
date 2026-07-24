@@ -370,28 +370,54 @@
             const activeRarity = window.eqFilters?.rarity || 'all';
             const activeSpecific = window.eqFilters?.specificItem || 'all';
 
+            // Coletar todos os itens disponíveis no inventário de equipamentos
+            const available = [];
+            for (let [id, qty] of Object.entries(gameState.equipment.inventory)) {
+                if (qty <= 0) continue;
+                const eq = getEquipmentItemData(id);
+                if (!eq) continue;
+                if (id.startsWith('inst_')) {
+                    available.push({ key: id, id: id, eq });
+                } else {
+                    for (let i = 0; i < qty; i++) {
+                        available.push({ key: `${id}_temp_${i}`, id: id, eq });
+                    }
+                }
+            }
+
+            const countAll = available.length;
+            const countWeapon = available.filter(i => i.eq.slot === 'weapon').length;
+            const countArmor = available.filter(i => ['armor', 'helmet', 'shield', 'pants', 'boots'].includes(i.eq.slot)).length;
+            const countAccessory = available.filter(i => ['ring', 'amulet'].includes(i.eq.slot)).length;
+
+            // Atualizar os rótulos das abas principais
+            document.querySelectorAll('#eq-tab-all').forEach(el => el.textContent = `Tudo (${countAll})`);
+            document.querySelectorAll('#eq-tab-weapon').forEach(el => el.textContent = `⚔️ Armas (${countWeapon})`);
+            document.querySelectorAll('#eq-tab-armor').forEach(el => el.textContent = `🛡️ Armaduras (${countArmor})`);
+            document.querySelectorAll('#eq-tab-accessory').forEach(el => el.textContent = `💍 Acessórios (${countAccessory})`);
+
             let subTabs = [];
             if (cat === 'weapon') {
                 subTabs = [
-                    { id: 'all', label: '⚔️ Todas Armas' },
-                    { id: 'weapon_melee', label: '🗡️ Corpo a Corpo' },
-                    { id: 'weapon_distance', label: '🏹 Distância (Arcos)' },
-                    { id: 'weapon_magic', label: '🪄 Magia (Cajados)' }
+                    { id: 'all', label: '⚔️ Todas Armas', count: countWeapon },
+                    { id: 'weapon_melee', label: '🗡️ Corpo a Corpo', count: available.filter(i => i.eq.slot === 'weapon' && (i.eq.weaponSkillType || 'melee') === 'melee').length },
+                    { id: 'weapon_distance', label: '🏹 Distância (Arcos)', count: available.filter(i => i.eq.slot === 'weapon' && i.eq.weaponSkillType === 'distance').length },
+                    { id: 'weapon_magic', label: '🪄 Magia (Cajados)', count: available.filter(i => i.eq.slot === 'weapon' && i.eq.weaponSkillType === 'magic').length }
                 ];
             } else if (cat === 'armor') {
                 subTabs = [
-                    { id: 'all', label: '🛡️ Todas Peças' },
-                    { id: 'helmet', label: '🪖 Elmos' },
-                    { id: 'armor', label: '🥋 Peitorais' },
-                    { id: 'shield', label: '🔰 Escudos' },
-                    { id: 'pants', label: '🦵 Grevas' },
-                    { id: 'boots', label: '👢 Botas' }
+                    { id: 'all', label: '🛡️ Todas Peças', count: countArmor },
+                    { id: 'helmet', label: '🪖 Elmos', count: available.filter(i => i.eq.slot === 'helmet').length },
+                    { id: 'armor', label: '🥋 Peitorais', count: available.filter(i => i.eq.slot === 'armor').length },
+                    { id: 'shield', label: '🔰 Escudos', count: available.filter(i => i.eq.slot === 'shield').length },
+                    { id: 'pants', label: '🦵 Grevas', count: available.filter(i => i.eq.slot === 'pants').length },
+                    { id: 'boots', label: '👢 Botas', count: available.filter(i => i.eq.slot === 'boots').length }
                 ];
             } else if (cat === 'accessory') {
                 subTabs = [
-                    { id: 'all', label: '💍 Todos Acessórios' },
-                    { id: 'ring', label: '💍 Anéis' },
-                    { id: 'amulet', label: '📿 Amuletos' }
+                    { id: 'all', label: '💍 Todos Acessórios', count: countAccessory },
+                    { id: 'ring', label: '💍 Anéis', count: available.filter(i => i.eq.slot === 'ring').length },
+                    { id: 'amulet', label: '📿 Amuletos', count: available.filter(i => i.eq.slot === 'amulet').length }
                 ];
             }
 
@@ -406,21 +432,38 @@
                 let html = '<div class="eq-subtabs-row">';
                 html += subTabs.map(st => `
                     <button class="eq-subtab-btn ${st.id === activeSub ? 'active' : ''}" onclick="setEqFilterSubCategory('${st.id}')">
-                        ${st.label}
+                        ${st.label} (${st.count})
                     </button>
                 `).join('');
                 html += '</div>';
 
                 // --- Linha 2: Pills de Raridade (quando subcategoria ativa) ---
                 if (activeSub !== 'all') {
+                    // Filtrar itens da subcategoria ativa
+                    const matchingSubItems = available.filter(item => {
+                        const eq = item.eq;
+                        const slot = eq.slot;
+                        const wSkill = eq.weaponSkillType || 'melee';
+                        if (cat === 'weapon' && slot === 'weapon') {
+                            if (activeSub === 'weapon_melee' && wSkill === 'melee') return true;
+                            if (activeSub === 'weapon_distance' && wSkill === 'distance') return true;
+                            if (activeSub === 'weapon_magic' && wSkill === 'magic') return true;
+                        } else if (cat === 'armor') {
+                            if (slot === activeSub) return true;
+                        } else if (cat === 'accessory') {
+                            if (slot === activeSub) return true;
+                        }
+                        return false;
+                    });
+
                     const rarityPills = [
-                        { id: 'all', label: '🌈 Todas', color: '#a0aec0' },
-                        { id: 'common', label: 'Comum', color: '#fff' },
-                        { id: 'uncommon', label: 'Incomum', color: '#4aff4a' },
-                        { id: 'rare', label: 'Raro', color: '#4a9aff' },
-                        { id: 'epic', label: 'Épico', color: '#c96ac9' },
-                        { id: 'legendary', label: 'Lendário', color: '#ffd700' },
-                        { id: 'ancient', label: 'Ancestral', color: '#ff44aa' }
+                        { id: 'all', label: '🌈 Todas', color: '#a0aec0', count: matchingSubItems.length },
+                        { id: 'common', label: 'Comum', color: '#fff', count: matchingSubItems.filter(i => i.eq.rarity === 'common').length },
+                        { id: 'uncommon', label: 'Incomum', color: '#4aff4a', count: matchingSubItems.filter(i => i.eq.rarity === 'uncommon').length },
+                        { id: 'rare', label: 'Raro', color: '#4a9aff', count: matchingSubItems.filter(i => i.eq.rarity === 'rare').length },
+                        { id: 'epic', label: 'Épico', color: '#c96ac9', count: matchingSubItems.filter(i => i.eq.rarity === 'epic').length },
+                        { id: 'legendary', label: 'Lendário', color: '#ffd700', count: matchingSubItems.filter(i => i.eq.rarity === 'legendary').length },
+                        { id: 'ancient', label: 'Ancestral', color: '#ff44aa', count: matchingSubItems.filter(i => i.eq.rarity === 'ancient').length }
                     ];
 
                     html += '<div class="eq-subtabs-row eq-rarity-row">';
@@ -429,68 +472,48 @@
                         <button class="eq-subtab-btn eq-rarity-pill ${r.id === activeRarity ? 'active' : ''}"
                                 style="${r.id === activeRarity ? `background:${r.color}; color:#0f1928; border-color:${r.color};` : `border-color:${r.color}40; color:${r.color};`}"
                                 onclick="setEqFilterRarityPill('${r.id}')">
-                            ${r.label}
+                            ${r.label} (${r.count})
                         </button>
                     `).join('');
                     html += '</div>';
 
                     // --- Linha 3: Pills de Itens Individuais ---
-                    // Coletar os itens base únicos que existem no inventário do jogador nessa subcategoria
-                    const uniqueItems = new Map(); // baseId -> { name, icon, rarity }
-                    for (let [id, qty] of Object.entries(gameState.equipment.inventory)) {
-                        if (qty <= 0) continue;
-                        const eq = getEquipmentItemData(id);
-                        if (!eq) continue;
-
-                        // Determinar baseId (para instâncias pegar o id original)
-                        let baseId = id;
-                        if (id.startsWith('inst_')) {
-                            const inst = gameState.equipment.instances?.[id];
+                    const uniqueItems = new Map(); // baseId -> { name, icon, rarity, count }
+                    matchingSubItems.forEach(item => {
+                        let baseId = item.id;
+                        if (item.id.startsWith('inst_')) {
+                            const inst = gameState.equipment.instances?.[item.id];
                             if (inst) baseId = inst.id;
                         }
-
-                        // Verificar se pertence à subcategoria ativa
-                        const slot = eq.slot;
-                        const wSkill = eq.weaponSkillType || 'melee';
-                        let matches = false;
-
-                        if (cat === 'weapon' && slot === 'weapon') {
-                            if (activeSub === 'weapon_melee' && wSkill === 'melee') matches = true;
-                            if (activeSub === 'weapon_distance' && wSkill === 'distance') matches = true;
-                            if (activeSub === 'weapon_magic' && wSkill === 'magic') matches = true;
-                        } else if (cat === 'armor') {
-                            if (slot === activeSub) matches = true;
-                        } else if (cat === 'accessory') {
-                            if (slot === activeSub) matches = true;
-                        }
-
-                        if (matches && !uniqueItems.has(baseId)) {
-                            const baseDef = equipmentData[baseId];
-                            if (baseDef) {
+                        const baseDef = equipmentData[baseId];
+                        if (baseDef) {
+                            if (!uniqueItems.has(baseId)) {
                                 uniqueItems.set(baseId, {
                                     name: baseDef.name,
                                     icon: baseDef.icon,
-                                    rarity: baseDef.rarity
+                                    rarity: baseDef.rarity,
+                                    count: 1
                                 });
+                            } else {
+                                uniqueItems.get(baseId).count++;
                             }
                         }
-                    }
+                    });
 
                     if (uniqueItems.size > 0) {
-                        // Ordenar por raridade
                         const rarOrder = { common: 1, uncommon: 2, rare: 3, epic: 4, legendary: 5, ancient: 6 };
                         const sorted = [...uniqueItems.entries()].sort((a, b) => (rarOrder[a[1].rarity] || 0) - (rarOrder[b[1].rarity] || 0));
 
                         html += '<div class="eq-subtabs-row eq-specific-row">';
                         html += '<span class="eq-row-label">Item:</span>';
-                        html += `<button class="eq-subtab-btn eq-specific-pill ${'all' === activeSpecific ? 'active' : ''}" onclick="setEqFilterSpecificItem('all')">Todos</button>`;
+                        html += `<button class="eq-subtab-btn eq-specific-pill ${'all' === activeSpecific ? 'active' : ''}" onclick="setEqFilterSpecificItem('all')">Todos (${matchingSubItems.length})</button>`;
                         html += sorted.map(([baseId, info]) => {
                             const rc = typeof rarityColors !== 'undefined' ? (rarityColors[info.rarity] || '#fff') : '#fff';
                             return `
                                 <button class="eq-subtab-btn eq-specific-pill ${baseId === activeSpecific ? 'active' : ''}"
                                         style="${baseId === activeSpecific ? `background:${rc}; color:#0f1928; border-color:${rc};` : `border-color:${rc}40; color:${rc};`}"
                                         onclick="setEqFilterSpecificItem('${baseId}')">
-                                    ${info.icon} ${info.name}
+                                    ${info.icon} ${info.name} (${info.count})
                                 </button>`;
                         }).join('');
                         html += '</div>';
@@ -1527,167 +1550,225 @@
             container.appendChild(tabsDiv);
 
             if (tab === 'forge') {
-                // Receitas normais de barras
-                smithingRecipes.forEach(recipe => {
-                    const maxQty = Math.floor((gameState.inventory[recipe.input.type] || 0) / recipe.input.qty);
-                    const isUnlocked = skillData.level >= recipe.levelReq;
-                    const workerCount = gameState.workers?.allocated?.[recipe.id] || 0;
-                    const workerTotal = getWorkerTotal();
-                    const workerHtml = workerTotal > 0 ? `
-                        <div class="worker-control" style="margin-top: 10px; display: flex; align-items: center; gap: 8px; justify-content: center;">
-                            <button class="worker-btn" onclick="allocateWorker('${recipe.id}', -1)" ${workerCount <= 0 ? 'disabled' : ''}>-</button>
-                            <span class="worker-count" style="font-size: 0.9em; font-family:'Outfit', sans-serif;">👷 ${workerCount}</span>
-                            <button class="worker-btn" onclick="allocateWorker('${recipe.id}', 1)" ${getWorkerFree() <= 0 ? 'disabled' : ''}>+</button>
-                            <span class="worker-prod" style="font-size: 0.75em; color: #aaa; font-family:'Outfit', sans-serif;">
-                                ${workerCount > 0 ? `Gasta: ${workerCount * recipe.input.qty}x/3s` : ''}
-                            </span>
-                            <button class="worker-btn" style="background:none;border:none;cursor:pointer;font-size:1.1em;padding:0;margin-left:5px;box-shadow:none;transition:transform 0.2s;" onclick="toggleWorkerNotification('${recipe.id}')" title="Alternar notificações">${(gameState.notificationFilters?.workers?.[recipe.id]) ? '🔕' : '🔔'}</button>
+                if (!gameState.smithingForgeFilter) gameState.smithingForgeFilter = 'bars';
+                if (!gameState.smithingSlotFilter) gameState.smithingSlotFilter = 'all';
+
+                const forgeCategory = gameState.smithingForgeFilter;
+                const slotFilter = gameState.smithingSlotFilter;
+
+                // Injetar barra de sub-filtros (Barras vs Equipamentos e Slots)
+                const subFiltersDiv = document.createElement('div');
+                subFiltersDiv.style.cssText = 'grid-column: 1 / -1; margin-bottom: 20px; width: 100%; display: flex; flex-direction: column; gap: 10px; background: rgba(0,0,0,0.3); padding: 12px; border-radius: 10px; border: 1px solid #3a4a5a;';
+                
+                let slotButtonsHtml = '';
+                if (forgeCategory === 'equip') {
+                    const slots = [
+                        { id: 'all', label: 'Todos', count: smithingEquipRecipes.length },
+                        { id: 'weapon', label: '⚔️ Armas', count: smithingEquipRecipes.filter(e => e.slot === 'weapon').length },
+                        { id: 'helmet', label: '🪖 Capacetes', count: smithingEquipRecipes.filter(e => e.slot === 'helmet').length },
+                        { id: 'armor', label: '🛡️ Armaduras', count: smithingEquipRecipes.filter(e => e.slot === 'armor').length },
+                        { id: 'shield', label: '🔰 Escudos', count: smithingEquipRecipes.filter(e => e.slot === 'shield').length },
+                        { id: 'boots', label: '🥾 Botas', count: smithingEquipRecipes.filter(e => e.slot === 'boots').length },
+                        { id: 'ring', label: '💍 Anéis', count: smithingEquipRecipes.filter(e => e.slot === 'ring').length },
+                        { id: 'amulet', label: '📿 Amuletos', count: smithingEquipRecipes.filter(e => e.slot === 'amulet').length }
+                    ];
+                    slotButtonsHtml = `
+                        <div style="display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
+                            ${slots.map(s => `
+                                <button class="arena-tab-btn ${slotFilter === s.id ? 'active' : ''}" onclick="setSmithingSlotFilter('${s.id}')" style="padding: 6px 14px; font-size: 0.85em; border-radius: 6px; cursor: pointer;">
+                                    ${s.label} (${s.count})
+                                </button>
+                            `).join('')}
                         </div>
-                    ` : '';
+                    `;
+                }
 
-                    const card = document.createElement('div');
-                    card.className = `recipe-card ${isUnlocked ? 'unlocked' : 'locked'}`;
+                subFiltersDiv.innerHTML = `
+                    <div style="display: flex; gap: 10px;">
+                        <button class="arena-tab-btn ${forgeCategory === 'bars' ? 'active' : ''}" onclick="setSmithingForgeFilter('bars')" style="flex: 1; padding: 10px; font-weight: bold; border-radius: 8px;">📦 Barras de Metal (${smithingRecipes.length})</button>
+                        <button class="arena-tab-btn ${forgeCategory === 'equip' ? 'active' : ''}" onclick="setSmithingForgeFilter('equip')" style="flex: 1; padding: 10px; font-weight: bold; border-radius: 8px;">⚔️ Equipamentos (${smithingEquipRecipes.length})</button>
+                    </div>
+                    ${slotButtonsHtml}
+                `;
+                container.appendChild(subFiltersDiv);
 
-                    const isCrafting = gameState.craftingTimers[`smithing_${recipe.id}`] ? true : false;
-                    if (isCrafting) card.classList.add('crafting');
+                if (forgeCategory === 'bars') {
+                    // Receitas normais de barras
+                    smithingRecipes.forEach(recipe => {
+                        const maxQty = Math.floor((gameState.inventory[recipe.input.type] || 0) / recipe.input.qty);
+                        const isUnlocked = skillData.level >= recipe.levelReq;
+                        const workerCount = gameState.workers?.allocated?.[recipe.id] || 0;
+                        const workerTotal = getWorkerTotal();
+                        const workerHtml = workerTotal > 0 ? `
+                            <div class="worker-control" style="margin-top: 10px; display: flex; align-items: center; gap: 8px; justify-content: center;">
+                                <button class="worker-btn" onclick="allocateWorker('${recipe.id}', -1)" ${workerCount <= 0 ? 'disabled' : ''}>-</button>
+                                <span class="worker-count" style="font-size: 0.9em; font-family:'Outfit', sans-serif;">👷 ${workerCount}</span>
+                                <button class="worker-btn" onclick="allocateWorker('${recipe.id}', 1)" ${getWorkerFree() <= 0 ? 'disabled' : ''}>+</button>
+                                <span class="worker-prod" style="font-size: 0.75em; color: #aaa; font-family:'Outfit', sans-serif;">
+                                    ${workerCount > 0 ? `Gasta: ${workerCount * recipe.input.qty}x/3s` : ''}
+                                </span>
+                                <button class="worker-btn" style="background:none;border:none;cursor:pointer;font-size:1.1em;padding:0;margin-left:5px;box-shadow:none;transition:transform 0.2s;" onclick="toggleWorkerNotification('${recipe.id}')" title="Alternar notificações">${(gameState.notificationFilters?.workers?.[recipe.id]) ? '🔕' : '🔔'}</button>
+                            </div>
+                        ` : '';
 
-                    const hasIngredients = gameState.inventory[recipe.input.type] >= recipe.input.qty;
-                    const totalItems = Object.values(gameState.inventory).filter(q => q > 0).length;
-                    const hasSpace = totalItems < gameState.bankSlots ||
-                        (gameState.inventory[recipe.output.type] > 0 && totalItems <= gameState.bankSlots);
+                        const card = document.createElement('div');
+                        card.className = `recipe-card ${isUnlocked ? 'unlocked' : 'locked'}`;
 
-                    const canCraft = isUnlocked && hasIngredients && hasSpace && !isCrafting;
+                        const isCrafting = gameState.craftingTimers[`smithing_${recipe.id}`] ? true : false;
+                        if (isCrafting) card.classList.add('crafting');
 
-                    let progressWidth = '0%';
-                    if (isCrafting) {
-                        const timer = gameState.craftingTimers[`smithing_${recipe.id}`];
-                        if (timer) {
-                            const elapsed = Date.now() - timer.startTime;
-                            const percent = Math.min((elapsed / (timer.craftTime * 1000)) * 100, 100);
-                            progressWidth = percent + '%';
+                        const hasIngredients = gameState.inventory[recipe.input.type] >= recipe.input.qty;
+                        const totalItems = Object.values(gameState.inventory).filter(q => q > 0).length;
+                        const hasSpace = totalItems < gameState.bankSlots ||
+                            (gameState.inventory[recipe.output.type] > 0 && totalItems <= gameState.bankSlots);
+
+                        const canCraft = isUnlocked && hasIngredients && hasSpace && !isCrafting;
+
+                        let progressWidth = '0%';
+                        if (isCrafting) {
+                            const timer = gameState.craftingTimers[`smithing_${recipe.id}`];
+                            if (timer) {
+                                const elapsed = Date.now() - timer.startTime;
+                                const percent = Math.min((elapsed / (timer.craftTime * 1000)) * 100, 100);
+                                progressWidth = percent + '%';
+                            }
                         }
-                    }
 
-                    const recipeIcon = recipe.image 
-                        ? `<img src="${recipe.image}" style="width:48px;height:48px;vertical-align:middle;margin-right:8px;" onerror="this.style.display='none';this.nextSibling.style.display='inline';" /><span style="display:none;">${recipe.icon}</span>`
-                        : recipe.icon;
+                        const recipeIcon = recipe.image 
+                            ? `<img src="${recipe.image}" style="width:48px;height:48px;vertical-align:middle;margin-right:8px;" onerror="this.style.display='none';this.nextSibling.style.display='inline';" /><span style="display:none;">${recipe.icon}</span>`
+                            : recipe.icon;
 
-                    if (!isUnlocked) {
-                        card.innerHTML = `
-                                    <div class="resource-lock">🔒</div>
-                                    <div class="recipe-name" style="display:flex;align-items:center;justify-content:center;flex-wrap:wrap;">
-                                        ${recipeIcon} ${recipe.name}
-                                        <span class="recipe-level-req" style="width:100%;text-align:center;margin-top:4px;">Nível ${recipe.levelReq}</span>
-                                    </div>
-                                    <div class="recipe-desc">${recipe.desc}</div>
-                                    <div class="recipe-ingredients">
-                                        <div class="ingredient-row">
-                                            <span class="ingredient-name">Requer:</span>
-                                            <span class="ingredient-qty">${recipe.input.qty}x ${getItemName(recipe.input.type)}</span>
+                        if (!isUnlocked) {
+                            card.innerHTML = `
+                                        <div class="resource-lock">🔒</div>
+                                        <div class="recipe-name" style="display:flex;align-items:center;justify-content:center;flex-wrap:wrap;">
+                                            ${recipeIcon} ${recipe.name}
+                                            <span class="recipe-level-req" style="width:100%;text-align:center;margin-top:4px;">Nível ${recipe.levelReq}</span>
                                         </div>
-                                    </div>
-                                    <div class="recipe-result">
-                                        <span class="result-name">→ ${recipe.output.name}</span>
-                                        <span class="result-qty">+${recipe.output.qty}</span>
-                                    </div>
-                                    <div class="recipe-stats">
-                                        <span>🎯 ${recipe.xpGain} XP</span>
-                                        <span>💰 ${recipe.price} ouro</span>
-                                    </div>
-                                    <button class="craft-btn" disabled>🔒 Bloqueado</button>
-                                `;
+                                        <div class="recipe-desc">${recipe.desc}</div>
+                                        <div class="recipe-ingredients">
+                                            <div class="ingredient-row">
+                                                <span class="ingredient-name">Requer:</span>
+                                                <span class="ingredient-qty">${recipe.input.qty}x ${getItemName(recipe.input.type)}</span>
+                                            </div>
+                                        </div>
+                                        <div class="recipe-result">
+                                            <span class="result-name">→ ${recipe.output.name}</span>
+                                            <span class="result-qty">+${recipe.output.qty}</span>
+                                        </div>
+                                        <div class="recipe-stats">
+                                            <span>🎯 ${recipe.xpGain} XP</span>
+                                            <span>💰 ${recipe.price} ouro</span>
+                                        </div>
+                                        <button class="craft-btn" disabled>🔒 Bloqueado</button>
+                                    `;
+                        } else {
+                            card.innerHTML = `
+                                        <div class="recipe-name" style="display:flex;align-items:center;justify-content:center;">
+                                            ${recipeIcon} ${recipe.name}
+                                        </div>
+                                        <div class="recipe-desc">${recipe.desc}</div>
+                                        <div class="recipe-ingredients">
+                                            <div class="ingredient-row">
+                                                <span class="ingredient-name">Requer:</span>
+                                                <span class="ingredient-qty">${recipe.input.qty}x ${getItemName(recipe.input.type)}</span>
+                                            </div>
+                                        </div>
+                                        <div class="recipe-result">
+                                            <span class="result-name">→ ${recipe.output.name}</span>
+                                            <span class="result-qty">+${recipe.output.qty}</span>
+                                        </div>
+                                        <div class="recipe-stats">
+                                            <span>🎯 ${recipe.xpGain} XP</span>
+                                            <span>💰 ${recipe.price} ouro</span>
+                                        </div>
+                                        ${workerHtml}
+                                        <div class="craft-progress">
+                                            <div class="craft-progress-bar" id="progress_smithing_${recipe.id}" style="width: ${progressWidth}"></div>
+                                        </div>
+                                        <div class="craft-buttons-row" style="display: flex; gap: 8px; width: 100%; margin-top: 10px;">
+                                            <button class="craft-btn ${isCrafting ? 'crafting' : ''}" 
+                                                    onclick="startCrafting('smithing', '${recipe.id}', 1)"
+                                                    ${!canCraft ? 'disabled' : ''}>
+                                                ${isCrafting ? '⏳ Fundindo...' : '⚒️ Fundir (1)'}
+                                            </button>
+                                            <button class="craft-btn ${isCrafting ? 'crafting' : ''}" 
+                                                    onclick="startCrafting('smithing', '${recipe.id}', 'all')"
+                                                    ${!canCraft || maxQty <= 1 ? 'disabled' : ''}>
+                                                ${isCrafting ? '⏳ Fundindo...' : `⚒️ Todos (${maxQty})`}
+                                            </button>
+                                        </div>
+                                    `;
+                        }
+
+                        container.appendChild(card);
+                    });
+                } else if (forgeCategory === 'equip') {
+                    // Equipamentos filtrados por slot
+                    const filteredEquip = smithingEquipRecipes.filter(eq => {
+                        if (slotFilter === 'all') return true;
+                        return eq.slot === slotFilter;
+                    });
+
+                    if (filteredEquip.length === 0) {
+                        const emptyMsg = document.createElement('div');
+                        emptyMsg.style.cssText = 'grid-column: 1 / -1; text-align: center; color: #aaa; padding: 30px; font-size: 1.1em; border: 1px dashed #4a5a6a; border-radius: 8px;';
+                        emptyMsg.textContent = 'Nenhum equipamento forjável disponível para este slot no momento.';
+                        container.appendChild(emptyMsg);
                     } else {
-                        card.innerHTML = `
-                                    <div class="recipe-name" style="display:flex;align-items:center;justify-content:center;">
-                                        ${recipeIcon} ${recipe.name}
-                                    </div>
-                                    <div class="recipe-desc">${recipe.desc}</div>
-                                    <div class="recipe-ingredients">
-                                        <div class="ingredient-row">
-                                            <span class="ingredient-name">Requer:</span>
-                                            <span class="ingredient-qty">${recipe.input.qty}x ${getItemName(recipe.input.type)}</span>
-                                        </div>
-                                    </div>
-                                    <div class="recipe-result">
-                                        <span class="result-name">→ ${recipe.output.name}</span>
-                                        <span class="result-qty">+${recipe.output.qty}</span>
-                                    </div>
-                                    <div class="recipe-stats">
-                                        <span>🎯 ${recipe.xpGain} XP</span>
-                                        <span>💰 ${recipe.price} ouro</span>
-                                    </div>
-                                    ${workerHtml}
-                                    <div class="craft-progress">
-                                        <div class="craft-progress-bar" id="progress_smithing_${recipe.id}" style="width: ${progressWidth}"></div>
-                                    </div>
-                                    <div class="craft-buttons-row" style="display: flex; gap: 8px; width: 100%; margin-top: 10px;">
-                                        <button class="craft-btn ${isCrafting ? 'crafting' : ''}" 
-                                                onclick="startCrafting('smithing', '${recipe.id}', 1)"
-                                                ${!canCraft ? 'disabled' : ''}>
-                                            ${isCrafting ? '⏳ Fundindo...' : '⚒️ Fundir (1)'}
-                                        </button>
-                                        <button class="craft-btn ${isCrafting ? 'crafting' : ''}" 
-                                                onclick="startCrafting('smithing', '${recipe.id}', 'all')"
-                                                ${!canCraft || maxQty <= 1 ? 'disabled' : ''}>
-                                            ${isCrafting ? '⏳ Fundindo...' : `⚒️ Todos (${maxQty})`}
-                                        </button>
-                                    </div>
-                                `;
+                        filteredEquip.forEach(eq => {
+                            const isUnlocked = skillData.level >= eq.craftReq;
+                            const hasAll = eq.ingredients.every(ing => (gameState.inventory[ing.type] || 0) >= ing.qty);
+                            const workerCount = gameState.workers?.allocated?.[eq.id] || 0;
+                            const workerTotal = getWorkerTotal();
+                            const workerHtml = (workerTotal > 0 && isUnlocked) ? `
+                                <div class="worker-control" style="margin-top: 10px; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; justify-content: center;">
+                                    <button class="worker-btn" onclick="allocateWorker('${eq.id}', -1)" ${workerCount <= 0 ? 'disabled' : ''}>-</button>
+                                    <span class="worker-count" style="font-size: 0.9em; font-family:'Outfit', sans-serif;">👷 ${workerCount}</span>
+                                    <button class="worker-btn" onclick="allocateWorker('${eq.id}', 1)" ${getWorkerFree() <= 0 ? 'disabled' : ''}>+</button>
+                                    <button class="worker-btn" style="background:none;border:none;cursor:pointer;font-size:1.1em;padding:0;margin-left:5px;box-shadow:none;transition:transform 0.2s;" onclick="toggleWorkerNotification('${eq.id}')" title="Alternar notificações">${(gameState.notificationFilters?.workers?.[eq.id]) ? '🔕' : '🔔'}</button>
+                                </div>
+                            ` : '';
+
+                            const card = document.createElement('div');
+                            card.className = `recipe-card ${isUnlocked ? 'unlocked' : ''}`;
+                            card.style.cssText = 'border-color:#4a5a6a;';
+                            const ingHtml = eq.ingredients.map(ing => {
+                                const has = (gameState.inventory[ing.type] || 0) >= ing.qty;
+                                return `<div style="color:${has ? '#4aff4a' : '#ff4444'}">${ing.qty}x ${getItemName(ing.type)}</div>`;
+                            }).join('');
+                            const equipIcon = eq.image 
+                                ? `<img src="${eq.image}" style="width:48px;height:48px;vertical-align:middle;margin-right:8px;" onerror="this.style.display='none';this.nextSibling.style.display='inline';" /><span style="display:none;">${eq.icon}</span>`
+                                : eq.icon;
+                            card.innerHTML = `
+                                ${!isUnlocked ? '<div class="resource-lock">🔒</div>' : ''}
+                                <div class="recipe-name" style="color:#fff;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;">${equipIcon} ${eq.name} <span class="recipe-level-req" style="width:100%;text-align:center;margin-top:4px;">Nv.${eq.craftReq}</span></div>
+                                <div style="color:#888;font-size:0.8em;margin-bottom:8px;">[Básico] • ${slotNames[eq.slot] || eq.slot}</div>
+                                <div class="recipe-desc">${eq.desc}</div>
+                                <div style="color:#4aff4a;font-size:0.85em;margin:8px 0;">${formatStats(eq.stats)}</div>
+                                <div class="recipe-ingredients">${ingHtml}</div>
+                                ${workerHtml}
+                                <button class="craft-btn" onclick="craftEquipment('${eq.id}')" ${!isUnlocked || !hasAll ? 'disabled' : ''}>
+                                    ${!isUnlocked ? '🔒 Bloqueado' : '⚒️ Forjar'}
+                                </button>`;
+                            container.appendChild(card);
+                        });
                     }
-
-                    container.appendChild(card);
-                });
-
-                // Seção de equipamentos forjáveis
-                const equipSection = document.createElement('div');
-                equipSection.style.cssText = 'grid-column:1/-1;margin-top:20px;';
-                equipSection.innerHTML = `<div style="color:#ffd700;font-size:1.2em;font-weight:bold;margin-bottom:15px;border-bottom:1px solid #ffd700;padding-bottom:8px;">⚔️ Forjar Equipamentos</div>`;
-                const equipGrid = document.createElement('div');
-                equipGrid.style.cssText = 'display:grid;grid-template-columns:repeat(3,1fr);gap:15px;';
-
-                smithingEquipRecipes.forEach(eq => {
-                    const isUnlocked = skillData.level >= eq.craftReq;
-                    const hasAll = eq.ingredients.every(ing => (gameState.inventory[ing.type] || 0) >= ing.qty);
-                    const workerCount = gameState.workers?.allocated?.[eq.id] || 0;
-                    const workerTotal = getWorkerTotal();
-                    const workerHtml = (workerTotal > 0 && isUnlocked) ? `
-                        <div class="worker-control" style="margin-top: 10px; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; justify-content: center;">
-                            <button class="worker-btn" onclick="allocateWorker('${eq.id}', -1)" ${workerCount <= 0 ? 'disabled' : ''}>-</button>
-                            <span class="worker-count" style="font-size: 0.9em; font-family:'Outfit', sans-serif;">👷 ${workerCount}</span>
-                            <button class="worker-btn" onclick="allocateWorker('${eq.id}', 1)" ${getWorkerFree() <= 0 ? 'disabled' : ''}>+</button>
-                            <button class="worker-btn" style="background:none;border:none;cursor:pointer;font-size:1.1em;padding:0;margin-left:5px;box-shadow:none;transition:transform 0.2s;" onclick="toggleWorkerNotification('${eq.id}')" title="Alternar notificações">${(gameState.notificationFilters?.workers?.[eq.id]) ? '🔕' : '🔔'}</button>
-                        </div>
-                    ` : '';
-
-                    const card = document.createElement('div');
-                    card.className = `recipe-card ${isUnlocked ? 'unlocked' : ''}`;
-                    card.style.cssText = 'border-color:#4a5a6a;';
-                    const ingHtml = eq.ingredients.map(ing => {
-                        const has = (gameState.inventory[ing.type] || 0) >= ing.qty;
-                        return `<div style="color:${has ? '#4aff4a' : '#ff4444'}">${ing.qty}x ${getItemName(ing.type)}</div>`;
-                    }).join('');
-                    const equipIcon = eq.image 
-                        ? `<img src="${eq.image}" style="width:48px;height:48px;vertical-align:middle;margin-right:8px;" onerror="this.style.display='none';this.nextSibling.style.display='inline';" /><span style="display:none;">${eq.icon}</span>`
-                        : eq.icon;
-                    card.innerHTML = `
-                        ${!isUnlocked ? '<div class="resource-lock">🔒</div>' : ''}
-                        <div class="recipe-name" style="color:#fff;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;">${equipIcon} ${eq.name} <span class="recipe-level-req" style="width:100%;text-align:center;margin-top:4px;">Nv.${eq.craftReq}</span></div>
-                        <div style="color:#888;font-size:0.8em;margin-bottom:8px;">[Básico] • ${slotNames[eq.slot]}</div>
-                        <div class="recipe-desc">${eq.desc}</div>
-                        <div style="color:#4aff4a;font-size:0.85em;margin:8px 0;">${formatStats(eq.stats)}</div>
-                        <div class="recipe-ingredients">${ingHtml}</div>
-                        ${workerHtml}
-                        <button class="craft-btn" onclick="craftEquipment('${eq.id}')" ${!isUnlocked || !hasAll ? 'disabled' : ''}>
-                            ${!isUnlocked ? '🔒 Bloqueado' : '⚒️ Forjar'}
-                        </button>`;
-                    equipGrid.appendChild(card);
-                });
-
-                equipSection.appendChild(equipGrid);
-                container.appendChild(equipSection);
+                }
             } else if (tab === 'upgrade') {
                 renderSmithingUpgrade(container);
             }
+        }
+
+        // Handlers de Filtro para a Forja
+        function setSmithingForgeFilter(filter) {
+            gameState.smithingForgeFilter = filter;
+            updateSmithingPage();
+        }
+
+        function setSmithingSlotFilter(slot) {
+            gameState.smithingSlotFilter = slot;
+            updateSmithingPage();
         }
 
         // Mudar aba da Ferraria

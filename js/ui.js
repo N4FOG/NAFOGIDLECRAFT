@@ -262,10 +262,16 @@
                         } else {
                             buffText = `⚔️ +${buffPercent.toFixed(1)}% Dano`;
                         }
-                        buffEl.textContent = buffText;
+                        if (buffEl) buffEl.textContent = buffText;
                     }
                 }
             }
+
+            // Sincronizar estado de exibição (minimizado/expandido) das Perícias de Combate na Sidebar
+            if (typeof window.syncSidebarCombatSkillsState === 'function') {
+                window.syncSidebarCombatSkillsState();
+            }
+
             for (let s in gameState.skills) {
                 let d = gameState.skills[s];
                 let lvl = document.getElementById(s + 'LevelLarge');
@@ -1158,6 +1164,38 @@ window.donateToWell = async function() {
         if (typeof updateSidebarBuffs === 'function') updateSidebarBuffs();
     }
 }
+
+// Controle de Minimizar / Expandir Perícias de Combate na Sidebar
+window.toggleSidebarCombatSkills = function() {
+    const container = document.getElementById('sidebarCombatSkillsContainer');
+    const toggleBtn = document.getElementById('sidebarCombatSkillsToggleBtn');
+    if (!container) return;
+
+    const isHidden = container.style.display === 'none';
+    if (isHidden) {
+        container.style.display = 'block';
+        if (toggleBtn) toggleBtn.textContent = '-';
+        if (typeof gameState !== 'undefined') gameState.sidebarCombatSkillsCollapsed = false;
+    } else {
+        container.style.display = 'none';
+        if (toggleBtn) toggleBtn.textContent = '+';
+        if (typeof gameState !== 'undefined') gameState.sidebarCombatSkillsCollapsed = true;
+    }
+};
+
+window.syncSidebarCombatSkillsState = function() {
+    const container = document.getElementById('sidebarCombatSkillsContainer');
+    const toggleBtn = document.getElementById('sidebarCombatSkillsToggleBtn');
+    if (!container) return;
+
+    if (typeof gameState !== 'undefined' && gameState.sidebarCombatSkillsCollapsed) {
+        container.style.display = 'none';
+        if (toggleBtn) toggleBtn.textContent = '+';
+    } else {
+        container.style.display = 'block';
+        if (toggleBtn) toggleBtn.textContent = '-';
+    }
+};
 
 // Inicializar após carregamento
 setTimeout(initWishingWell, 1000);
