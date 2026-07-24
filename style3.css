@@ -1,0 +1,1158 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Cinzel:wght@600;700;900&display=swap');
+
+/* ============================================
+   IDLE CRAFT RPG — PREMIUM VISUAL REDESIGN
+   Estilo: Medieval Premium (Diablo IV / Albion / Melvor)
+   ============================================ */
+
+:root {
+    /* --- Tema Padrão --- */
+    --primary-color: #ffd700;
+    --primary-rgb: 255, 215, 0;
+    --accent-color: #ff9944;
+    --bg-gradient: radial-gradient(ellipse at 30% 20%, #1a2a3e 0%, #0d1520 50%, #050a0f 100%);
+    --bg-vignette: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.6) 100%);
+    --card-bg: linear-gradient(145deg, rgba(26, 38, 52, 0.85), rgba(16, 24, 34, 0.92));
+    --card-border: 1px solid rgba(170, 190, 220, 0.12);
+    --card-border-premium: 1px solid rgba(255, 215, 0, 0.15);
+    --glow-color: rgba(255, 215, 0, 0.15);
+    --glow-strong: rgba(255, 215, 0, 0.35);
+    --sidebar-bg: linear-gradient(160deg, rgba(14, 22, 34, 0.97), rgba(8, 14, 24, 0.98));
+    
+    /* Suporte a Customização */
+    --font-family-main: 'Outfit', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --font-family-title: 'Cinzel', 'Times New Roman', serif;
+    --text-color-main: #e0e6ed;
+    --text-color-dim: #7a8a9a;
+    --text-color-bright: #ffffff;
+    
+    /* Dimensões */
+    --panel-radius: 14px;
+    --panel-radius-sm: 10px;
+    --panel-radius-lg: 20px;
+    --border-glow: 0 0 15px rgba(255, 215, 0, 0.08);
+}
+
+/* Temas das Casas */
+body.class-guardiao_norte { --primary-color: #aaccff; --primary-rgb: 170,204,255; --accent-color: #5da4ff; --bg-gradient: radial-gradient(ellipse at 30% 20%, #0f1c2a 0%, #0a1420 50%, #050b10 100%); --card-bg: linear-gradient(145deg, rgba(20, 35, 55, 0.85), rgba(12, 22, 36, 0.92)); --glow-color: rgba(170,204,255,0.12); --glow-strong: rgba(170,204,255,0.3); }
+body.class-leao_ouro { --primary-color: #ffd700; --primary-rgb: 255,215,0; --accent-color: #d4af37; --bg-gradient: radial-gradient(ellipse at 30% 20%, #1a1205 0%, #0f0a02 50%, #080501 100%); --card-bg: linear-gradient(145deg, rgba(32, 25, 12, 0.87), rgba(18, 14, 6, 0.95)); --glow-color: rgba(255,215,0,0.15); --glow-strong: rgba(255,215,0,0.35); }
+body.class-senhor_fogo { --primary-color: #ff6644; --primary-rgb: 255,102,68; --accent-color: #ff2222; --bg-gradient: radial-gradient(ellipse at 30% 20%, #1f0a0a 0%, #120505 50%, #080202 100%); --card-bg: linear-gradient(145deg, rgba(45, 15, 15, 0.87), rgba(24, 8, 8, 0.95)); --glow-color: rgba(255,102,68,0.12); --glow-strong: rgba(255,102,68,0.3); }
+body.class-mar_negro { --primary-color: #3a8a9a; --primary-rgb: 58,138,154; --accent-color: #00ffd2; --bg-gradient: radial-gradient(ellipse at 30% 20%, #05141a 0%, #030d10 50%, #010508 100%); --card-bg: linear-gradient(145deg, rgba(10, 35, 45, 0.87), rgba(5, 18, 24, 0.95)); --glow-color: rgba(0,255,210,0.12); --glow-strong: rgba(0,255,210,0.3); }
+body.class-jardim_eterno { --primary-color: #7acc7a; --primary-rgb: 122,204,122; --accent-color: #4aff4a; --bg-gradient: radial-gradient(ellipse at 30% 20%, #051805 0%, #030d03 50%, #010801 100%); --card-bg: linear-gradient(145deg, rgba(12, 35, 12, 0.87), rgba(6, 18, 6, 0.95)); --glow-color: rgba(74,255,74,0.12); --glow-strong: rgba(74,255,74,0.3); }
+body.class-ultima_guarda { --primary-color: #c9a44a; --primary-rgb: 201,164,74; --accent-color: #d4a373; --bg-gradient: radial-gradient(ellipse at 30% 20%, #1a160d 0%, #0f0c06 50%, #0a0905 100%); --card-bg: linear-gradient(145deg, rgba(35, 28, 15, 0.87), rgba(20, 16, 8, 0.95)); --glow-color: rgba(201,164,74,0.12); --glow-strong: rgba(201,164,74,0.3); }
+
+/* ============================================
+   RESET & GLOBAL
+   ============================================ */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: var(--font-family-main); color: var(--text-color-main); }
+h1, h2, h3, .menu-title, .ng-title, .sidebar-title, .combat-title, .dungeon-detail-title, .page-title {
+    font-family: var(--font-family-title);
+    font-weight: 700;
+}
+
+body {
+    background: var(--bg-gradient);
+    min-height: 100vh;
+    padding: 12px;
+    color: var(--text-color-main);
+    transition: background 0.8s ease;
+    position: relative;
+}
+
+/* Camada de vinheta + ruído sutil sobre o body */
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: var(--bg-vignette);
+    pointer-events: none;
+    z-index: -1;
+}
+body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: -1;
+    opacity: 0.15;
+}
+
+/* ============================================
+   GAME CONTAINER — Premium Frame
+   ============================================ */
+.game-container {
+    max-width: 1400px;
+    width: 100%;
+    background: linear-gradient(135deg, rgba(12, 20, 30, 0.85), rgba(6, 12, 20, 0.92));
+    border-radius: var(--panel-radius-lg);
+    padding: 16px;
+    box-shadow: 
+        0 30px 80px rgba(0, 0, 0, 0.7),
+        0 0 0 1px rgba(255, 215, 0, 0.06),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(170, 190, 220, 0.08);
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 12px;
+    position: relative;
+}
+
+/* Cantos decorativos */
+.game-container::before {
+    content: '✦';
+    position: absolute;
+    top: -8px; left: 50%;
+    transform: translateX(-50%);
+    font-size: 1.2em;
+    color: var(--primary-color);
+    text-shadow: 0 0 10px var(--glow-strong);
+    opacity: 0.5;
+}
+
+/* ============================================
+   SCROLLBAR PREMIUM
+   ============================================ */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 3px; }
+::-webkit-scrollbar-thumb { background: rgba(255, 215, 0, 0.2); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255, 215, 0, 0.35); }
+
+/* Firefox */
+* { scrollbar-width: thin; scrollbar-color: rgba(255,215,0,0.2) rgba(0,0,0,0.2); }
+
+/* ============================================
+   SIDEBAR — Painel de Personagem Premium
+   ============================================ */
+.sidebar {
+    background: var(--sidebar-bg);
+    border-radius: var(--panel-radius);
+    padding: 14px 12px;
+    border: 1px solid rgba(170, 190, 220, 0.08);
+    height: fit-content;
+    box-shadow: 
+        0 15px 40px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    position: relative;
+    overflow: hidden;
+}
+
+.sidebar::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+    opacity: 0.3;
+}
+
+.sidebar-title {
+    color: var(--primary-color);
+    font-size: 1.15em;
+    margin-bottom: 18px;
+    text-align: center;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    position: relative;
+    padding-bottom: 12px;
+    font-family: var(--font-family-title);
+    text-shadow: 0 0 20px rgba(255, 215, 0, 0.15);
+}
+.sidebar-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 20%; right: 20%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+}
+
+.sidebar-category {
+    color: var(--text-color-dim);
+    font-size: 0.75em;
+    margin-top: 18px;
+    margin-bottom: 10px;
+    padding-left: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-weight: 600;
+}
+
+.sidebar-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 18px;
+}
+
+/* --- MENU BUTTONS Premium --- */
+.menu-btn {
+    background: linear-gradient(135deg, rgba(42, 58, 74, 0.6), rgba(30, 42, 56, 0.7));
+    color: #c8d6e5;
+    border: 1px solid rgba(100, 130, 160, 0.15);
+    padding: 9px 14px;
+    border-radius: var(--panel-radius-sm);
+    cursor: pointer;
+    font-size: 0.95em;
+    font-weight: 600;
+    transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+    overflow: hidden;
+    letter-spacing: 0.3px;
+}
+.menu-btn::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; bottom: 0;
+    width: 3px;
+    background: transparent;
+    transition: background 0.2s;
+    border-radius: 0 2px 2px 0;
+}
+.menu-btn:hover {
+    background: linear-gradient(135deg, rgba(52, 72, 92, 0.7), rgba(38, 54, 72, 0.8));
+    transform: translateX(4px);
+    border-color: rgba(170, 190, 220, 0.2);
+    color: #fff;
+}
+.menu-btn:hover::before { background: var(--primary-color); }
+.menu-btn.active {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.12), rgba(200, 160, 0, 0.06));
+    border-color: rgba(255, 215, 0, 0.3);
+    color: var(--primary-color);
+    box-shadow: inset 0 0 20px rgba(255, 215, 0, 0.05);
+}
+.menu-btn.active::before { background: var(--primary-color); box-shadow: 0 0 10px var(--glow-strong); }
+
+/* Cores dos botões por categoria */
+.menu-btn.mercado, .menu-btn.woodcutting { border-left: 3px solid rgba(74, 154, 74, 0.5); }
+.menu-btn.mining { border-left: 3px solid rgba(201, 176, 74, 0.5); }
+.menu-btn.fishing { border-left: 3px solid rgba(74, 201, 217, 0.5); }
+.menu-btn.cooking { border-left: 3px solid rgba(255, 159, 74, 0.5); }
+.menu-btn.crafting { border-left: 3px solid rgba(201, 154, 74, 0.5); }
+.menu-btn.smithing { border-left: 3px solid rgba(201, 122, 122, 0.5); }
+.menu-btn.combat { border-left: 3px solid rgba(255, 102, 102, 0.5); }
+.menu-btn.inventory { border-left: 3px solid rgba(106, 138, 201, 0.5); }
+.menu-btn.pets { border-left: 3px solid rgba(201, 106, 201, 0.5); }
+.menu-btn.tech { border-left: 3px solid rgba(74, 201, 122, 0.5); }
+.menu-btn.alchemy { border-left: 3px solid rgba(201, 122, 154, 0.5); }
+.menu-btn.dungeon { border-left: 3px solid rgba(138, 74, 201, 0.5); }
+.menu-btn.property { border-left: 3px solid rgba(106, 201, 106, 0.5); }
+
+/* --- PLAYER INFO BAR (Sidebar) Premium --- */
+.player-info-bar {
+    background: linear-gradient(135deg, rgba(0,0,0,0.35), rgba(0,0,0,0.2));
+    border-radius: var(--panel-radius-sm);
+    padding: 14px;
+    margin-bottom: 14px;
+    border: 1px solid rgba(170, 190, 220, 0.06);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    position: relative;
+}
+.player-info-bar::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 10%; right: 10%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,215,0,0.1), transparent);
+}
+.player-avatar-display {
+    font-size: 2.4em;
+    filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.2));
+    background: rgba(0,0,0,0.2);
+    border-radius: 50%;
+    width: 52px; height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid rgba(255, 215, 0, 0.1);
+}
+.player-name-display { color: var(--primary-color); font-weight: 700; font-size: 0.95em; letter-spacing: 0.5px; }
+.player-class-display { color: var(--text-color-dim); font-size: 0.78em; margin-top: 2px; }
+.player-gold-display { color: #f0c040; font-size: 0.8em; margin-top: 4px; font-weight: 600; letter-spacing: 0.3px; }
+
+/* --- SIDEBAR STATS Premium --- */
+.sidebar-stats {
+    margin-top: 8px;
+    margin-bottom: 10px;
+    padding: 12px;
+    background: rgba(0,0,0,0.2);
+    border-radius: var(--panel-radius-sm);
+    border: 1px solid rgba(255,255,255,0.04);
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    color: #ccc;
+    margin-bottom: 4px;
+    padding: 4px 8px;
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 6px;
+    transition: background 0.2s;
+}
+.stat-row:hover { background: rgba(0, 0, 0, 0.25); }
+.stat-label { color: var(--text-color-dim); font-size: 0.82em; }
+.stat-value { color: var(--primary-color); font-weight: 700; font-size: 0.85em; }
+
+/* --- BUFFS ATIVOS Premium --- */
+.active-buffs-section {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+}
+.active-buffs-title {
+    color: var(--text-color-dim);
+    font-size: 0.7em;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 8px;
+    padding-left: 4px;
+    font-weight: 600;
+}
+.buff-tag {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(0,0,0,0.25);
+    border-radius: 8px;
+    padding: 6px 10px;
+    margin-bottom: 5px;
+    border-left: 3px solid #4aff4a;
+    font-size: 0.8em;
+    color: #ddd;
+    transition: all 0.2s;
+}
+.buff-tag:hover { background: rgba(0,0,0,0.35); }
+.buff-tag.pet { border-left-color: #c96ac9; }
+.buff-tag.potion { border-left-color: #4a9aff; }
+.buff-tag.tech { border-left-color: #4ac97a; }
+.buff-tag.equip { border-left-color: #ffd700; }
+.buff-tag.passive { border-left-color: #ff9944; animation: none; opacity: 1; }
+.buff-tag.tool { border-left-color: #c9a44a; }
+.buff-tag.worldboss { border-left-color: #9b59b6; }
+.buff-tag.globalevent { border-left-color: #ffd700; }
+.buff-timer {
+    font-size: 0.78em;
+    color: #ff9944;
+    font-family: monospace;
+    flex-shrink: 0;
+    background: rgba(0,0,0,0.25);
+    padding: 1px 6px;
+    border-radius: 8px;
+}
+
+/* ============================================
+   TOP STATS BAR — Premium HUD
+   ============================================ */
+.top-stats-bar {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: linear-gradient(135deg, rgba(8, 16, 28, 0.92), rgba(4, 10, 18, 0.95));
+    border-radius: var(--panel-radius-sm);
+    padding: 6px 10px;
+    margin-bottom: 8px;
+    border: 1px solid rgba(170, 190, 220, 0.06);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    flex-wrap: wrap;
+    position: relative;
+}
+.top-stats-bar::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,215,0,0.1), transparent);
+}
+.top-bar-resources { display: flex; gap: 4px; align-items: center; }
+.top-bar-divider {
+    width: 1px; height: 22px;
+    background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.1), transparent);
+    margin: 0 6px;
+    flex-shrink: 0;
+}
+.top-bar-item, .top-res-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: background 0.2s;
+    position: relative;
+    cursor: pointer;
+}
+.top-bar-item:hover, .top-res-item:hover { background: rgba(255,255,255,0.04); }
+.top-bar-icon { font-size: 0.85em; }
+.top-res-icon { display: flex; align-items: center; }
+.top-res-icon .game-icon { width: 24px; height: 24px; }
+.top-bar-label { font-size: 0.72em; color: var(--text-color-dim); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+.top-bar-value { font-size: 0.8em; color: #c8d6e5; font-weight: 700; }
+.top-res-qty { font-size: 0.78em; color: #c8d6e5; font-weight: 700; min-width: 20px; }
+
+/* Top Bar Tooltips premium */
+.top-bar-tooltip {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 6px;
+    background: rgba(8, 16, 28, 0.97);
+    border: 1px solid rgba(255, 215, 0, 0.15);
+    border-radius: var(--panel-radius-sm);
+    padding: 10px 14px;
+    min-width: 180px;
+    z-index: 10000;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    pointer-events: none;
+    backdrop-filter: blur(10px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    transform: translateY(4px);
+}
+.top-res-item:hover .top-bar-tooltip,
+.top-bar-item:hover .top-bar-tooltip {
+    display: block;
+    transform: translateY(0);
+}
+.tooltip-header { font-size: 0.82em; color: var(--primary-color); font-weight: 700; margin-bottom: 6px; font-family: var(--font-family-title); }
+.tooltip-list { display: flex; flex-direction: column; gap: 3px; }
+.tooltip-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75em;
+    color: #aaa;
+    padding: 2px 0;
+}
+.tooltip-row-name { color: #bbb; }
+.tooltip-row-qty { color: var(--primary-color); font-weight: 600; }
+
+/* ============================================
+   CONTENT AREA Premium
+   ============================================ */
+.content-area {
+    background: linear-gradient(145deg, rgba(22, 32, 44, 0.9), rgba(14, 22, 32, 0.95));
+    border-radius: var(--panel-radius);
+    padding: 16px;
+    border: 1px solid rgba(100, 130, 160, 0.1);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+}
+
+.content-page { display: none; margin-bottom: 25px; }
+.content-page.active {
+    display: block;
+    animation: fadeIn 0.4s ease;
+}
+
+/* ============================================
+   PAGE TITLE Premium
+   ============================================ */
+.page-title {
+    color: var(--primary-color);
+    font-size: 1.3em;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    position: relative;
+    letter-spacing: 1px;
+    text-shadow: 0 0 20px rgba(255, 215, 0, 0.1);
+}
+.page-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 60px; height: 2px;
+    background: linear-gradient(90deg, var(--primary-color), transparent);
+}
+
+/* ============================================
+   CARDS PREMIUM — Resource / Recipe / Tool / Pet
+   ============================================ */
+.resources-grid, .recipes-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin: 16px 0;
+}
+
+.resource-card, .recipe-card {
+    background: var(--card-bg);
+    border-radius: var(--panel-radius);
+    padding: 20px;
+    border: 1px solid rgba(100, 130, 160, 0.08);
+    position: relative;
+    opacity: 0.5;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+.resource-card.unlocked, .recipe-card.unlocked {
+    opacity: 1;
+    background: var(--card-bg);
+    border-color: rgba(100, 130, 160, 0.12);
+}
+.resource-card.unlocked:hover, .recipe-card.unlocked:hover {
+    transform: translateY(-3px);
+    border-color: rgba(255, 215, 0, 0.2);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3), 0 0 20px var(--glow-color);
+}
+
+.resource-card.locked { opacity: 0.35; }
+.resource-lock { position: absolute; top: 14px; right: 12px; color: #ff4444; font-size: 1em; }
+.resource-name {
+    color: #e8eef5;
+    font-size: 1.15em;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+}
+.resource-level-req { color: var(--primary-color); font-size: 0.75em; background: rgba(0,0,0,0.3); padding: 2px 8px; border-radius: 4px; }
+.resource-desc { color: var(--text-color-dim); font-size: 0.85em; margin-bottom: 14px; line-height: 1.4; }
+.resource-stats {
+    display: flex;
+    justify-content: space-between;
+    color: var(--text-color-dim);
+    font-size: 0.82em;
+    margin-bottom: 14px;
+    padding: 6px 10px;
+    background: rgba(0,0,0,0.15);
+    border-radius: 6px;
+}
+.resource-buttons { display: flex; gap: 10px; }
+
+/* --- BOTÕES Premium --- */
+.farm-btn, .craft-btn, .potion-btn, .tech-btn, .tool-buy-btn, .academy-btn, .prop-btn, .pet-btn {
+    flex: 1;
+    background: linear-gradient(135deg, #3a8a3a 0%, #2a6a2a 100%);
+    color: #fff;
+    font-weight: 700;
+    border: 1px solid rgba(74, 154, 74, 0.3);
+    padding: 10px 16px;
+    border-radius: var(--panel-radius-sm);
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: all 0.2s ease;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255,255,255,0.05);
+    position: relative;
+    overflow: hidden;
+    letter-spacing: 0.3px;
+}
+.farm-btn:hover:not(:disabled), .craft-btn:hover:not(:disabled),
+.potion-btn:hover:not(:disabled), .tech-btn:hover:not(:disabled),
+.tool-buy-btn:hover:not(:disabled), .academy-btn:hover:not(:disabled),
+.prop-btn:hover:not(:disabled), .pet-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.25), 0 0 12px rgba(74, 154, 74, 0.2);
+    filter: brightness(1.1);
+}
+.farm-btn:disabled, .craft-btn:disabled {
+    background: rgba(255, 255, 255, 0.03) !important;
+    border: 1px solid rgba(255, 255, 255, 0.06) !important;
+    color: rgba(255, 255, 255, 0.2) !important;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+    filter: none !important;
+}
+
+/* Botão Upgrade / Ação especial */
+.prop-btn.upgrade { background: linear-gradient(135deg, #3a8a3a, #2a6a2a); }
+.prop-btn.collect { background: linear-gradient(135deg, #c97a3a, #a85e2a); }
+
+/* --- BOTÃO ATIVO COM GLOW --- */
+.menu-btn.active {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.12), rgba(200, 160, 0, 0.06));
+    border-color: rgba(255, 215, 0, 0.3);
+    color: var(--primary-color);
+    box-shadow: inset 0 0 20px rgba(255, 215, 0, 0.05);
+}
+
+/* ============================================
+   PROGRESS BARS Premium
+   ============================================ */
+.total-level-bar, .skill-progress-large, .combat-health-bar {
+    background: rgba(0,0,0,0.3);
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.04);
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+    position: relative;
+}
+.total-level-progress, .skill-progress-bar-large, .health-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-color), #ffaa00);
+    border-radius: 10px;
+    transition: width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    position: relative;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), 0 0 10px var(--glow-color);
+}
+
+.player-health-bar { background: linear-gradient(90deg, #00e676, #00a152); }
+.enemy-health-bar { background: linear-gradient(90deg, #ff5252, #c62828); }
+
+/* ============================================
+   TOOLTIP PREMIUM (Item Info Modal)
+   ============================================ */
+.item-info-modal {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(145deg, #1a2636, #0e1824);
+    border: 1px solid rgba(255, 215, 0, 0.2);
+    border-radius: var(--panel-radius);
+    padding: 24px;
+    min-width: 320px;
+    max-width: 420px;
+    z-index: 2000;
+    box-shadow: 
+        0 30px 80px rgba(0,0,0,0.6),
+        0 0 0 1px rgba(255,215,0,0.06);
+    backdrop-filter: blur(10px);
+}
+.item-info-modal .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    border-bottom: 1px solid rgba(255, 215, 0, 0.1);
+    padding-bottom: 12px;
+}
+.item-info-modal .modal-header h3 { color: var(--primary-color); font-size: 1.2em; font-family: var(--font-family-title); }
+.item-info-modal .close-modal { background: none; border: none; color: var(--text-color-dim); font-size: 1.4em; cursor: pointer; padding: 0 5px; transition: color 0.2s; }
+.item-info-modal .close-modal:hover { color: #fff; }
+.item-info-modal .modal-icon { font-size: 3em; text-align: center; margin-bottom: 14px; filter: drop-shadow(0 0 10px rgba(255,215,0,0.1)); }
+.item-info-modal .modal-description { color: #d0d8e0; line-height: 1.5; margin-bottom: 14px; }
+.item-info-modal .modal-uses { background: rgba(0,0,0,0.2); border-radius: var(--panel-radius-sm); padding: 12px; margin-top: 10px; border: 1px solid rgba(255,255,255,0.04); }
+.item-info-modal .modal-uses h4 { color: var(--primary-color); margin-bottom: 8px; font-size: 0.85em; }
+.item-info-modal .modal-uses ul { margin-left: 18px; color: var(--text-color-dim); }
+.item-info-modal .modal-uses li { margin-bottom: 4px; font-size: 0.85em; }
+
+/* ============================================
+   NOTIFICATIONS Premium
+   ============================================ */
+.notification-area {
+    position: fixed;
+    top: 56px;
+    right: 16px;
+    z-index: 5000;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: none;
+}
+.notification-toast {
+    background: linear-gradient(135deg, rgba(22, 34, 48, 0.96), rgba(12, 20, 32, 0.98));
+    border-left: 3px solid var(--primary-color);
+    border-radius: var(--panel-radius-sm);
+    padding: 14px 18px;
+    color: #e0e8f0;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,215,0,0.06);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 260px;
+    max-width: 360px;
+    animation: slideIn 0.3s ease, fadeOut 0.3s ease 3s forwards;
+    pointer-events: auto;
+    backdrop-filter: blur(10px);
+}
+
+/* ============================================
+   MODAIS PREMIUM (Config, Perfil, Ranking, etc)
+   ============================================ */
+.game-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    z-index: 3000;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(4px);
+}
+.modal-content {
+    background: linear-gradient(145deg, #162236, #0c1420);
+    border-radius: var(--panel-radius-lg);
+    padding: 28px;
+    max-width: 700px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    border: 1px solid rgba(255, 215, 0, 0.1);
+    box-shadow: 0 30px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,215,0,0.04);
+    animation: modalFadeIn 0.25s ease;
+}
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.modal-title { font-family: var(--font-family-title); color: var(--primary-color); font-size: 1.2em; letter-spacing: 1px; }
+.modal-close {
+    background: none; border: none;
+    color: var(--text-color-dim); font-size: 1.4em;
+    cursor: pointer; transition: color 0.2s;
+    width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%;
+}
+.modal-close:hover { color: #fff; background: rgba(255,255,255,0.06); }
+
+@keyframes modalFadeIn {
+    from { transform: scale(0.95); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* ============================================
+   SKILL DETAIL Premium
+   ============================================ */
+.skill-detail {
+    background: linear-gradient(145deg, rgba(30, 42, 56, 0.9), rgba(20, 28, 40, 0.95));
+    border-radius: var(--panel-radius);
+    padding: 20px 28px;
+    border: 1px solid rgba(100, 130, 160, 0.08);
+}
+.skill-icon { font-size: 4em; margin-bottom: 8px; text-align: center; filter: drop-shadow(0 0 15px rgba(255,215,0,0.1)); }
+.skill-name-large { color: #e8eef5; font-size: 2.2em; margin-bottom: 6px; text-align: center; font-family: var(--font-family-title); }
+.skill-level-large { color: var(--primary-color); font-size: 1.3em; margin-bottom: 4px; text-align: center; }
+.skill-progress-large { height: 24px; }
+.skill-progress-bar-large { height: 100%; background: linear-gradient(90deg, var(--primary-color), #ffaa00); border-radius: 10px; }
+.skill-xp-large { color: var(--text-color-dim); font-size: 1em; margin-bottom: 6px; text-align: center; }
+
+/* ============================================
+   INVENTORY Premium
+   ============================================ */
+.inventory-page {
+    background: linear-gradient(145deg, rgba(22, 32, 44, 0.92), rgba(14, 22, 32, 0.96));
+    border-radius: var(--panel-radius);
+    padding: 24px;
+    border: 1px solid rgba(100, 130, 160, 0.08);
+}
+.inventory-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.inventory-header h3 { color: var(--primary-color); font-size: 1.5em; font-family: var(--font-family-title); }
+.inventory-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.inventory-slot {
+    background: linear-gradient(145deg, rgba(30, 42, 56, 0.8), rgba(20, 28, 40, 0.85));
+    border: 1px solid rgba(100, 130, 160, 0.1);
+    border-radius: var(--panel-radius-sm);
+    padding: 14px;
+    text-align: center;
+    min-height: 110px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    transition: all 0.2s ease;
+}
+.inventory-slot.filled:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 15px var(--glow-color);
+}
+.inventory-item { color: #d0d8e0; }
+.inventory-item .item-icon { font-size: 1.8em; margin-bottom: 6px; }
+.inventory-item .item-name { font-size: 0.82em; margin-bottom: 4px; word-break: break-word; }
+.inventory-item .item-amount { color: var(--primary-color); font-weight: 700; font-size: 1.1em; }
+
+/* ============================================
+   PROPRIEDADE (Property/Camp) Premium
+   ============================================ */
+.property-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.prop-card {
+    background: var(--card-bg);
+    border: 1px solid rgba(100, 130, 160, 0.08);
+    border-radius: var(--panel-radius);
+    padding: 18px;
+    transition: all 0.2s;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+.prop-card:hover { border-color: rgba(90, 122, 90, 0.2); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.2); }
+.prop-card.locked { opacity: 0.4; }
+.prop-header {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 12px; padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.prop-icon { font-size: 2em; filter: drop-shadow(0 0 6px rgba(255,215,0,0.1)); }
+.prop-name { color: var(--primary-color); font-size: 1em; font-weight: 700; }
+.prop-level { color: var(--text-color-dim); font-size: 0.75em; margin-top: 2px; }
+.prop-desc { color: var(--text-color-dim); font-size: 0.78em; margin-bottom: 12px; line-height: 1.4; }
+.prop-production { background: rgba(0,0,0,0.15); border-radius: 6px; padding: 8px 10px; margin-bottom: 10px; font-size: 0.8em; }
+.prop-prod-row { display: flex; justify-content: space-between; color: var(--text-color-dim); margin-bottom: 3px; }
+.prop-prod-row span { color: #4aff4a; font-weight: 600; }
+.prop-upgrade-cost { color: var(--primary-color); font-size: 0.85em; margin-bottom: 8px; text-align: center; }
+
+/* ============================================
+   TOOLS Premium
+   ============================================ */
+.tools-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 10px; }
+.tool-card {
+    background: var(--card-bg);
+    border: 1px solid rgba(100, 130, 160, 0.08);
+    border-radius: var(--panel-radius);
+    padding: 20px 16px;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+.tool-card:hover { border-color: rgba(90, 106, 122, 0.2); transform: translateY(-2px); }
+.tool-icon { font-size: 2.8em; margin-bottom: 10px; filter: drop-shadow(0 0 8px rgba(255,215,0,0.1)); }
+.tool-name { color: #e0e8f0; font-size: 1.1em; font-weight: 700; margin-bottom: 4px; }
+.tool-tier-pip { width: 26px; height: 7px; border-radius: 4px; background: rgba(0,0,0,0.3); border: 1px solid rgba(100,130,160,0.1); transition: background 0.3s; }
+.tool-tier-pip.filled { background: var(--primary-color); border-color: var(--primary-color); box-shadow: 0 0 6px rgba(255,215,0,0.3); }
+
+/* ============================================
+   COMBAT PREMIUM
+   ============================================ */
+.combat-area {
+    background: linear-gradient(145deg, rgba(40, 22, 22, 0.9), rgba(24, 12, 12, 0.95));
+    border-radius: var(--panel-radius);
+    padding: 28px;
+    border: 1px solid rgba(255, 68, 68, 0.08);
+}
+.combat-title { color: #ff5252; font-size: 1.8em; font-weight: 700; font-family: var(--font-family-title); }
+.combat-status { color: #fff; background: linear-gradient(135deg, #ff4444, #cc2222); padding: 6px 22px; border-radius: 20px; font-size: 0.85em; font-weight: 600; }
+.combat-vs { color: var(--primary-color); font-size: 2em; font-weight: 700; text-align: center; font-family: var(--font-family-title); text-shadow: 0 0 20px rgba(255,215,0,0.2); }
+.combat-btn { background: linear-gradient(135deg, #ff4444, #cc2222); color: #fff; border: none; padding: 14px 28px; border-radius: var(--panel-radius-sm); cursor: pointer; font-weight: 700; transition: all 0.2s; letter-spacing: 0.5px; }
+.combat-btn:hover { transform: translateY(-1px); box-shadow: 0 5px 15px rgba(255,68,68,0.3); }
+.combat-btn.reset { background: linear-gradient(135deg, #555, #333); }
+
+/* ============================================
+   MENU INICIAL PREMIUM
+   ============================================ */
+#mainMenuScreen, #newGameScreen {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 30%, #0f1a2a 0%, #080e18 50%, #03060c 100%);
+    z-index: 9000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow-y: auto;
+    padding: 40px 20px;
+}
+#mainMenuScreen::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.6) 100%);
+    pointer-events: none;
+}
+.menu-logo {
+    font-size: 5em;
+    margin-bottom: 6px;
+    filter: drop-shadow(0 0 30px rgba(255,215,0,0.4));
+    animation: logoPulse 3s ease-in-out infinite;
+}
+.menu-title {
+    color: var(--primary-color);
+    font-size: 3em;
+    font-weight: 700;
+    letter-spacing: 6px;
+    text-shadow: 0 0 40px rgba(255,215,0,0.3);
+    margin-bottom: 4px;
+    font-family: var(--font-family-title);
+}
+.menu-subtitle { color: var(--text-color-dim); font-size: 0.85em; letter-spacing: 3px; margin-bottom: 40px; text-transform: uppercase; }
+.menu-btn-main {
+    width: 340px;
+    padding: 16px;
+    margin-bottom: 12px;
+    border-radius: var(--panel-radius-sm);
+    border: 1px solid;
+    font-size: 1.1em;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    letter-spacing: 2px;
+    position: relative;
+    overflow: hidden;
+}
+.menu-btn-main.continue {
+    background: linear-gradient(135deg, rgba(26, 58, 42, 0.8), rgba(15, 42, 26, 0.9));
+    border-color: rgba(74, 255, 74, 0.2);
+    color: #4aff4a;
+}
+.menu-btn-main.continue:hover {
+    background: linear-gradient(135deg, rgba(42, 74, 58, 0.85), rgba(26, 58, 42, 0.95));
+    box-shadow: 0 0 30px rgba(74, 255, 74, 0.2);
+    transform: scale(1.02);
+}
+.menu-btn-main.newgame {
+    background: linear-gradient(135deg, rgba(58, 26, 26, 0.8), rgba(42, 15, 15, 0.9));
+    border-color: rgba(255, 102, 68, 0.2);
+    color: #ff6644;
+}
+.menu-btn-main.newgame:hover {
+    background: linear-gradient(135deg, rgba(74, 42, 42, 0.85), rgba(58, 26, 26, 0.95));
+    box-shadow: 0 0 30px rgba(255, 102, 68, 0.2);
+    transform: scale(1.02);
+}
+
+/* ============================================
+   NEW GAME SCREEN Premium
+   ============================================ */
+.ng-container { width: 100%; max-width: 860px; }
+.ng-title { color: var(--primary-color); font-size: 1.8em; font-weight: 700; text-align: center; margin-bottom: 28px; letter-spacing: 3px; font-family: var(--font-family-title); text-shadow: 0 0 20px rgba(255,215,0,0.1); }
+.ng-section {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(100, 130, 160, 0.08);
+    border-radius: var(--panel-radius);
+    padding: 20px 24px;
+    margin-bottom: 18px;
+}
+.ng-section-title { color: var(--text-color-dim); font-size: 0.75em; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 14px; font-weight: 600; }
+.ng-name-input {
+    width: 100%;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(100, 130, 160, 0.12);
+    border-radius: var(--panel-radius-sm);
+    padding: 14px 18px;
+    color: #fff;
+    font-size: 1.1em;
+    outline: none;
+    transition: border-color 0.2s;
+}
+.ng-name-input:focus { border-color: var(--primary-color); }
+.ng-name-input::placeholder { color: rgba(100, 130, 160, 0.3); }
+.ng-gender-btn {
+    flex: 1; padding: 12px; border-radius: var(--panel-radius-sm);
+    border: 1px solid rgba(100, 130, 160, 0.1);
+    background: rgba(0,0,0,0.2);
+    color: var(--text-color-dim); font-size: 1em; cursor: pointer; transition: all 0.2s;
+}
+.ng-gender-btn.selected { border-color: var(--primary-color); background: rgba(255,215,0,0.06); color: var(--primary-color); }
+.ng-class-card {
+    background: rgba(0,0,0,0.2);
+    border: 1px solid rgba(100, 130, 160, 0.06);
+    border-radius: var(--panel-radius-sm);
+    padding: 12px 10px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+}
+.ng-class-card:hover { border-color: rgba(74, 106, 138, 0.2); background: rgba(255,255,255,0.03); transform: translateY(-2px); }
+.ng-class-card.selected { border-color: var(--primary-color); background: rgba(255,215,0,0.04); box-shadow: 0 0 15px rgba(255,215,0,0.08); }
+.ng-start-btn {
+    width: 100%; padding: 16px;
+    background: linear-gradient(135deg, rgba(58, 42, 10, 0.8), rgba(42, 26, 0, 0.9));
+    border: 1px solid rgba(255, 215, 0, 0.2);
+    border-radius: var(--panel-radius-sm);
+    color: var(--primary-color);
+    font-size: 1.2em; font-weight: 700;
+    cursor: pointer; letter-spacing: 3px;
+    transition: all 0.3s; margin-top: 10px;
+}
+.ng-start-btn:hover { background: linear-gradient(135deg, rgba(74, 58, 26, 0.85), rgba(58, 42, 10, 0.95)); box-shadow: 0 0 30px rgba(255,215,0,0.15); transform: scale(1.01); }
+.ng-start-btn:disabled { opacity: 0.25; cursor: not-allowed; transform: none; box-shadow: none; }
+
+/* ============================================
+   PET CARD Premium
+   ============================================ */
+.pet-card {
+    background: var(--card-bg);
+    border: 1px solid rgba(100, 130, 160, 0.08);
+    border-radius: var(--panel-radius);
+    padding: 18px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.pet-card:hover { transform: translateY(-2px); border-color: rgba(100, 130, 160, 0.2); }
+.pet-card.owned { border-color: rgba(255, 215, 0, 0.2); }
+.pet-card.active { border-color: rgba(74, 255, 74, 0.3); box-shadow: 0 0 20px rgba(74, 255, 74, 0.1); }
+.pet-icon { font-size: 3.5em; margin-bottom: 8px; filter: drop-shadow(0 0 12px rgba(255,215,0,0.15)); }
+.pet-name { color: var(--primary-color); font-size: 1.15em; margin-bottom: 8px; font-weight: 700; }
+.pet-effect { background: rgba(0,0,0,0.15); border-radius: 6px; padding: 8px; margin: 8px 0; font-size: 0.8em; color: var(--text-color-dim); }
+.pet-btn.buy { background: linear-gradient(135deg, #3a8a3a, #2a6a2a); }
+.pet-btn.activate { background: linear-gradient(135deg, #3a6a8a, #2a4a6a); }
+.pet-btn.active { background: linear-gradient(135deg, #cc3333, #aa2222); }
+
+/* ============================================
+   TECH CATEGORY Premium
+   ============================================ */
+.tech-category {
+    background: var(--card-bg);
+    border: 1px solid rgba(100, 130, 160, 0.08);
+    border-radius: var(--panel-radius);
+    padding: 18px;
+    margin-bottom: 18px;
+}
+.tech-header { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; border-bottom: 1px solid rgba(255,215,0,0.08); padding-bottom: 10px; }
+.tech-header-icon { font-size: 2em; }
+.tech-header h3 { color: var(--primary-color); font-size: 1.3em; font-family: var(--font-family-title); }
+.tech-upgrade { background: rgba(0,0,0,0.15); border-radius: var(--panel-radius-sm); padding: 14px; }
+
+/* ============================================
+   POTION CARD Premium
+   ============================================ */
+.potion-card {
+    background: var(--card-bg);
+    border: 1px solid rgba(100, 130, 160, 0.08);
+    border-radius: var(--panel-radius);
+    padding: 18px;
+    text-align: center;
+}
+.potion-icon { font-size: 2.8em; margin-bottom: 8px; filter: drop-shadow(0 0 10px rgba(255,215,0,0.1)); }
+.potion-name { color: var(--primary-color); font-size: 1.1em; margin-bottom: 6px; font-weight: 700; }
+.potion-desc { color: var(--text-color-dim); font-size: 0.8em; margin-bottom: 8px; }
+
+/* ============================================
+   SHOP/ACADEMY Premium
+   ============================================ */
+.shop-tabs { display: flex; gap: 8px; margin-bottom: 18px; }
+.shop-tab {
+    flex: 1;
+    background: rgba(0,0,0,0.2);
+    color: var(--text-color-dim);
+    border: 1px solid rgba(100, 130, 160, 0.1);
+    padding: 10px;
+    border-radius: var(--panel-radius-sm);
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+.shop-tab.active {
+    background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(200,160,0,0.05));
+    border-color: rgba(255,215,0,0.2);
+    color: var(--primary-color);
+}
+.academy-card {
+    background: var(--card-bg);
+    border: 1px solid rgba(100, 130, 160, 0.08);
+    border-radius: var(--panel-radius);
+    padding: 22px;
+    text-align: center;
+}
+.academy-icon { font-size: 2.8em; margin-bottom: 12px; filter: drop-shadow(0 0 8px rgba(255,215,0,0.1)); }
+
+/* ============================================
+   WORKER CONTROLS Premium
+   ============================================ */
+.worker-control {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(0,0,0,0.15);
+    padding: 6px 10px;
+    border-radius: 6px;
+    margin: 8px 0;
+}
+.worker-btn {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: #c8d6e5;
+    width: 28px; height: 28px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: 700;
+    transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center;
+}
+.worker-btn:hover { background: rgba(255,255,255,0.1); }
+.worker-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.worker-count { font-size: 0.85em; color: #c8d6e5; font-weight: 700; min-width: 28px; text-align: center; }
+.worker-prod { font-size: 0.75em; color: var(--text-color-dim); }
+
+/* ============================================
+   FORGE / SAWMILL LOG Premium
+   ============================================ */
+.forge-log-container {
+    background: rgba(0,0,0,0.15);
+    border-radius: var(--panel-radius-sm);
+    padding: 10px;
+    border: 1px solid rgba(255,255,255,0.04);
+    max-height: 120px;
+    overflow-y: auto;
+}
+
+/* ============================================
+   EQUIPMENT COMPARISON Premium
+   ============================================ */
+.eq-sub-tabs-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    background: rgba(0,0,0,0.15);
+    padding: 8px 12px;
+    border-radius: var(--panel-radius-sm);
+    border: 1px solid rgba(255, 153, 68, 0.08);
+    margin-bottom: 14px;
+}
+.eq-subtab-btn {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    color: var(--text-color-dim);
+    padding: 5px 12px;
+    font-size: 0.75em;
+    font-weight: 600;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.eq-subtab-btn:hover { background: rgba(255,255,255,0.08); color: #fff; border-color: rgba(255,255,255,0.12); }
+.eq-subtab-btn.active { background: var(--accent-color); color: #0f1928; font-weight: 700; border-color: var(--accent-color); box-shadow: 0 0 10px rgba(255, 153, 68, 0.2); }
+
+/* ============================================
+   RARITY COLORS
+   ============================================ */
+.rarity-common { color: #a0aec0; }
+.rarity-uncommon { color: #4aff4a; }
+.rarity-rare { color: #4a9aff; }
+.rarity-epic { color: #c96ac9; }
+.rarity-legendary { color: #ffd700; }
+.rarity-ancient { color: #ff44aa; }
+
+/* ============================================
+   MICRO ANIMATIONS
+   ============================================ */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+@keyframes fadeOut { to { transform: translateX(100%); opacity: 0; } }
+@keyframes logoPulse { 0%,100% { filter: drop-shadow(0 0 20px rgba(255,215,0,0.3)); } 50% { filter: drop-shadow(0 0 40px rgba(255,215,0,0.6)); } }
+@keyframes crownFloat { 0%,100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-4px) rotate(3deg); } }
+@keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+@keyframes buffPulse { 0%,100% { opacity: 1; } 50% { opacity: 0.8; } }
+
+/* Hover Lift (use com .hover-lift) */
+.hover-lift { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.hover-lift:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.2); }
+
+/* ============================================
+   RESPONSIVO — Mantendo compatibilidade
+   ============================================ */
+@media (max-width: 1200px) {
+    .game-container { grid-template-columns: 200px 1fr; gap: 10px; padding: 12px; }
+    .resources-grid, .recipes-grid { grid-template-columns: repeat(2, 1fr); }
+    .property-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 992px) {
+    .game-container { grid-template-columns: 1fr; gap: 10px; padding: 12px; }
+    .sidebar { display: none; }
+    .sidebar.mobile-open { display: block; position: fixed; inset: 0; z-index: 8000; overflow-y: auto; border-radius: 0; }
+    .hide-mobile { display: none !important; }
+    .top-bar-divider.mobile-hide { display: none; }
+}
+@media (max-width: 768px) {
+    .game-container { grid-template-columns: 1fr; padding: 14px; border-radius: 16px; }
+    .sidebar { display: none; }
+    .sidebar.mobile-open { display: block; position: fixed; inset: 0; z-index: 8000; overflow-y: auto; border-radius: 0; }
+    .resources-grid, .recipes-grid { grid-template-columns: 1fr; }
+    .property-grid { grid-template-columns: 1fr; }
+    .inventory-grid { grid-template-columns: repeat(2, 1fr); }
+    body { padding: 8px; }
+    .top-stats-bar { padding: 6px 10px; gap: 4px; font-size: 0.85em; }
+    .top-bar-divider.mobile-hide { display: none; }
+}
+@media (max-width: 480px) {
+    .inventory-grid { grid-template-columns: repeat(1, 1fr); }
+    .page-title { font-size: 1.2em; }
+}
