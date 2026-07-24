@@ -58,7 +58,11 @@
                 { id: 'ore2', name: 'Minério de Ferro', icon: '⚙️', levelReq: 15, xpGain: 15, price: 10, desc: 'Mais resistente' },
                 { id: 'ore3', name: 'Minério de Prata', icon: '🥈', levelReq: 35, xpGain: 35, price: 22, desc: 'Brilhante' },
                 { id: 'ore4', name: 'Minério de Ouro', icon: '🥇', levelReq: 60, xpGain: 80, price: 40, desc: 'Valioso' },
-                { id: 'ore5', name: 'Minério de Mitril', icon: '💫', levelReq: 85, xpGain: 200, price: 70, desc: 'Lendário' }
+                { id: 'ore5', name: 'Minério de Mitril', icon: '💫', levelReq: 85, xpGain: 200, price: 70, desc: 'Lendário' },
+                { id: 'ore6', name: 'Minério de Titânio', image: 'img/ore6_titanio.jpg', levelReq: 70, xpGain: 350, price: 120, desc: 'Minério de titânio denso e ultrarresistente' },
+                { id: 'ore7', name: 'Minério de Adamantita', image: 'img/bar7_adamantita.jpg', levelReq: 80, xpGain: 600, price: 200, desc: 'Minério verde radiante com dureza lendária' },
+                { id: 'ore8', name: 'Minério de Obsidiana', image: 'img/weapon_obsidian.jpg', levelReq: 95, xpGain: 1200, price: 380, desc: 'Vidro vulcânico incandescente' },
+                { id: 'ore9', name: 'Minério Estelar', image: 'img/shield_starfall.jpg', levelReq: 100, xpGain: 2500, price: 800, desc: 'Fragmento de meteorito cósmico' }
             ],
             fishing: [
                 { id: 'fish1', name: 'Peixe Pequeno', icon: '🐟', levelReq: 1, xpGain: 6, price: 2, desc: 'Fácil de pescar', healAmount: 10 },
@@ -271,6 +275,54 @@
                 time: 4.0,
                 desc: 'Barra lendária de mitril',
                 price: 100
+            },
+            {
+                id: 'bar6',
+                name: 'Barra de Titânio',
+                image: 'img/ore6_titanio.jpg',
+                levelReq: 70,
+                input: { type: 'ore6', qty: 3 },
+                output: { type: 'bar6', qty: 1, name: 'Barra de Titânio' },
+                xpGain: 1500,
+                time: 4.2,
+                desc: 'Barra leve e resistente de titânio',
+                price: 300
+            },
+            {
+                id: 'bar7',
+                name: 'Barra de Adamantita',
+                image: 'img/bar7_adamantita.jpg',
+                levelReq: 80,
+                input: { type: 'ore7', qty: 3 },
+                output: { type: 'bar7', qty: 1, name: 'Barra de Adamantita' },
+                xpGain: 2200,
+                time: 4.5,
+                desc: 'Barra verde escura e impenetrável de adamantita',
+                price: 500
+            },
+            {
+                id: 'bar8',
+                name: 'Barra de Obsidiana',
+                image: 'img/weapon_obsidian.jpg',
+                levelReq: 95,
+                input: { type: 'ore8', qty: 3 },
+                output: { type: 'bar8', qty: 1, name: 'Barra de Obsidiana' },
+                xpGain: 4000,
+                time: 5.0,
+                desc: 'Barra negra e incandescente com veios de lava',
+                price: 900
+            },
+            {
+                id: 'bar9',
+                name: 'Barra Estelar',
+                image: 'img/shield_starfall.jpg',
+                levelReq: 100,
+                input: { type: 'ore9', qty: 3 },
+                output: { type: 'bar9', qty: 1, name: 'Barra Estelar' },
+                xpGain: 8000,
+                time: 6.0,
+                desc: 'Barra cósmica cintilante de poeira estelar',
+                price: 2000
             },
             {
                 id: 'blade1',

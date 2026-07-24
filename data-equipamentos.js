@@ -64,7 +64,13 @@ const equipmentData = {
     'wb_chimera_boots':  { id: 'wb_chimera_boots',  name: 'Botas da Tempestade',         icon: '⚡', slot: 'boots',  rarity: 'ancient', stats: { speedBonus: 45, strength: 20, maxHealth: 80 }, desc: 'Botas envoltas pela fúria da Quimera.', price: 2500 },
     'wb_stone_helm':     { id: 'wb_stone_helm',     name: 'Elmo Titânico de Rocha',      icon: '🪖', slot: 'helmet', rarity: 'ancient', stats: { defense: 45, maxHealth: 250, strength: 20 }, desc: 'Elmo pesado esculpido da rocha viva do Titã.', price: 2800 },
     'wb_dracula_cloak':  { id: 'wb_dracula_cloak',  name: 'Manto Sanguinário de Drácula', icon: '🧛', slot: 'armor',  rarity: 'ancient', stats: { defense: 35, critChance: 18, lifesteal: 8 },    desc: 'Manto lendário do Soberano das Sombras.', price: 3000 },
-    'wb_slime_crown':    { id: 'wb_slime_crown',    name: 'Coroa de Slime Supremo',       icon: '👑', slot: 'ring',   rarity: 'ancient', stats: { maxHealth: 300, xpBonus: 20, speedBonus: 15 }, desc: 'Relíquia viscosa e pulsante do Rei Slime.', price: 2500 }
+    'wb_slime_crown':    { id: 'wb_slime_crown',    name: 'Coroa de Slime Supremo',       icon: '👑', slot: 'ring',   rarity: 'ancient', stats: { maxHealth: 300, xpBonus: 20, speedBonus: 15 }, desc: 'Relíquia viscosa e pulsante do Rei Slime.', price: 2500 },
+
+    // NOVOS EQUIPAMENTOS CRAFTÁVEIS DE FERRARIA (AVANÇADOS)
+    'weapon_titanium':   { id: 'weapon_titanium',   name: 'Lâmina de Titânio',          image: 'img/ore6_titanio.jpg', slot: 'weapon', rarity: 'epic',      stats: { strength: 45, critChance: 12 }, desc: 'Lâmina afiada e ultraleve de titânio', craftSkill: 'smithing', craftReq: 70, ingredients: [{ type: 'bar6', qty: 3 }], price: 1200, weaponSkillType: 'melee' },
+    'armor_adamantite':  { id: 'armor_adamantite',  name: 'Placa de Adamantita',         image: 'img/bar7_adamantita.jpg', slot: 'armor', rarity: 'legendary', stats: { defense: 55, maxHealth: 180 }, desc: 'Armadura pesada e impenetrável de adamantita', craftSkill: 'smithing', craftReq: 80, ingredients: [{ type: 'bar7', qty: 4 }], price: 2200 },
+    'weapon_obsidian':   { id: 'weapon_obsidian',   name: 'Machado de Obsidiana',       image: 'img/weapon_obsidian.jpg', slot: 'weapon', rarity: 'ancient',    stats: { strength: 75, critChance: 20, lifesteal: 5 }, desc: 'Machado vulcânico com veios incandescentes de lava', craftSkill: 'smithing', craftReq: 95, ingredients: [{ type: 'bar8', qty: 4 }], price: 4500, weaponSkillType: 'melee' },
+    'shield_starfall':   { id: 'shield_starfall',   name: 'Escudo Estelar Cósmico',      image: 'img/shield_starfall.jpg', slot: 'shield', rarity: 'ancient',    stats: { defense: 85, maxHealth: 350, strength: 25 }, desc: 'Escudo forjado com poeira e metais de meteorito estelar', craftSkill: 'smithing', craftReq: 100, ingredients: [{ type: 'bar9', qty: 4 }], price: 8000 }
 };
 
 // Receitas de equipamentos para Ferraria e Criação
