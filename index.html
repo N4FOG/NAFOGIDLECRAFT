@@ -1287,12 +1287,15 @@
             </div>
 
             <!-- QUICK LINKS: botoes de atalho rapido -->
-            <div class="sidebar-quick-links layout-editable" id="sidebarQuickLinks" data-layout-label="⚡ Atalhos Rápidos" style="display: none; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 14px; margin-top: 2px;">
-                <button class="menu-btn inventory layout-editable" id="qlBtnInventory" data-layout-label="📦 Botão Inventário" onclick="showPage('inventory')" style="padding: 10px 5px; justify-content: center; text-align: center; gap: 6px; font-size: 0.85em; transition: all 0.2s ease;">
+            <div class="sidebar-quick-links layout-editable" id="sidebarQuickLinks" data-layout-label="⚡ Atalhos Rápidos" style="display: none; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin: 6px 12px; margin-top: 4px;">
+                <button class="menu-btn inventory layout-editable" id="qlBtnInventory" data-layout-label="📦 Botão Inventário" onclick="showPage('inventory')" style="padding: 8px 3px; justify-content: center; text-align: center; gap: 4px; font-size: 0.78em; transition: all 0.2s ease;">
                     <img src="img/07_chest.png" class="game-icon" alt="Inventário"><span>Inventário</span>
                 </button>
-                <button class="menu-btn property layout-editable" id="qlBtnProperty" data-layout-label="🏡 Botão Propriedade" onclick="showPage('property')" style="padding: 10px 5px; justify-content: center; text-align: center; gap: 6px; font-size: 0.85em; transition: all 0.2s ease;">
+                <button class="menu-btn property layout-editable" id="qlBtnProperty" data-layout-label="🏡 Botão Propriedade" onclick="showPage('property')" style="padding: 8px 3px; justify-content: center; text-align: center; gap: 4px; font-size: 0.78em; transition: all 0.2s ease;">
                     <img src="img/20_house.png" class="game-icon" alt="Propriedade"><span>Propriedade</span>
+                </button>
+                <button class="menu-btn layout-editable" id="qlBtnCharacter" data-layout-label="🧙 Botão Personagem" onclick="showPage('character')" style="padding: 8px 3px; justify-content: center; text-align: center; gap: 4px; font-size: 0.78em; transition: all 0.2s ease;">
+                    <img src="img/24_mage.png" class="game-icon" alt="Personagem"><span>Personagem</span>
                 </button>
             </div>
 
@@ -6819,44 +6822,6 @@
                 </div>
             </div>
         </div>
-    <style>
-        /* ===== ABA DE NAVEGAÇÃO DO PAINEL ADMIN ===== */
-        .adm-tab-btn {
-            padding: 9px 16px;
-            background: rgba(20, 30, 50, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 8px;
-            color: #bbb;
-            font-family: 'Outfit', sans-serif;
-            font-size: 0.85em;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .adm-tab-btn:hover {
-            background: rgba(255, 255, 255, 0.12);
-            color: #fff;
-            transform: translateY(-2px);
-            border-color: rgba(255, 255, 255, 0.25);
-        }
-        .adm-tab-btn.active {
-            background: linear-gradient(135deg, #e74c3c, #c0392b);
-            border-color: #ff6b6b;
-            color: #fff;
-            font-weight: bold;
-            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
-        }
-        .adm-section-tab {
-            animation: fadeInTab 0.25s ease-out;
-        }
-        @keyframes fadeInTab {
-            from { opacity: 0; transform: translateY(6px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
         /* ===== CHANGELOG NO MENU INICIAL ===== */
         .menu-changelog {
             margin-top: 20px;

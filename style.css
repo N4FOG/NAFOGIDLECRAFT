@@ -1042,56 +1042,259 @@
         }
 
         .academy-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-        }
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+}
 
-        .academy-card {
-            background: #2a3a4a;
-            border-radius: 15px;
-            padding: 25px;
-            border: 2px solid #4a5a6a;
-            text-align: center;
-        }
+/* ============================================
+   ACADEMY / TOOL CARD — Premium Shop Card
+   ============================================ */
+.academy-card {
+    background: linear-gradient(160deg, rgba(26, 38, 52, 0.92), rgba(16, 24, 36, 0.96));
+    border-radius: 16px;
+    padding: 22px 18px 20px;
+    text-align: center;
+    position: relative;
+    border: 1px solid rgba(120, 150, 190, 0.1);
+    box-shadow: 
+        0 8px 24px rgba(0,0,0,0.25),
+        inset 0 1px 0 rgba(255,255,255,0.04);
+    transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+    overflow: hidden;
+}
 
-        .academy-icon {
-            font-size: 3em;
-            margin-bottom: 15px;
-        }
+/* Brilho decorativo no topo do card */
+.academy-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 15%; right: 15%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.12), transparent);
+    pointer-events: none;
+    z-index: 1;
+}
 
-        .academy-name {
-            color: #fff;
-            font-size: 1.5em;
-            margin-bottom: 10px;
-        }
+/* Borda dupla ornamental (interna) */
+.academy-card::after {
+    content: '';
+    position: absolute;
+    top: 4px; left: 4px; right: 4px; bottom: 4px;
+    border: 1px solid rgba(170, 190, 220, 0.04);
+    border-radius: 13px;
+    pointer-events: none;
+}
 
-        .academy-value {
-            color: #ffd700;
-            font-size: 2em;
-            margin-bottom: 15px;
-        }
+/* Cantos ornamentados com SVG — 4 cantos */
+.academy-card 
 
-        .academy-desc {
-            color: #aaa;
-            margin-bottom: 20px;
-        }
+/* Ornamentos de canto via background radial + bordas decorativas */
+.academy-card::before {
+    /* Reaproveitado do brilho do topo - mantido */
+}
 
-        .academy-cost {
-            color: #ffd700;
-            font-size: 1.2em;
-            margin-bottom: 15px;
-        }
+.academy-card {
+    /* Cantos decorativos via box-shadow multi-camada */
+    box-shadow: 
+        0 8px 24px rgba(0,0,0,0.25),
+        inset 0 1px 0 rgba(255,255,255,0.04),
+        /* Canto superior esquerdo */
+        2px 2px 0 -1px rgba(255, 215, 0, 0.04),
+        /* Canto superior direito */
+        -2px 2px 0 -1px rgba(255, 215, 0, 0.04),
+        /* Canto inferior esquerdo */
+        2px -2px 0 -1px rgba(255, 215, 0, 0.04),
+        /* Canto inferior direito */
+        -2px -2px 0 -1px rgba(255, 215, 0, 0.04);
+}
 
-        .academy-btn {
-            width: 100%;
-            background: #4a9a4a;
-            color: #fff;
-            border: none;
-            padding: 12px;
-            border-radius: 8px;
-            cursor: pointer;
-        }
+
+
+.academy-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(180, 200, 230, 0.15);
+    box-shadow: 
+        0 12px 32px rgba(0,0,0,0.35),
+        0 0 20px rgba(255, 215, 0, 0.04),
+        inset 0 1px 0 rgba(255,255,255,0.06),
+        2px 2px 0 -1px rgba(255, 215, 0, 0.08),
+        -2px 2px 0 -1px rgba(255, 215, 0, 0.08),
+        2px -2px 0 -1px rgba(255, 215, 0, 0.08),
+        -2px -2px 0 -1px rgba(255, 215, 0, 0.08);
+}
+
+.academy-card:active {
+    transform: scale(0.98);
+    transition-duration: 0.08s;
+}
+
+/* ===== ICONE — Medalhão Premium ===== */
+.academy-icon {
+    width: 72px;
+    height: 72px;
+    margin: 0 auto 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.8em;
+    background: radial-gradient(circle at 40% 30%, rgba(255,215,0,0.08), rgba(0,0,0,0.2));
+    border-radius: 50%;
+    border: 2px solid rgba(255, 215, 0, 0.2);
+    box-shadow: 
+        0 0 0 3px rgba(30, 40, 55, 0.8),
+        0 0 0 4px rgba(255, 215, 0, 0.06),
+        inset 0 2px 4px rgba(0,0,0,0.3),
+        0 4px 12px rgba(0,0,0,0.2);
+    transition: all 0.25s ease;
+    position: relative;
+}
+
+/* Brilho superior no medalhão */
+.academy-icon::after {
+    content: '';
+    position: absolute;
+    top: 4px; left: 15px; right: 15px;
+    height: 30%;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.1), transparent);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.academy-card:hover .academy-icon {
+    border-color: rgba(255, 215, 0, 0.35);
+    box-shadow: 
+        0 0 0 3px rgba(30, 40, 55, 0.8),
+        0 0 0 4px rgba(255, 215, 0, 0.1),
+        inset 0 2px 4px rgba(0,0,0,0.3),
+        0 6px 20px rgba(255, 215, 0, 0.08);
+}
+
+/* ===== NOME ===== */
+.academy-name {
+    color: #e8eef5;
+    font-size: 1.15em;
+    font-weight: 700;
+    margin-bottom: 6px;
+    letter-spacing: 0.5px;
+    font-family: 'Cinzel', serif;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+/* ===== VALOR / NÍVEL ===== */
+.academy-value {
+    color: #ffd700;
+    font-size: 2.4em;
+    font-weight: 800;
+    margin-bottom: 12px;
+    font-family: 'Cinzel', serif;
+    text-shadow: 
+        0 2px 4px rgba(0,0,0,0.3),
+        0 0 15px rgba(255, 215, 0, 0.1);
+    line-height: 1.1;
+    position: relative;
+    padding-bottom: 14px;
+}
+
+/* Separador ornamental abaixo do nível */
+.academy-value::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 20%; right: 20%;
+    height: 1.5px;
+    background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.25), transparent);
+    border-radius: 1px;
+}
+
+/* ===== DESCRIÇÃO ===== */
+.academy-desc {
+    color: #9aabb8;
+    font-size: 0.82em;
+    margin-bottom: 14px;
+    line-height: 1.4;
+    font-weight: 400;
+    padding: 0 4px;
+}
+
+/* ===== PREÇO ===== */
+.academy-cost {
+    color: #ffd700;
+    font-size: 1.15em;
+    font-weight: 700;
+    margin-bottom: 14px;
+    font-family: 'Cinzel', serif;
+    letter-spacing: 0.5px;
+    text-shadow: 
+        0 1px 3px rgba(0,0,0,0.3),
+        0 0 10px rgba(255, 215, 0, 0.06);
+    padding: 6px 10px;
+    background: rgba(0,0,0,0.15);
+    border-radius: 8px;
+    display: inline-block;
+    min-width: 60%;
+    border: 1px solid rgba(255, 215, 0, 0.08);
+}
+
+/* ===== BOTÃO COMPRAR — Premium ===== */
+.academy-btn {
+    width: 100%;
+    background: linear-gradient(160deg, #3a9a4a 0%, #2e8a3e 50%, #227a32 100%);
+    color: #fff;
+    border: 1px solid rgba(80, 200, 110, 0.4);
+    padding: 11px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: 700;
+    font-family: 'Outfit', sans-serif;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    transition: all 0.22s cubic-bezier(0.25, 0.8, 0.25, 1);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 
+        0 4px 12px rgba(0,0,0,0.2),
+        inset 0 1px 0 rgba(255,255,255,0.15);
+}
+
+/* Brilho superior no botão */
+.academy-btn::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 45%;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.1), transparent);
+    border-radius: 10px 10px 0 0;
+    pointer-events: none;
+}
+
+.academy-btn:hover {
+    transform: translateY(-2px);
+    background: linear-gradient(160deg, #46aa56 0%, #359a46 50%, #288a3a 100%);
+    box-shadow: 
+        0 6px 18px rgba(0,0,0,0.3),
+        0 0 15px rgba(74, 200, 100, 0.15),
+        inset 0 1px 0 rgba(255,255,255,0.2);
+    border-color: rgba(80, 220, 120, 0.5);
+}
+
+.academy-btn:active {
+    transform: scale(0.97);
+    transition-duration: 0.08s;
+    box-shadow: 
+        0 2px 6px rgba(0,0,0,0.2),
+        inset 0 2px 4px rgba(0,0,0,0.15);
+}
+
+.academy-btn:disabled {
+    background: rgba(255, 255, 255, 0.04) !important;
+    border: 1px solid rgba(255, 255, 255, 0.06) !important;
+    color: rgba(255, 255, 255, 0.2) !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+}
 
         .pet-card {
             background: #2a3a4a;
@@ -1340,25 +1543,172 @@
         }
 
         .shop-tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
+    display: flex;
+    gap: 6px;
+    margin-bottom: 20px;
+    background: linear-gradient(135deg, rgba(10, 18, 28, 0.6), rgba(5, 10, 18, 0.7));
+    padding: 5px;
+    border-radius: 12px;
+    border: 1px solid rgba(170, 190, 220, 0.08);
+    box-shadow: 
+        inset 0 1px 0 rgba(255, 255, 255, 0.03),
+        0 4px 12px rgba(0, 0, 0, 0.2);
+    position: relative;
+}
 
-        .shop-tab {
-            flex: 1;
-            background: #2a3a4a;
-            color: #fff;
-            border: 2px solid #3a4a5a;
-            padding: 12px;
-            border-radius: 8px;
-            cursor: pointer;
-        }
+.shop-tabs::before {
+    content: '';
+    position: absolute;
+    top: -1px; left: 10%; right: 10%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.1), transparent);
+    pointer-events: none;
+}
 
-        .shop-tab.active {
-            background: #ffd700;
-            color: #000;
-        }
+.shop-tab {
+    flex: 1;
+    background: transparent;
+    color: #8a9aaa;
+    border: 1px solid transparent;
+    padding: 10px 14px;
+    border-radius: 9px;
+    cursor: pointer;
+    font-size: 0.85em;
+    font-weight: 600;
+    font-family: 'Outfit', sans-serif;
+    transition: all 0.22s cubic-bezier(0.25, 0.8, 0.25, 1);
+    letter-spacing: 0.3px;
+    text-shadow: 0 1px 1px rgba(0,0,0,0.3);
+    position: relative;
+    white-space: nowrap;
+}
+
+.shop-tab:hover {
+    color: #d0d8e0;
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(170, 190, 220, 0.08);
+    transform: translateY(-1px);
+}
+
+.shop-tab:active {
+    transform: translateY(-1px) scale(0.97);
+    transition-duration: 0.08s;
+}
+
+.shop-tab.active {
+    color: #0f1928;
+    background: linear-gradient(135deg, #ffd700 0%, #e6b800 50%, #d4a800 100%);
+    border: 1px solid rgba(255, 215, 0, 0.4);
+    box-shadow: 
+        0 2px 8px rgba(255, 215, 0, 0.25),
+        0 0 15px rgba(255, 215, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+    font-weight: 800;
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);
+    letter-spacing: 0.5px;
+}
+
+.shop-tab.active::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 50%;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.15), transparent);
+    border-radius: 9px 9px 0 0;
+    pointer-events: none;
+}
+
+/* ============================================
+   ADMIN TABS — Premium
+   ============================================ */
+.admin-tabs-nav {
+    display: flex !important;
+    gap: 6px !important;
+    flex-wrap: wrap !important;
+    padding: 6px 8px 0 8px !important;
+    background: linear-gradient(135deg, rgba(10, 18, 28, 0.6), rgba(5, 10, 18, 0.7));
+    border-radius: 12px 12px 0 0;
+    border: 1px solid rgba(170, 190, 220, 0.08);
+    border-bottom: none;
+    box-shadow: 
+        inset 0 1px 0 rgba(255, 255, 255, 0.03),
+        0 4px 12px rgba(0, 0, 0, 0.2);
+    position: relative;
+}
+
+.admin-tabs-nav::before {
+    content: '';
+    position: absolute;
+    top: -1px; left: 10%; right: 10%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.1), transparent);
+    pointer-events: none;
+}
+
+.adm-tab-btn {
+    padding: 8px 14px !important;
+    background: transparent !important;
+    border: 1px solid transparent !important;
+    border-radius: 9px !important;
+    color: #8a9aaa !important;
+    font-family: 'Outfit', sans-serif !important;
+    font-size: 0.82em !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: all 0.22s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+    letter-spacing: 0.2px;
+    text-shadow: 0 1px 1px rgba(0,0,0,0.3);
+    position: relative;
+}
+
+.adm-tab-btn:hover {
+    color: #d0d8e0 !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-color: rgba(170, 190, 220, 0.1) !important;
+    transform: translateY(-1px) !important;
+}
+
+.adm-tab-btn:active {
+    transform: translateY(-1px) scale(0.97) !important;
+    transition-duration: 0.08s !important;
+}
+
+.adm-tab-btn.active {
+    color: #ffffff !important;
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 50%, #a93226 100%) !important;
+    border: 1px solid rgba(255, 107, 107, 0.4) !important;
+    box-shadow: 
+        0 2px 8px rgba(231, 76, 60, 0.3),
+        0 0 15px rgba(231, 76, 60, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.1) !important;
+    font-weight: 800 !important;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    letter-spacing: 0.4px;
+}
+
+.adm-tab-btn.active::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 50%;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.12), transparent);
+    border-radius: 9px 9px 0 0;
+    pointer-events: none;
+}
+
+.adm-section-tab {
+    animation: fadeInTab 0.25s ease-out;
+}
+
+@keyframes fadeInTab {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
 
         .shop-section {
             display: none;
@@ -4120,8 +4470,8 @@
     .shop-tab {
         flex: 1 1 45%;
         text-align: center;
-        padding: 10px 5px !important;
-        font-size: 0.85em !important;
+        padding: 8px 6px !important;
+        font-size: 0.8em !important;
     }
 }
 
@@ -6832,11 +7182,74 @@ body.layout-editor-active .le-toggle-btn:hover {
     filter: drop-shadow(0 0 8px rgba(255,215,0,0.15)) drop-shadow(0 1px 3px rgba(0,0,0,0.4));
 }
 
+/* Botão Personagem (Perfil) */
+#qlBtnCharacter {
+    background: linear-gradient(160deg, rgba(80, 50, 90, 0.55), rgba(60, 35, 70, 0.6)) !important;
+    border: 1px solid rgba(180, 120, 200, 0.2) !important;
+    border-bottom: 2px solid rgba(180, 120, 200, 0.15) !important;
+    border-radius: 10px !important;
+    box-shadow: 
+        inset 0 1px 0 rgba(255, 255, 255, 0.06),
+        0 2px 6px rgba(0, 0, 0, 0.2) !important;
+    color: #c8a8e0 !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.4px;
+    transition: all 0.22s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+    position: relative;
+    overflow: hidden;
+}
+
+#qlBtnCharacter::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 45%;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.06), transparent);
+    border-radius: 10px 10px 0 0;
+    pointer-events: none;
+}
+
+#qlBtnCharacter:hover {
+    transform: translateY(-2px) !important;
+    background: linear-gradient(160deg, rgba(100, 65, 115, 0.65), rgba(75, 46, 88, 0.7)) !important;
+    border-color: rgba(200, 140, 230, 0.35) !important;
+    border-bottom-color: rgba(200, 140, 230, 0.25) !important;
+    box-shadow: 
+        inset 0 1px 0 rgba(255, 255, 255, 0.1),
+        0 4px 14px rgba(160, 100, 200, 0.15) !important;
+    color: #dcc0f0 !important;
+}
+
+#qlBtnCharacter:active {
+    transform: translateY(-1px) scale(0.97) !important;
+    transition-duration: 0.08s !important;
+    box-shadow: 
+        inset 0 2px 4px rgba(0,0,0,0.3),
+        0 1px 3px rgba(0,0,0,0.2) !important;
+}
+
+/* Ajuste dos ícones */
+#qlBtnInventory .game-icon,
+#qlBtnProperty .game-icon,
+#qlBtnCharacter .game-icon {
+    width: 24px !important;
+    height: 24px !important;
+    filter: drop-shadow(0 1px 3px rgba(0,0,0,0.4));
+    transition: filter 0.2s ease;
+}
+
+#qlBtnInventory:hover .game-icon,
+#qlBtnProperty:hover .game-icon,
+#qlBtnCharacter:hover .game-icon {
+    filter: drop-shadow(0 0 8px rgba(255,215,0,0.15)) drop-shadow(0 1px 3px rgba(0,0,0,0.4));
+}
+
 #qlBtnInventory span,
-#qlBtnProperty span {
-    font-size: 0.9em;
+#qlBtnProperty span,
+#qlBtnCharacter span {
+    font-size: 0.8em;
     font-family: 'Outfit', sans-serif;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.3px;
     position: relative;
     z-index: 1;
 }
