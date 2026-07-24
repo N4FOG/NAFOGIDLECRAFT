@@ -168,6 +168,48 @@
                     const count = gameState.workers.allocated[resourceId];
                     if (count <= 0) continue;
                     
+                    // AUTO FUEL: Trabalhadores abastecendo a fornalha
+                    if (resourceId === 'auto_fuel') {
+                        // Throttle de log: só loga error uma vez a cada 15s
+                        if (!window._autoFuelLastLog) window._autoFuelLastLog = 0;
+                        const canLog = Date.now() - window._autoFuelLastLog > 15000;
+                        
+                        if (gameState.property.forge.enabled === false) {
+                            if (canLog && typeof addForgeLog === 'function') {
+                                addForgeLog('👷 Abastecedores parados — Fornalha desligada.', 'error');
+                                window._autoFuelLastLog = Date.now();
+                            }
+                            continue;
+                        }
+                        let fuelCount = 0;
+                        for (let w = 0; w < count; w++) {
+                            if (gameState.property.forge.heat >= 100) break;
+                            // Tenta pegar a madeira de menor tier primeiro
+                            const woodTypes = ['wood1', 'wood2', 'wood3', 'wood4', 'wood5'];
+                            let woodFound = null;
+                            for (const wt of woodTypes) {
+                                if ((gameState.inventory[wt] || 0) > 0) {
+                                    woodFound = wt;
+                                    break;
+                                }
+                            }
+                            if (!woodFound) break;
+                            gameState.inventory[woodFound]--;
+                            gameState.property.forge.heat = Math.min(100, gameState.property.forge.heat + 5);
+                            fuelCount++;
+                        }
+                        if (fuelCount > 0) {
+                            if (typeof addForgeLog === 'function') addForgeLog(`👷 ${fuelCount}x madeira queimada (+${fuelCount * 5} Calor)`, 'fuel');
+                            anyWork = true;
+                        } else if (gameState.property.forge.heat < 100 && canLog) {
+                            if (typeof addForgeLog === 'function') {
+                                addForgeLog('👷 Abastecedores sem madeira disponível!', 'error');
+                                window._autoFuelLastLog = Date.now();
+                            }
+                        }
+                        continue;
+                    }
+
                     let skill = '';
                     for (const s of ['woodcutting', 'mining', 'fishing', 'herbalism']) {
                         if (resources[s]?.find(r => r.id === resourceId)) { skill = s; break; }
@@ -539,8 +581,7 @@
                         );
                     }
                     anyWork = true;
-                }
-                if (anyWork) updateUI();
+                }                        if (anyWork) updateUI();
             }, 3000);
         }
 
@@ -565,10 +606,18 @@
             if (cycles <= 0) return;
 
             const collected = {}; // { resourceId: qty }
+            let forgeInfo = null; // { woodBurned, heatFinal }
+            let autoFuelCount = 0; // Armazena qtd de abastecedores para processar DEPOIS da coleta
 
             for (const resourceId in gameState.workers.allocated) {
                 const count = gameState.workers.allocated[resourceId];
                 if (count <= 0) continue;
+
+                // AUTO FUEL: Guarda para processar DEPOIS que toda coleta de madeira acontecer
+                if (resourceId === 'auto_fuel') {
+                    autoFuelCount = count;
+                    continue;
+                }
 
                 // Apenas workers de coleta bruta (woodcutting, mining, fishing, herbalism)
                 let skill = '';
@@ -667,14 +716,46 @@
                 addXP(skill, offlineXpGain);
             }
 
+            // Processar AUTO FUEL DEPOIS de toda a coleta (madeira já foi adicionada ao inventário)
+            if (autoFuelCount > 0 && gameState.property.forge.enabled !== false) {
+                let heatBefore = gameState.property.forge.heat || 0;
+                let totalWoodBurned = 0;
+                const woodTypes = ['wood1', 'wood2', 'wood3', 'wood4', 'wood5'];
+
+                const heatToFill = Math.max(0, 100 - heatBefore);
+                const maxWoodForHeat = Math.ceil(heatToFill / 5);
+                const potentialBurned = Math.min(autoFuelCount * cycles, maxWoodForHeat);
+
+                let remainingToBurn = potentialBurned;
+                for (const wt of woodTypes) {
+                    if (remainingToBurn <= 0) break;
+                    const available = gameState.inventory[wt] || 0;
+                    const take = Math.min(available, remainingToBurn);
+                    if (take > 0) {
+                        gameState.inventory[wt] -= take;
+                        totalWoodBurned += take;
+                        remainingToBurn -= take;
+                    }
+                }
+
+                if (totalWoodBurned > 0) {
+                    gameState.property.forge.heat = Math.min(100, heatBefore + totalWoodBurned * 5);
+                    forgeInfo = {
+                        woodBurned: totalWoodBurned,
+                        heatFinal: gameState.property.forge.heat,
+                        heatBefore: heatBefore
+                    };
+                }
+            }
+
             const itemsCollected = Object.keys(collected).length;
-            if (itemsCollected === 0) return;
+            if (itemsCollected === 0 && !forgeInfo) return;
 
             // Exibir popup de retorno offline
-            showOfflineProductionPopup(offlineSecs, collected);
+            showOfflineProductionPopup(offlineSecs, collected, forgeInfo);
         }
 
-        function showOfflineProductionPopup(secs, collected) {
+        function showOfflineProductionPopup(secs, collected, forgeInfo) {
             const modal = document.getElementById('offlineProductionModal');
             if (!modal) return;
 
@@ -701,6 +782,23 @@
                         <span style="font-family:'Cinzel'; font-size:0.95em; color:#ffd700; font-weight:700;">+${formatNumber(qty)}</span>
                     `;
                     listEl.appendChild(row);
+                }
+
+                // Exibir info da fornalha no popup
+                if (forgeInfo) {
+                    const forgeRow = document.createElement('div');
+                    forgeRow.style.cssText = 'display:flex; align-items:center; gap:10px; margin-top:8px; padding:8px 0; border-top:2px solid rgba(255,170,0,0.2);';
+                    forgeRow.innerHTML = `
+                        <span style="font-size:1.3em;">🔥</span>
+                        <span style="flex:1; font-family:Outfit; font-size:0.85em; color:#ddd;">
+                            Fornalha abastecida
+                        </span>
+                        <div style="text-align:right; font-family:Cinzel; font-size:0.85em;">
+                            <div style="color:#ffaa00;">-${formatNumber(forgeInfo.woodBurned)} 🪵</div>
+                            <div style="color:#ffd700; font-size:0.8em;">${forgeInfo.heatBefore}% → ${forgeInfo.heatFinal}% 🔥</div>
+                        </div>
+                    `;
+                    listEl.appendChild(forgeRow);
                 }
             }
 

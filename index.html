@@ -1212,10 +1212,15 @@
             </div>
         </div>
         <div class="top-bar-divider"></div>
-        <div class="top-bar-item" onclick="navigateToWorkerCamp()" style="cursor: pointer;">
+        <div class="top-bar-item" onclick="navigateToWorkerCamp()" style="cursor: pointer; position:relative;">
             <span class="top-bar-icon"><img src="img/26_worker.png" class="game-icon" alt="Trabalhadores"></span>
             <span class="top-bar-label">Trabalhadores:</span>
             <span id="topWorkers" class="top-bar-value">0/0</span>
+            <span id="topWorkersDetail" class="top-workers-detail"></span>
+            <div class="top-bar-tooltip">
+                <div class="tooltip-header">👷 Alocação de Trabalhadores</div>
+                <div class="tooltip-list" id="topWorkersTooltipList"></div>
+            </div>
         </div>
         <div class="top-bar-divider mobile-hide"></div>
         <div class="top-bar-item mobile-hide" onclick="showPage('pets')" style="cursor: pointer;">
@@ -3113,7 +3118,15 @@
                                 </div>
                             </div>
                         </div>
-                        <div id="forgeSpecBox" style="font-size: 12px; color: #aaa; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 4px;">
+                        <!-- Fuel Workers -->
+                        <div style="display:flex; align-items:center; gap:8px; margin-top:6px; padding:6px 8px; background:rgba(255,170,0,0.06); border:1px solid rgba(255,170,0,0.12); border-radius:6px;">
+                            <span style="font-size:0.78em; color:#ffaa00; font-family:'Outfit';">👷 Abastecedores</span>
+                            <button class="worker-btn" onclick="allocateWorker('auto_fuel', -1)" style="padding:2px 10px; background:rgba(255,68,68,0.15); border:1px solid rgba(255,68,68,0.3); color:#ff6644; border-radius:4px; cursor:pointer; font-weight:bold; font-size:0.85em;">−</button>
+                            <span id="autoFuelCount" style="font-size:0.85em; color:#fff; font-weight:bold; min-width:24px; text-align:center; font-family:'Cinzel';">0</span>
+                            <button class="worker-btn" onclick="allocateWorker('auto_fuel', 1)" style="padding:2px 10px; background:rgba(68,255,68,0.15); border:1px solid rgba(68,255,68,0.3); color:#4aff4a; border-radius:4px; cursor:pointer; font-weight:bold; font-size:0.85em;">+</button>
+                            <span style="font-size:0.65em; color:#888; margin-left:auto; font-family:'Outfit';">🪵 +5 Calor/ciclo cada</span>
+                        </div>
+                        <div id="forgeSpecBox" style="font-size: 12px; color: #aaa; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 4px; margin-top:6px;">
                             <span id="forgeSpecText" style="cursor:pointer;" onclick="openForgeSpecModal()">⚙️ Escolher Especialização</span>
                             <span id="forgeZoneInfo" style="display: flex; align-items: center; gap: 6px;"></span>
                         </div>

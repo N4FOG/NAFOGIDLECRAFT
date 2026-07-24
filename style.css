@@ -4497,8 +4497,18 @@ body.menu-open .top-stats-bar {
 }
 
 .top-res-item {
-    position: relative; /* para posicionamento absoluto da tooltip */
+    position: relative;
     cursor: pointer;
+}
+
+.top-workers-detail {
+    font-size: 0.7em;
+    color: #ff9944;
+    margin-left: 4px;
+    font-weight: 700;
+    display: none;
+    animation: fadeIn 0.3s ease;
+    text-shadow: 0 0 8px rgba(255, 153, 68, 0.5);
 }
 
 .top-bar-tooltip {
@@ -4518,7 +4528,8 @@ body.menu-open .top-stats-bar {
     transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
-.top-res-item:hover .top-bar-tooltip {
+.top-res-item:hover .top-bar-tooltip,
+.top-bar-item:hover .top-bar-tooltip {
     display: block;
 }
 

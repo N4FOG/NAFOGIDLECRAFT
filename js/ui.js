@@ -23,6 +23,12 @@
             if (typeof updateForgeSpecDisplay === 'function') updateForgeSpecDisplay();
             if (typeof updateSawmillSpecDisplay === 'function') updateSawmillSpecDisplay();
             
+            // AUTO FUEL COUNT
+            const autoFuelEl = document.getElementById('autoFuelCount');
+            if (autoFuelEl) {
+                autoFuelEl.textContent = gameState.workers?.allocated?.['auto_fuel'] || 0;
+            }
+
             // FORGE HEAT UI
             const heatBar = document.getElementById('forgeHeatBar');
             const heatText = document.getElementById('forgeHeatText');
@@ -375,6 +381,68 @@
                         elWorkers.textContent = `${getWorkerAllocated()}/${getWorkerTotal()}`;
                     } else {
                         elWorkers.textContent = '0/0';
+                    }
+                    
+                    // Detalhe inline dos abastecedores
+                    const workersDetailEl = document.getElementById('topWorkersDetail');
+                    const allocated = gameState.workers?.allocated || {};
+                    const fuelCount = allocated['auto_fuel'] || 0;
+                    if (workersDetailEl) {
+                        if (fuelCount > 0) {
+                            workersDetailEl.textContent = `🔥${fuelCount}`;
+                            workersDetailEl.style.display = 'inline';
+                        } else {
+                            workersDetailEl.style.display = 'none';
+                        }
+                    }
+                    
+                    // Tooltip com breakdown completo de todos os workers
+                    const tooltipList = document.getElementById('topWorkersTooltipList');
+                    if (tooltipList) {
+                        const workerLabels = {
+                            'wood1': '🌲 Lenha T1',
+                            'wood2': '🌲 Lenha T2',
+                            'wood3': '🌲 Lenha T3',
+                            'wood4': '🌲 Lenha T4',
+                            'wood5': '🌲 Lenha T5',
+                            'ore1': '⛏️ Minério T1',
+                            'ore2': '⛏️ Minério T2',
+                            'ore3': '⛏️ Minério T3',
+                            'ore4': '⛏️ Minério T4',
+                            'ore5': '⛏️ Minério T5',
+                            'fish1': '🎣 Peixe T1',
+                            'fish2': '🎣 Peixe T2',
+                            'fish3': '🎣 Peixe T3',
+                            'fish4': '🎣 Peixe T4',
+                            'fish5': '🎣 Peixe T5',
+                            'herb1': '🌿 Erva T1',
+                            'herb2': '🌿 Erva T2',
+                            'herb3': '🌿 Erva T3',
+                            'herb4': '🌿 Erva T4',
+                            'herb5': '🌿 Erva T5',
+                            'auto_potter': '🧪 Poções Auto',
+                            'auto_fuel': '🔥 Abastecedor'
+                        };
+                        
+                        let html = '';
+                        let hasAny = false;
+                        for (const [resId, qty] of Object.entries(allocated)) {
+                            if (qty <= 0) continue;
+                            hasAny = true;
+                            const label = workerLabels[resId] || `📋 ${resId}`;
+                            const colour = resId === 'auto_fuel' ? '#ff9944' : (resId === 'auto_potter' ? '#c96ac9' : '#aaddff');
+                            html += `
+                                <div class="tooltip-row">
+                                    <span class="tooltip-row-name" style="color:${colour};">${label}</span>
+                                    <span class="tooltip-row-qty">${qty}</span>
+                                </div>
+                            `;
+                        }
+                        
+                        if (!hasAny) {
+                            html = '<div class="tooltip-row" style="color:#888;">Nenhum trabalhador alocado</div>';
+                        }
+                        tooltipList.innerHTML = html;
                     }
                 }
                 
