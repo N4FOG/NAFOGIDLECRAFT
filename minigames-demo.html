@@ -1,0 +1,1890 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Idle Craft RPG - Minigames Aprovados 🎣🪙</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-dark: #0f141c;
+            --bg-card: rgba(22, 30, 44, 0.9);
+            --border-glow: #2a3a54;
+            --accent-gold: #ffd700;
+            --accent-blue: #3a96ff;
+            --accent-cyan: #00e5ff;
+            --accent-green: #2ecc71;
+            --accent-red: #e74c3c;
+            --accent-purple: #9b59b6;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: radial-gradient(circle at top center, #1b2838 0%, #0a0e14 100%);
+            color: var(--text-main);
+            font-family: 'Outfit', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-family: 'Cinzel', serif;
+            font-size: 2.2rem;
+            color: var(--accent-gold);
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+            letter-spacing: 1px;
+        }
+
+        p.subtitle {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-top: 5px;
+        }
+
+        /* TAB BAR */
+        .tab-bar {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            max-width: 600px;
+            margin-bottom: 24px;
+            background: rgba(10, 15, 25, 0.8);
+            padding: 8px 12px;
+            border-radius: 14px;
+            border: 1px solid var(--border-glow);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+        }
+
+        .tab-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-muted);
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-btn:hover {
+            background: rgba(58, 150, 255, 0.2);
+            color: #fff;
+            border-color: var(--accent-blue);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #1e40af, #3b82f6);
+            color: #fff;
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 16px rgba(59, 130, 246, 0.6);
+        }
+
+        /* CONTAINER DE CONTEÚDO */
+        .stage-container {
+            width: 100%;
+            max-width: 750px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-glow);
+            border-radius: 16px;
+            padding: 28px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+            position: relative;
+            min-height: 520px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .game-panel {
+            display: none;
+            width: 100%;
+            flex-direction: column;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .game-panel.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .panel-header {
+            width: 100%;
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 12px;
+        }
+
+        .panel-title {
+            font-family: 'Cinzel', serif;
+            font-size: 1.5rem;
+            color: var(--accent-gold);
+        }
+
+        .panel-desc {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* UI STATUS & PAINEL DE CONTROLE */
+        .status-box {
+            display: flex;
+            gap: 15px;
+            width: 100%;
+            justify-content: space-around;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--border-glow);
+            border-radius: 12px;
+            padding: 12px 20px;
+            margin-top: 20px;
+        }
+
+        .status-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .status-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            margin-top: 2px;
+        }
+
+        /* LAGOAS VISUAIS DE PISCICULTURA */
+        .visual-pond-water {
+            position: relative;
+            width: 100%;
+            height: 140px;
+            background: linear-gradient(180deg, #0284c7 0%, #0369a1 100%);
+            border: 4px solid #78350f;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: inset 0 0 25px rgba(0, 0, 0, 0.6);
+        }
+
+        .visual-pond-water.polluted {
+            background: linear-gradient(180deg, #4d7c0f 0%, #3f6212 100%) !important;
+        }
+
+        .visual-fish {
+            position: absolute;
+            font-size: 1.8rem;
+            animation: swim 6s infinite ease-in-out alternate;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4));
+        }
+
+        .visual-fish-2 {
+            position: absolute;
+            font-size: 1.6rem;
+            animation: swim2 8s infinite ease-in-out alternate;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4));
+        }
+
+        @keyframes swim {
+            0% { transform: translate(10px, 15px) scaleX(1); }
+            50% { transform: translate(220px, 50px) scaleX(1); }
+            51% { transform: translate(220px, 50px) scaleX(-1); }
+            100% { transform: translate(30px, 85px) scaleX(-1); }
+        }
+
+        @keyframes swim2 {
+            0% { transform: translate(240px, 80px) scaleX(-1); }
+            50% { transform: translate(40px, 20px) scaleX(-1); }
+            51% { transform: translate(40px, 20px) scaleX(1); }
+            100% { transform: translate(200px, 60px) scaleX(1); }
+        }
+
+        .visual-aerator-wheel {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            font-size: 2.2rem;
+            animation: spinWheel 1.5s infinite linear;
+        }
+
+        @keyframes spinWheel {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .visual-bubbles {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            font-size: 1.2rem;
+            animation: riseBubbles 2s infinite ease-in;
+        }
+
+        @keyframes riseBubbles {
+            0% { opacity: 0; transform: translateY(20px); }
+            50% { opacity: 1; }
+            100% { opacity: 0; transform: translateY(-30px); }
+        }
+
+        /* BOTÕES DE AÇÃO */
+        .btn-action {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            border: 1px solid var(--accent-cyan);
+            color: white;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            padding: 12px 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+            font-size: 1rem;
+        }
+
+        .btn-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.6);
+        }
+
+        .btn-action:active {
+            transform: translateY(0);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #16a34a, #15803d);
+            border-color: var(--accent-green);
+            box-shadow: 0 4px 15px rgba(22, 163, 74, 0.4);
+        }
+
+        /* FLOATING TEXT NOTIFICATIONS */
+        .floating-text {
+            position: absolute;
+            font-family: 'Cinzel', serif;
+            font-weight: 800;
+            font-size: 1.2rem;
+            pointer-events: none;
+            animation: floatUp 1.2s ease-out forwards;
+            text-shadow: 0 0 10px rgba(0,0,0,0.8);
+            z-index: 100;
+        }
+
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translate(-50%, 0) scale(0.8); }
+            50% { opacity: 1; transform: translate(-50%, -30px) scale(1.1); }
+            100% { opacity: 0; transform: translate(-50%, -60px) scale(1); }
+        }
+
+        /* ESTILOS ESPECÍFICOS: 1. BARRA DE TENSÃO */
+        .tension-stage {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .track-vertical {
+            position: relative;
+            width: 50px;
+            height: 280px;
+            background: rgba(10, 15, 25, 0.9);
+            border: 2px solid #334155;
+            border-radius: 25px;
+            overflow: hidden;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.8);
+        }
+
+        .green-zone {
+            position: absolute;
+            width: 100%;
+            height: 80px;
+            background: linear-gradient(to bottom, rgba(46, 204, 113, 0.4), rgba(46, 204, 113, 0.7));
+            border-top: 2px solid var(--accent-green);
+            border-bottom: 2px solid var(--accent-green);
+            box-shadow: 0 0 15px rgba(46, 204, 113, 0.5);
+            transition: top 0.05s linear;
+        }
+
+        .fish-icon {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.8rem;
+            transition: top 0.1s ease;
+            filter: drop-shadow(0 0 8px rgba(0,229,255,0.8));
+        }
+
+        .progress-bar-v {
+            width: 22px;
+            height: 280px;
+            background: #1e293b;
+            border-radius: 11px;
+            overflow: hidden;
+            border: 1px solid #475569;
+            display: flex;
+            flex-direction: column-reverse;
+        }
+
+        .progress-fill-v {
+            width: 100%;
+            height: 0%;
+            background: linear-gradient(to top, #3b82f6, #00e5ff);
+            transition: height 0.1s linear;
+        }
+
+        /* ESTILOS ESPECÍFICOS: 2. POÇO DOS DESEJOS */
+        .well-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            width: 100%;
+        }
+
+        .well-circle {
+            position: relative;
+            width: 280px;
+            height: 280px;
+            background: radial-gradient(circle, #0284c7 0%, #0369a1 40%, #0f172a 75%);
+            border: 6px solid var(--accent-gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 35px rgba(255, 215, 0, 0.3), inset 0 0 30px rgba(0,0,0,0.8);
+            overflow: hidden;
+        }
+
+        .well-target {
+            position: absolute;
+            width: 90px;
+            height: 90px;
+            background: rgba(255, 215, 0, 0.25);
+            border: 3px dashed var(--accent-gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulseTarget 2s infinite ease-in-out;
+        }
+
+        @keyframes pulseTarget {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.15); opacity: 1; box-shadow: 0 0 20px var(--accent-gold); }
+        }
+
+        .coin-launcher {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .power-bar-container {
+            width: 100%;
+            height: 20px;
+            background: #1e293b;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid #475569;
+            position: relative;
+        }
+
+        .power-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(to right, #3b82f6, #f59e0b, #ef4444);
+        /* MODAL COMO JOGAR */
+        .how-to-play-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 20px;
+        }
+
+        .how-to-play-modal-content {
+            background: radial-gradient(circle, #1e293b 0%, #0f172a 100%);
+            border: 2px solid var(--accent-gold);
+            border-radius: 16px;
+            max-width: 680px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 25px;
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <header style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+        <h1>🎮 Laboratório de Testes de Minigames</h1>
+        <button class="btn-action" style="background: linear-gradient(135deg, #d97706, #b45309); border-color: var(--accent-gold); padding: 8px 20px; font-size: 0.9rem; box-shadow: 0 0 15px rgba(217, 119, 6, 0.4);" onclick="openHowToPlayModal()">
+            ❓ COMO JOGAR (GUIA COMPLETO)
+        </button>
+        <p class="subtitle">Idle Craft RPG — Protótipos Interativos dos Minigames do Jogo</p>
+    </header>
+
+    <!-- MODAL COMO JOGAR -->
+    <div class="how-to-play-modal-overlay" id="howToPlayModal" onclick="closeHowToPlayModal(event)">
+        <div class="how-to-play-modal-content" onclick="event.stopPropagation()">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--accent-gold); padding-bottom: 10px;">
+                <h2 style="color: var(--accent-gold); font-family: 'Cinzel', serif; font-size: 1.4rem;">📜 Como Jogar os Minigames</h2>
+                <button style="background: transparent; border: none; color: #fff; font-size: 1.5rem; cursor: pointer;" onclick="closeHowToPlayModal()">&times;</button>
+            </div>
+
+            <!-- GUIA DO JOGO 1 -->
+            <div style="background: rgba(0,0,0,0.4); border-left: 4px solid #38bdf8; border-radius: 8px; padding: 12px; font-size: 0.9rem;">
+                <h3 style="color: #38bdf8; font-size: 1.05rem;">🎣 1. Barra de Tensão (Pesca Interativa)</h3>
+                <p style="color: var(--text-muted); margin-top: 4px;">Segure o botão <b>RECOLHER LINHA</b> ou a tecla <b>ESPAÇO</b> para elevar a zona verde vertical. Mantenha o peixe dentro da área verde até completar a barra de captura em 100%!</p>
+            </div>
+
+            <!-- GUIA DO JOGO 2 -->
+            <div style="background: rgba(0,0,0,0.4); border-left: 4px solid var(--accent-gold); border-radius: 8px; padding: 12px; font-size: 0.9rem;">
+                <h3 style="color: var(--accent-gold); font-size: 1.05rem;">🪙 2. Poço dos Desejos (Cidade & Sorte)</h3>
+                <p style="color: var(--text-muted); margin-top: 4px;">Pressione e segure o botão <b>LANÇAR MOEDA</b> para carregar a barra de força. Solte no momento exato em torno dos 75% para acertar o poço. Cuidado com o vento lateral e os alvos móveis no modo Hardcore!</p>
+            </div>
+
+            <!-- GUIA DO JOGO 3 -->
+            <div style="background: rgba(0,0,0,0.4); border-left: 4px solid #a855f7; border-radius: 8px; padding: 12px; font-size: 0.9rem;">
+                <h3 style="color: #a855f7; font-size: 1.05rem;">📜 3. Alquimia Arcana & Círculo Rúnico</h3>
+                <p style="color: var(--text-muted); margin-top: 4px;">Escolha uma receita no <b>Livro de Receitas</b>. Clique nos reagentes do inventário inferior para preencher os 4 nós do Círculo Rúnico. Quando o frasco acender com aura dourada, clique em <b>TRANSMUTAR POÇÃO</b>!</p>
+            </div>
+
+            <!-- GUIA DO JOGO 4 -->
+            <div style="background: rgba(0,0,0,0.4); border-left: 4px solid #2ecc71; border-radius: 8px; padding: 12px; font-size: 0.9rem;">
+                <h3 style="color: #2ecc71; font-size: 1.05rem;">🐟 4. Piscicultura & Mercado (Aquaculture Tycoon)</h3>
+                <p style="color: var(--text-muted); margin-top: 4px;">Escave viveiros de água e gerencie espécies. Instale <b>Aeradores (O2%)</b> e <b>Filtros (Pureza)</b> para manter os peixes felizes. Alimente-os regularmente, contrate funcionários e venda a colheita no pico das cotações!</p>
+            </div>
+
+            <button class="btn-action btn-success" style="width: 100%; font-size: 1.0rem; padding: 10px; margin-top: 10px;" onclick="closeHowToPlayModal()">
+                ✅ ENTENDI, VAMOS JOGAR!
+            </button>
+        </div>
+    </div>
+
+    <!-- NAVEGAÇÃO DE ABAS -->
+    <nav class="tab-bar">
+        <button class="tab-btn active" onclick="switchTab('tension')">🎣 1. Barra de Tensão (Pesca)</button>
+        <button class="tab-btn" onclick="switchTab('wishingwell')">🪙 2. Poço dos Desejos (Cidade)</button>
+        <button class="tab-btn" onclick="switchTab('gothic-alchemy')">📜 3. Alquimia Arcana (Círculo Rúnico)</button>
+        <button class="tab-btn" onclick="switchTab('aquaculture')">🐟 4. Piscicultura & Mercado (Aquaculture)</button>
+    </nav>
+
+    <!-- CONTAINER PRINCIPAL DOS JOGOS -->
+    <main class="stage-container">
+
+        <!-- ====================================================
+             1. BARRA DE TENSÃO (PESCA 🎣)
+             ==================================================== -->
+        <div id="panel-tension" class="game-panel active">
+            <div class="panel-header">
+                <h2 class="panel-title">1. Barra de Tensão (Pesca Interativa 🎣)</h2>
+                <p class="panel-desc">Segure o mouse ou ESPAÇO para subir a zona verde. Mantenha o peixe dentro dela até preencher a barra de captura!</p>
+            </div>
+
+            <!-- Seleção de Dificuldade do Peixe -->
+            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                <button class="btn-action" style="padding: 6px 14px; font-size: 0.85rem;" onclick="setFishDifficulty('common')">🐟 Peixe Comum</button>
+                <button class="btn-action" style="padding: 6px 14px; font-size: 0.85rem; background: linear-gradient(135deg, #0284c7, #0369a1);" onclick="setFishDifficulty('rare')">🐠 Peixe Raro</button>
+                <button class="btn-action" style="padding: 6px 14px; font-size: 0.85rem; background: linear-gradient(135deg, #7c3aed, #6d28d9);" onclick="setFishDifficulty('legendary')">🦈 Leviatã Mítico</button>
+            </div>
+
+            <div class="tension-stage">
+                <!-- Trilha da Barra Verde & Peixe -->
+                <div class="track-vertical" id="tensionTrack">
+                    <div class="green-zone" id="greenZone"></div>
+                    <div class="fish-icon" id="fishIcon">🐟</div>
+                </div>
+
+                <!-- Barra de Progresso de Captura -->
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 6px;">
+                    <span class="status-label">Captura</span>
+                    <div class="progress-bar-v">
+                        <div class="progress-fill-v" id="catchFill"></div>
+                    </div>
+                </div>
+            </div>
+
+            <p style="margin-top: 15px; font-size: 0.9rem; color: var(--accent-gold);">💡 Pressione / Segure o Botão abaixo ou a tecla <b>ESPAÇO</b>!</p>
+            <button class="btn-action" style="margin-top: 8px; width: 220px;" id="reelBtn">🎣 Recolher Linha (Segure)</button>
+
+            <div class="status-box">
+                <div class="status-item">
+                    <span class="status-label">Dificuldade</span>
+                    <span class="status-value" id="fishDiffText">Peixe Comum</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Status da Linha</span>
+                    <span class="status-value" id="tensionStatusText">Aguardando</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Peixes Capturados</span>
+                    <span class="status-value" id="fishCaughtCount">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ====================================================
+             2. POÇO DOS DESEJOS (CIDADE 🪙)
+             ==================================================== -->
+        <div id="panel-wishingwell" class="game-panel">
+            <div class="panel-header">
+                <h2 class="panel-title">2. Poço dos Desejos (Evento Místico da Cidade 🪙)</h2>
+                <p class="panel-desc">Segure o botão para carregar a força do arremesso e solte no momento certo para acertar o centro do Poço dos Desejos!</p>
+            </div>
+
+            <!-- Seleção de Dificuldade & Vento -->
+            <div style="display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; justify-content: center;">
+                <button class="btn-action" style="padding: 6px 12px; font-size: 0.85rem;" onclick="setWellDifficulty('easy')">🌱 Brisa Suave (Fácil)</button>
+                <button class="btn-action" style="padding: 6px 12px; font-size: 0.85rem; background: linear-gradient(135deg, #d97706, #b45309);" onclick="setWellDifficulty('medium')">💨 Ventania Arcana (Médio)</button>
+                <button class="btn-action" style="padding: 6px 12px; font-size: 0.85rem; background: linear-gradient(135deg, #dc2626, #991b1b);" onclick="setWellDifficulty('hardcore')">🌪️ Tempestade Mística (Hardcore)</button>
+            </div>
+
+            <div class="well-container">
+                <!-- O Poço de Água & Alvo Móvel -->
+                <div class="well-circle" id="wellCircle">
+                    <div class="well-target" id="wellTarget" style="transition: transform 0.2s ease;">
+                        <span style="font-size: 2.2rem; filter: drop-shadow(0 0 10px #ffd700);">🪙</span>
+                    </div>
+                    <div id="coinGraphic" style="position: absolute; font-size: 2rem; display: none; transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);">🪙</div>
+                </div>
+
+                <!-- Barra de Força do Arremesso com Vento -->
+                <div class="coin-launcher">
+                    <div style="display: flex; justify-content: space-between; width: 100%;">
+                        <span class="status-label" id="windLabelText">💨 Vento: Nulo (0 km/h)</span>
+                        <span style="font-size: 0.85rem; color: var(--accent-gold); font-weight: 700;" id="powerText">0%</span>
+                    </div>
+                    <div class="power-bar-container">
+                        <div class="power-bar-fill" id="powerFill"></div>
+                    </div>
+
+                    <button class="btn-action btn-success" style="width: 260px; font-size: 1.1rem; margin-top: 10px;" id="tossBtn">🪙 Segurar para Carregar Força</button>
+                </div>
+            </div>
+
+            <div class="status-box">
+                <div class="status-item">
+                    <span class="status-label">Modo</span>
+                    <span class="status-value" id="wellDiffText">Brisa Suave</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Combo Streak</span>
+                    <span class="status-value" style="color: var(--accent-gold);" id="wellComboText">0x</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Ganhos / Perdas</span>
+                    <span class="status-value"><span style="color: var(--accent-green);" id="wellWinsText">0</span> / <span style="color: var(--accent-red);" id="wellLossesText">0</span></span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Precisão</span>
+                    <span class="status-value" id="wellAccuracyText">0%</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Pontuação</span>
+                    <span class="status-value" id="wellScoreText">0 pts</span>
+                </div>
+            </div>
+
+            <!-- HISTÓRICO DE GANHOS E PERDAS -->
+            <div style="width: 100%; margin-top: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <span class="status-label" style="font-size: 0.9rem; color: var(--accent-gold);">📜 Histórico de Ganhos e Perdas</span>
+                    <button style="background: transparent; border: 1px solid rgba(255,255,255,0.2); color: var(--text-muted); font-size: 0.75rem; padding: 4px 8px; border-radius: 4px; cursor: pointer;" onclick="clearWellHistory()">Limpar Histórico</button>
+                </div>
+                <div id="wellHistoryLog" style="width: 100%; height: 160px; background: rgba(10, 14, 20, 0.95); border: 1px solid var(--border-glow); border-radius: 10px; padding: 10px; overflow-y: auto; font-family: monospace; font-size: 0.85rem; display: flex; flex-direction: column; gap: 6px;">
+                    <div style="color: var(--text-muted); text-align: center; margin-top: 60px;">Nenhum arremesso realizado ainda. Segure o botão para lançar uma moeda no poço!</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ====================================================
+             3. ALQUIMIA ARCANA: CÍRCULO RÚNICO & RECEITAS 📜
+             ==================================================== -->
+        <div id="panel-gothic-alchemy" class="game-panel">
+            <div class="panel-header">
+                <h2 class="panel-title">3. Alquimia Arcana & Círculo Rúnico (Workbench Gothic 📜)</h2>
+                <p class="panel-desc">Selecione uma receita no livro sagrado, posicione os reagentes nos nós do círculo de transmutação e sintonize o mana para forjar elixires!</p>
+            </div>
+
+            <!-- WORKBENCH GÓTICO: LIVRO NA ESQUERDA + CÍRCULO NA DIREITA -->
+            <div style="display: flex; gap: 20px; width: 100%; align-items: stretch; flex-wrap: wrap; margin-bottom: 20px;">
+
+                <!-- LIVRO DE RECEITAS (RECIPES BOOK) -->
+                <div style="flex: 1; min-width: 260px; background: rgba(20, 15, 12, 0.95); border: 2px solid #8b5a2b; border-radius: 14px; padding: 15px; box-shadow: 0 0 20px rgba(0,0,0,0.8); display: flex; flex-direction: column; gap: 12px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #5c3a1e; padding-bottom: 8px;">
+                        <h3 style="font-family: 'Cinzel', serif; color: var(--accent-gold); font-size: 1.1rem;">📖 Livro de Receitas</h3>
+                        <span style="font-size: 0.8rem; color: var(--text-muted);">1 / 2</span>
+                    </div>
+
+                    <!-- Filtros de Receita -->
+                    <div style="display: flex; gap: 4px; overflow-x: auto; padding-bottom: 4px;">
+                        <button class="btn-action" style="padding: 4px 8px; font-size: 0.75rem;" onclick="filterRecipes('all')">Todas</button>
+                        <button class="btn-action" style="padding: 4px 8px; font-size: 0.75rem; background: linear-gradient(135deg, #b91c1c, #991b1b);" onclick="filterRecipes('heal')">🍷 Cura</button>
+                        <button class="btn-action" style="padding: 4px 8px; font-size: 0.75rem; background: linear-gradient(135deg, #15803d, #166534);" onclick="filterRecipes('stamina')">🧪 Estamina</button>
+                        <button class="btn-action" style="padding: 4px 8px; font-size: 0.75rem; background: linear-gradient(135deg, #6b21a8, #581c87);" onclick="filterRecipes('poison')">🟣 Veneno</button>
+                    </div>
+
+                    <!-- Lista de Receitas -->
+                    <div style="display: flex; flex-direction: column; gap: 8px; max-height: 280px; overflow-y: auto;" id="recipesList">
+                        <!-- Card 1: Poção de Cura -->
+                        <div class="recipe-card active" onclick="selectRecipe('healing')" id="recipe-healing" style="background: rgba(40, 25, 18, 0.9); border: 1px solid var(--accent-gold); border-radius: 8px; padding: 10px; cursor: pointer; transition: all 0.2s ease;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span style="font-size: 2rem;">🍷</span>
+                                <div>
+                                    <h4 style="color: var(--accent-gold); font-size: 0.95rem;">Poção de Cura Menor</h4>
+                                    <p style="font-size: 0.75rem; color: var(--text-muted);">Restaura vida instantaneamente.</p>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 6px; margin-top: 8px; font-size: 0.85rem;">
+                                <span>🌺 1x</span> <span>🌿 1x</span> <span>💎 1x</span>
+                            </div>
+                        </div>
+
+                        <!-- Card 2: Elixir de Estamina -->
+                        <div class="recipe-card" onclick="selectRecipe('stamina')" id="recipe-stamina" style="background: rgba(25, 30, 20, 0.6); border: 1px solid #475569; border-radius: 8px; padding: 10px; cursor: pointer; transition: all 0.2s ease;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span style="font-size: 2rem;">🧪</span>
+                                <div>
+                                    <h4 style="color: var(--accent-cyan); font-size: 0.95rem;">Elixir de Estamina</h4>
+                                    <p style="font-size: 0.75rem; color: var(--text-muted);">Aumenta velocidade de regeneração.</p>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 6px; margin-top: 8px; font-size: 0.85rem;">
+                                <span>🌿 1x</span> <span>💜 1x</span> <span>🍄 1x</span>
+                            </div>
+                        </div>
+
+                        <!-- Card 3: Extrato de Veneno -->
+                        <div class="recipe-card" onclick="selectRecipe('poison')" id="recipe-poison" style="background: rgba(30, 20, 35, 0.6); border: 1px solid #475569; border-radius: 8px; padding: 10px; cursor: pointer; transition: all 0.2s ease;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span style="font-size: 2rem;">🟣</span>
+                                <div>
+                                    <h4 style="color: var(--accent-purple); font-size: 0.95rem;">Extrato de Veneno Místico</h4>
+                                    <p style="font-size: 0.75rem; color: var(--text-muted);">Causa dano tóxico contínuo.</p>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 6px; margin-top: 8px; font-size: 0.85rem;">
+                                <span>🟣 1x</span> <span>🌿 1x</span> <span>🖤 1x</span>
+                            </div>
+                        </div>
+
+                        <!-- Card 4: Tônico de Sabedoria -->
+                        <div class="recipe-card" onclick="selectRecipe('wisdom')" id="recipe-wisdom" style="background: rgba(20, 30, 40, 0.6); border: 1px solid #475569; border-radius: 8px; padding: 10px; cursor: pointer; transition: all 0.2s ease;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span style="font-size: 2rem;">💧</span>
+                                <div>
+                                    <h4 style="color: var(--accent-blue); font-size: 0.95rem;">Tônico de Sabedoria</h4>
+                                    <p style="font-size: 0.75rem; color: var(--text-muted);">Concede bônus de XP por 30min.</p>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 6px; margin-top: 8px; font-size: 0.85rem;">
+                                <span>💎 1x</span> <span>🌼 1x</span> <span>🍄 1x</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CÍRCULO RÚNICO DE ALQUIMIA (ALCHEMY ARCANA CIRCLE WORKBENCH) -->
+                <div style="flex: 1.4; min-width: 320px; background: radial-gradient(circle, #241913 0%, #120c08 100%); border: 3px solid #b47838; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; box-shadow: inset 0 0 40px rgba(0,0,0,0.9), 0 0 25px rgba(180, 120, 56, 0.3);">
+                    
+                    <div style="position: absolute; top: 12px; right: 15px; background: rgba(0,0,0,0.6); border: 1px solid #5c3a1e; border-radius: 6px; padding: 4px 10px; font-size: 0.75rem; color: var(--accent-gold);">
+                        ✨ Círculo Místico Ativo
+                    </div>
+
+                    <!-- CÍRCULO CONCÊNTRICO RÚNICO -->
+                    <div style="position: relative; width: 250px; height: 250px; border: 2px dashed rgba(255, 215, 0, 0.4); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 10px 0;" id="arcanaCircleRing">
+                        
+                        <!-- Linhas Arcanas Cruzadas -->
+                        <div style="position: absolute; width: 100%; height: 1px; background: rgba(255, 215, 0, 0.25);"></div>
+                        <div style="position: absolute; width: 1px; height: 100%; background: rgba(255, 215, 0, 0.25);"></div>
+                        <div style="position: absolute; width: 180px; height: 180px; border: 1px solid rgba(255, 215, 0, 0.3); transform: rotate(45deg);"></div>
+
+                        <!-- SLOTS RÚNICOS DOS 4 NÓS CARDINAIS -->
+                        <!-- Nó 1: Norte (Topo) -->
+                        <div class="circle-node-slot" id="nodeSlot1" onclick="clearNodeSlot(1)" style="position: absolute; top: -20px; width: 55px; height: 55px; background: rgba(20, 15, 10, 0.9); border: 2px solid var(--accent-gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; cursor: pointer; box-shadow: 0 0 12px rgba(255,215,0,0.3); transition: all 0.2s ease;">
+                            <span id="nodeContent1">❓</span>
+                        </div>
+
+                        <!-- Nó 2: Leste (Direita) -->
+                        <div class="circle-node-slot" id="nodeSlot2" onclick="clearNodeSlot(2)" style="position: absolute; right: -20px; width: 55px; height: 55px; background: rgba(20, 15, 10, 0.9); border: 2px solid var(--accent-gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; cursor: pointer; box-shadow: 0 0 12px rgba(255,215,0,0.3); transition: all 0.2s ease;">
+                            <span id="nodeContent2">❓</span>
+                        </div>
+
+                        <!-- Nó 3: Sul (Baixo) -->
+                        <div class="circle-node-slot" id="nodeSlot3" onclick="clearNodeSlot(3)" style="position: absolute; bottom: -20px; width: 55px; height: 55px; background: rgba(20, 15, 10, 0.9); border: 2px solid var(--accent-gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; cursor: pointer; box-shadow: 0 0 12px rgba(255,215,0,0.3); transition: all 0.2s ease;">
+                            <span id="nodeContent3">❓</span>
+                        </div>
+
+                        <!-- Nó 4: Oeste (Esquerda) -->
+                        <div class="circle-node-slot" id="nodeSlot4" onclick="clearNodeSlot(4)" style="position: absolute; left: -20px; width: 55px; height: 55px; background: rgba(20, 15, 10, 0.9); border: 2px solid var(--accent-gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; cursor: pointer; box-shadow: 0 0 12px rgba(255,215,0,0.3); transition: all 0.2s ease;">
+                            <span id="nodeContent4">❓</span>
+                        </div>
+
+                        <!-- FRASCO CENTRAL DE TRANSMUTAÇÃO -->
+                        <div id="centralFlask" style="width: 80px; height: 80px; background: radial-gradient(circle, rgba(255,215,0,0.3) 0%, rgba(0,0,0,0.8) 100%); border: 3px solid var(--accent-gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.6rem; box-shadow: 0 0 25px rgba(255,215,0,0.4); transition: transform 0.3s ease;">
+                            🧪
+                        </div>
+                    </div>
+
+                    <span id="gothicStatusText" style="font-size: 0.85rem; color: var(--accent-gold); margin-top: 15px; font-weight: 700; text-align: center;">Selecione reagentes para preencher os nós!</span>
+                </div>
+            </div>
+
+            <!-- PAINEL INFERIOR DE REAGENTES & BOTÃO TRANSMUTAR -->
+            <div style="width: 100%; background: rgba(15, 12, 10, 0.95); border: 2px solid #8b5a2b; border-radius: 14px; padding: 15px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.7);">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span class="status-label" style="font-size: 0.9rem; color: var(--accent-gold);">🌿 Reagentes do Inventário (Clique para Inserir no Círculo)</span>
+                    <button class="btn-action" style="padding: 4px 12px; font-size: 0.8rem; background: linear-gradient(135deg, #475569, #334155);" onclick="clearAllNodes()">🔄 Limpar Nós</button>
+                </div>
+
+                <!-- SLOTS DE REAGENTES INFERIORES -->
+                <div style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; justify-content: center; flex-wrap: wrap;" id="ingredientsShelf">
+                    <!-- Reagente 1 -->
+                    <div class="ingredient-slot" onclick="insertIngredientToCircle('🌺', 'Flor Vermelha')" style="background: rgba(30, 20, 15, 0.9); border: 1px solid #8b5a2b; border-radius: 10px; padding: 8px 12px; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: all 0.15s ease; min-width: 65px;">
+                        <span style="font-size: 1.8rem;">🌺</span>
+                        <span style="font-size: 0.75rem; color: var(--accent-gold); font-weight: 700; margin-top: 4px;" id="ingCount-red">12</span>
+                    </div>
+                    <!-- Reagente 2 -->
+                    <div class="ingredient-slot" onclick="insertIngredientToCircle('🌿', 'Folha Verde')" style="background: rgba(15, 30, 15, 0.9); border: 1px solid #8b5a2b; border-radius: 10px; padding: 8px 12px; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: all 0.15s ease; min-width: 65px;">
+                        <span style="font-size: 1.8rem;">🌿</span>
+                        <span style="font-size: 0.75rem; color: var(--accent-green); font-weight: 700; margin-top: 4px;" id="ingCount-green">18</span>
+                    </div>
+                    <!-- Reagente 3 -->
+                    <div class="ingredient-slot" onclick="insertIngredientToCircle('💜', 'Flor Roxa')" style="background: rgba(25, 15, 30, 0.9); border: 1px solid #8b5a2b; border-radius: 10px; padding: 8px 12px; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: all 0.15s ease; min-width: 65px;">
+                        <span style="font-size: 1.8rem;">💜</span>
+                        <span style="font-size: 0.75rem; color: var(--accent-purple); font-weight: 700; margin-top: 4px;" id="ingCount-purple">9</span>
+                    </div>
+                    <!-- Reagente 4 -->
+                    <div class="ingredient-slot" onclick="insertIngredientToCircle('💎', 'Cristal Azul')" style="background: rgba(15, 25, 35, 0.9); border: 1px solid #8b5a2b; border-radius: 10px; padding: 8px 12px; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: all 0.15s ease; min-width: 65px;">
+                        <span style="font-size: 1.8rem;">💎</span>
+                        <span style="font-size: 0.75rem; color: var(--accent-cyan); font-weight: 700; margin-top: 4px;" id="ingCount-blue">14</span>
+                    </div>
+                    <!-- Reagente 5 -->
+                    <div class="ingredient-slot" onclick="insertIngredientToCircle('🍄', 'Cogumelo Castanho')" style="background: rgba(30, 25, 15, 0.9); border: 1px solid #8b5a2b; border-radius: 10px; padding: 8px 12px; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: all 0.15s ease; min-width: 65px;">
+                        <span style="font-size: 1.8rem;">🍄</span>
+                        <span style="font-size: 0.75rem; color: #f59e0b; font-weight: 700; margin-top: 4px;" id="ingCount-brownmush">11</span>
+                    </div>
+                    <!-- Reagente 6 -->
+                    <div class="ingredient-slot" onclick="insertIngredientToCircle('🟣', 'Cogumelo Roxo')" style="background: rgba(30, 15, 30, 0.9); border: 1px solid #8b5a2b; border-radius: 10px; padding: 8px 12px; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: all 0.15s ease; min-width: 65px;">
+                        <span style="font-size: 1.8rem;">🟣</span>
+                        <span style="font-size: 0.75rem; color: #a855f7; font-weight: 700; margin-top: 4px;" id="ingCount-purpmush">7</span>
+                    </div>
+                    <!-- Reagente 7 -->
+                    <div class="ingredient-slot" onclick="insertIngredientToCircle('🌼', 'Flor Branca')" style="background: rgba(30, 30, 30, 0.9); border: 1px solid #8b5a2b; border-radius: 10px; padding: 8px 12px; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: all 0.15s ease; min-width: 65px;">
+                        <span style="font-size: 1.8rem;">🌼</span>
+                        <span style="font-size: 0.75rem; color: #f1f5f9; font-weight: 700; margin-top: 4px;" id="ingCount-white">10</span>
+                    </div>
+                    <!-- Reagente 8 -->
+                    <div class="ingredient-slot" onclick="insertIngredientToCircle('🖤', 'Carvão Místico')" style="background: rgba(10, 10, 10, 0.9); border: 1px solid #8b5a2b; border-radius: 10px; padding: 8px 12px; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: all 0.15s ease; min-width: 65px;">
+                        <span style="font-size: 1.8rem;">🖤</span>
+                        <span style="font-size: 0.75rem; color: #94a3b8; font-weight: 700; margin-top: 4px;" id="ingCount-coal">6</span>
+                    </div>
+                </div>
+
+                <!-- BOTÃO CRAFT / TRANSMUTAR -->
+                <button class="btn-action btn-success" style="width: 100%; font-size: 1.2rem; padding: 14px; background: linear-gradient(135deg, #d97706, #b45309); border-color: var(--accent-gold); box-shadow: 0 0 20px rgba(217, 119, 6, 0.5);" onclick="transmuteGothicPotion()">
+                    🧪 TRANSMUTAR POÇÃO (CRAFT)
+                </button>
+            </div>
+
+            <div class="status-box">
+                <div class="status-item">
+                    <span class="status-label">Receita Selecionada</span>
+                    <span class="status-value" id="gothicRecipeText">Poção de Cura Menor</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Poções Criadas</span>
+                    <span class="status-value" id="gothicCraftedCountText">0</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Nível de Alquimia</span>
+                    <span class="status-value" style="color: var(--accent-gold);">Nível 5 (Mestre)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ====================================================
+             4. PISCICULTURA & MERCADO: AQUACULTURE TYCOON 🐟
+             ==================================================== -->
+        <div id="panel-aquaculture" class="game-panel">
+            <div class="panel-header">
+                <h2 class="panel-title">4. Piscicultura & Gestão de Viveiros (Aquaculture Tycoon 🐟)</h2>
+                <p class="panel-desc">Construa viveiros, gerencie geradores e aeradores de oxigênio, contrate funcionários, atenda pedidos e venda espécies no pico da cotação!</p>
+            </div>
+
+            <!-- BARRA SUPERIOR DE RECURSOS DA FAZENDA -->
+            <div style="display: flex; gap: 15px; width: 100%; background: rgba(15, 25, 20, 0.95); border: 2px solid #0284c7; border-radius: 12px; padding: 12px 18px; margin-bottom: 20px; align-items: center; justify-content: space-between; flex-wrap: wrap;">
+                <div style="display: flex; gap: 20px; align-items: center;">
+                    <div><span style="font-size: 0.8rem; color: var(--text-muted);">Saldo da Fazenda:</span> <b style="color: var(--accent-gold); font-size: 1.1rem;" id="aquaGoldText">💰 $15,000</b></div>
+                    <div><span style="font-size: 0.8rem; color: var(--text-muted);">Nível de Piscicultura:</span> <b style="color: var(--accent-cyan); font-size: 1.1rem;" id="aquaLevelText">⭐ Nível 3 (EXP 450/1000)</b></div>
+                    <div><span style="font-size: 0.8rem; color: var(--text-muted);">Status da Energia:</span> <b style="color: #2ecc71; font-size: 1.0rem;" id="aquaPowerStatus">⚡ Gerador Online (100kW)</b></div>
+                </div>
+                <button class="btn-action" style="padding: 6px 14px; font-size: 0.85rem; background: linear-gradient(135deg, #0284c7, #0369a1);" onclick="triggerAquaDayTick()">⏩ Avançar Dia (+Manutenção)</button>
+            </div>
+
+            <!-- GRID PRINCIPAL: FERRAMENTAS NA ESQUERDA + VIVEIROS NO CENTRO + MERCADO/PEDIDOS NA DIREITA -->
+            <div style="display: flex; gap: 20px; width: 100%; align-items: flex-start; flex-wrap: wrap;">
+
+                <!-- BARRA LATERAL DE CONSTRUÇÃO & FERRAMENTAS -->
+                <div style="flex: 1; min-width: 240px; background: rgba(20, 30, 25, 0.9); border: 2px solid #059669; border-radius: 14px; padding: 15px; display: flex; flex-direction: column; gap: 10px;">
+                    <h3 style="color: #34d399; font-size: 1.0rem; border-bottom: 1px solid rgba(52, 211, 153, 0.3); padding-bottom: 6px;">🛠️ Ferramentas & Estruturas</h3>
+                    
+                    <button class="btn-action" style="padding: 10px; font-size: 0.85rem; text-align: left; background: rgba(30, 45, 35, 0.8);" onclick="buildNewPond()">
+                        ⛏️ Escavar Novo Viveiro ($2,000)
+                    </button>
+                    <button class="btn-action" style="padding: 10px; font-size: 0.85rem; text-align: left; background: rgba(30, 45, 35, 0.8);" onclick="installAerator()">
+                        💨 Instalar Aerador de Oxigênio ($800)
+                    </button>
+                    <button class="btn-action" style="padding: 10px; font-size: 0.85rem; text-align: left; background: rgba(30, 45, 35, 0.8);" onclick="installGenerator()">
+                        ⚡ Instalar Gerador Elétrico ($1,500)
+                    </button>
+                    <button class="btn-action" style="padding: 10px; font-size: 0.85rem; text-align: left; background: rgba(30, 45, 35, 0.8);" onclick="installWaterFilter()">
+                        🧹 Instalar Filtro de Purificação ($1,200)
+                    </button>
+                    <button class="btn-action" style="padding: 10px; font-size: 0.85rem; text-align: left; background: linear-gradient(135deg, #10b981, #059669);" onclick="feedAllPonds()">
+                        🌾 Alimentar Todos os Viveiros ($150)
+                    </button>
+
+                    <!-- PAINEL DE FUNCIONÁRIOS -->
+                    <h3 style="color: var(--accent-gold); font-size: 1.0rem; border-bottom: 1px solid rgba(255, 215, 0, 0.3); padding-bottom: 6px; margin-top: 10px;">👨‍🌾 Equipe de Funcionários</h3>
+                    
+                    <div style="font-size: 0.8rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 6px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.4); padding: 6px; border-radius: 6px;">
+                            <span>👷 Jack (Manutenção)</span>
+                            <button class="btn-action" style="padding: 2px 8px; font-size: 0.75rem;" onclick="hireStaff('jack')">Contratar ($630/mês)</button>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.4); padding: 6px; border-radius: 6px;">
+                            <span>👨‍🍳 Norm (Alimentação)</span>
+                            <button class="btn-action" style="padding: 2px 8px; font-size: 0.75rem;" onclick="hireStaff('norm')">Contratar ($980/mês)</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PAINEL CENTRAL DE VIVEIROS ATIVOS -->
+                <div style="flex: 2; min-width: 320px; display: flex; flex-direction: column; gap: 15px;" id="pondsContainer">
+                    
+                    <!-- VIVEIRO 1 -->
+                    <div class="pond-card" id="pond-1" style="background: rgba(15, 23, 42, 0.9); border: 3px solid #38bdf8; border-radius: 14px; padding: 15px; box-shadow: 0 0 20px rgba(2, 132, 199, 0.4); display: flex; flex-direction: column; gap: 10px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <h4 style="color: #fff; font-size: 1.1rem;">🌊 Viveiro 1 — Tilápia do Nilo 🐟</h4>
+                            <span style="background: rgba(0,0,0,0.6); padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; color: #7dd3fc;" id="pond1Count">População: 28 / 40 Peixes</span>
+                        </div>
+
+                        <!-- LAGOAS VISUAIS DE ÁGUA ANIMADA -->
+                        <div class="visual-pond-water" id="pond1WaterBox">
+                            <div class="visual-fish" id="pond1Fish1">🐟</div>
+                            <div class="visual-fish-2" id="pond1Fish2">🐟</div>
+                            <div class="visual-aerator-wheel" title="Aerador Ativo">🌀</div>
+                            <div class="visual-bubbles">🫧</div>
+                            
+                            <!-- Balão de Status Flutuante sobre o Tanque -->
+                            <div style="position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.7); border: 1px solid var(--accent-gold); border-radius: 20px; padding: 4px 10px; font-size: 0.75rem; color: #fff;" id="pond1BadgeBubble">
+                                🙂 Água Cristalina & Peixes Ativos
+                            </div>
+                        </div>
+
+                        <!-- BARRAS DE STATUS DO VIVEIRO (OXIGÊNIO & AGUA) -->
+                        <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                            <div style="flex: 1;">
+                                <span style="font-size: 0.75rem; color: #e0f2fe;">💨 Oxigênio Dissolvido (O2): <b id="pond1O2Text">92%</b></span>
+                                <div style="width: 100%; height: 10px; background: rgba(0,0,0,0.5); border-radius: 5px; overflow: hidden; margin-top: 3px;">
+                                    <div style="width: 92%; height: 100%; background: #38bdf8;" id="pond1O2Bar"></div>
+                                </div>
+                            </div>
+                            <div style="flex: 1;">
+                                <span style="font-size: 0.75rem; color: #e0f2fe;">💧 Pureza da Água: <b id="pond1PurityText">Limpa (96%)</b></span>
+                                <div style="width: 100%; height: 10px; background: rgba(0,0,0,0.5); border-radius: 5px; overflow: hidden; margin-top: 3px;">
+                                    <div style="width: 96%; height: 100%; background: #2ecc71;" id="pond1PurityBar"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- STATUS DE FOME E EQUIPAMENTOS -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); padding: 8px 12px; border-radius: 8px;">
+                            <span style="font-size: 0.85rem; color: #fff;" id="pond1HungerText">🙂 Peixes Alimentados</span>
+                            <span style="font-size: 0.8rem; color: var(--accent-gold);" id="pond1EquipText">⚡ Aerador LIGADO | 🧹 Filtro LIGADO</span>
+                        </div>
+
+                        <!-- BOTÕES DE AÇÃO DO VIVEIRO -->
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <button class="btn-action" style="padding: 6px 12px; font-size: 0.8rem; background: #0284c7;" onclick="feedPond(1)">🌾 Alimentar ($30)</button>
+                            <button class="btn-action" style="padding: 6px 12px; font-size: 0.8rem; background: #0d9488;" onclick="cleanPond(1)">🧹 Limpar Água ($50)</button>
+                            <button class="btn-action btn-success" style="padding: 6px 12px; font-size: 0.8rem;" onclick="harvestPond(1)">🎣 Colher 28kg de Tilápia</button>
+                        </div>
+                    </div>
+
+                    <!-- VIVEIRO 2 (CAMARÃO / MOLLUSK) -->
+                    <div class="pond-card" id="pond-2" style="background: rgba(15, 23, 42, 0.9); border: 3px solid #2dd4bf; border-radius: 14px; padding: 15px; box-shadow: 0 0 20px rgba(15, 118, 110, 0.4); display: flex; flex-direction: column; gap: 10px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <h4 style="color: #fff; font-size: 1.1rem;">🌊 Viveiro 2 — Camarão Imperial 🦐</h4>
+                            <span style="background: rgba(0,0,0,0.6); padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; color: #99f6e4;" id="pond2Count">População: 15 / 40 Crustáceos</span>
+                        </div>
+
+                        <!-- LAGOAS VISUAIS DE ÁGUA ANIMADA -->
+                        <div class="visual-pond-water" id="pond2WaterBox">
+                            <div class="visual-fish" id="pond2Fish1">🦐</div>
+                            <div class="visual-fish-2" id="pond2Fish2">🦐</div>
+                            <div class="visual-aerator-wheel" title="Aerador Ativo">🌀</div>
+                            <div class="visual-bubbles">🫧</div>
+                            
+                            <div style="position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.7); border: 1px solid #e74c3c; border-radius: 20px; padding: 4px 10px; font-size: 0.75rem; color: #ff6b6b;" id="pond2BadgeBubble">
+                                🍲 Com Fome! Precisa de Ração
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                            <div style="flex: 1;">
+                                <span style="font-size: 0.75rem; color: #ccfbf1;">💨 Oxigênio Dissolvido (O2): <b id="pond2O2Text">85%</b></span>
+                                <div style="width: 100%; height: 10px; background: rgba(0,0,0,0.5); border-radius: 5px; overflow: hidden; margin-top: 3px;">
+                                    <div style="width: 85%; height: 100%; background: #2dd4bf;" id="pond2O2Bar"></div>
+                                </div>
+                            </div>
+                            <div style="flex: 1;">
+                                <span style="font-size: 0.75rem; color: #ccfbf1;">💧 Pureza da Água: <b id="pond2PurityText">Normal (82%)</b></span>
+                                <div style="width: 100%; height: 10px; background: rgba(0,0,0,0.5); border-radius: 5px; overflow: hidden; margin-top: 3px;">
+                                    <div style="width: 82%; height: 100%; background: #2ecc71;" id="pond2PurityBar"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); padding: 8px 12px; border-radius: 8px;">
+                            <span style="font-size: 0.85rem; color: #fff;" id="pond2HungerText">🍲 Com Fome!</span>
+                            <span style="font-size: 0.8rem; color: var(--accent-gold);" id="pond2EquipText">⚡ Aerador LIGADO</span>
+                        </div>
+
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <button class="btn-action" style="padding: 6px 12px; font-size: 0.8rem; background: #0f766e;" onclick="feedPond(2)">🌾 Alimentar ($30)</button>
+                            <button class="btn-action" style="padding: 6px 12px; font-size: 0.8rem; background: #0d9488;" onclick="cleanPond(2)">🧹 Limpar Água ($50)</button>
+                            <button class="btn-action btn-success" style="padding: 6px 12px; font-size: 0.8rem;" onclick="harvestPond(2)">🎣 Colher 15kg de Camarão</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- COTAÇÃO DE MERCADO & PEDIDOS DE CLIENTES -->
+                <div style="flex: 1.2; min-width: 280px; display: flex; flex-direction: column; gap: 15px;">
+                    
+                    <!-- TABELA DE COTAÇÕES VIVAS DE MERCADO -->
+                    <div style="background: rgba(15, 23, 42, 0.95); border: 2px solid #3b82f6; border-radius: 14px; padding: 15px; box-shadow: 0 0 20px rgba(0,0,0,0.8);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(59, 130, 246, 0.3); padding-bottom: 6px; margin-bottom: 10px;">
+                            <h3 style="color: #60a5fa; font-size: 1.0rem;">📈 Mercado de Cotações (Ao Vivo)</h3>
+                            <span style="font-size: 0.75rem; color: #2ecc71;">● Atualizando</span>
+                        </div>
+
+                        <div style="display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem;" id="aquaMarketList">
+                            <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.4); padding: 8px; border-radius: 6px;">
+                                <span>🐟 Tilápia do Nilo</span>
+                                <span style="color: #2ecc71; font-weight: bold;">$1,312/kg 📈 (+12%)</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.4); padding: 8px; border-radius: 6px;">
+                                <span>🦐 Camarão Imperial</span>
+                                <span style="color: #2ecc71; font-weight: bold;">$2,160/kg 📈 (+8%)</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.4); padding: 8px; border-radius: 6px;">
+                                <span>🐍 Peixe Cobra</span>
+                                <span style="color: #e74c3c; font-weight: bold;">$1,376/kg 📉 (-5%)</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.4); padding: 8px; border-radius: 6px;">
+                                <span>🦪 Ostra Zebra</span>
+                                <span style="color: #2ecc71; font-weight: bold;">$2,414/kg 📈 (+15%)</span>
+                            </div>
+                        </div>
+
+                        <button class="btn-action btn-success" style="width: 100%; margin-top: 12px; font-size: 0.9rem;" onclick="sellInventoryToMarket()">
+                            💰 Vender Estoque de Peixes no Pico
+                        </button>
+                    </div>
+
+                    <!-- PEDIDOS DE CLIENTES (CUSTOMER ORDERS) -->
+                    <div style="background: rgba(30, 20, 10, 0.95); border: 2px solid #b47838; border-radius: 14px; padding: 15px; box-shadow: 0 0 20px rgba(0,0,0,0.8);">
+                        <h3 style="color: var(--accent-gold); font-size: 1.0rem; border-bottom: 1px solid #5c3a1e; padding-bottom: 6px; margin-bottom: 10px;">📜 Pedidos de Clientes (EXP & Nível)</h3>
+                        
+                        <div style="display: flex; flex-direction: column; gap: 8px;" id="aquaOrdersList">
+                            <div style="background: rgba(0,0,0,0.4); border: 1px solid #8b5a2b; border-radius: 8px; padding: 10px; font-size: 0.8rem;">
+                                <div style="display: flex; justify-content: space-between; color: var(--accent-gold); font-weight: bold;">
+                                    <span>📦 Pedido #104: Resto do Mar</span>
+                                    <span>Recompensa: $3,500 + 400 EXP</span>
+                                </div>
+                                <p style="color: var(--text-muted); margin-top: 4px;">Requer: 20kg de Tilápia do Nilo (Concluído: 20/20kg)</p>
+                                <button class="btn-action btn-success" style="padding: 4px 10px; font-size: 0.75rem; margin-top: 6px;" onclick="completeCustomerOrder(104)">Entregar Pedido ✅</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="status-box">
+                <div class="status-item">
+                    <span class="status-label">Viveiros Construídos</span>
+                    <span class="status-value" id="aquaPondCountText">2 / 5</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Estoque Colhido</span>
+                    <span class="status-value" id="aquaHarvestedText">43 kg</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Funcionários Ativos</span>
+                    <span class="status-value" id="aquaStaffCountText">0 Contratados</span>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // ====================================================
+        // MODAL COMO JOGAR
+        // ====================================================
+        function openHowToPlayModal() {
+            document.getElementById('howToPlayModal').style.display = 'flex';
+        }
+
+        function closeHowToPlayModal(e) {
+            document.getElementById('howToPlayModal').style.display = 'none';
+        }
+
+        // ====================================================
+        // SISTEMA DE TROCA DE ABAS
+        // ====================================================
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.game-panel').forEach(panel => panel.classList.remove('active'));
+
+            const targetBtn = btn || (window.event ? window.event.currentTarget : null);
+            if (targetBtn) targetBtn.classList.add('active');
+
+            const panel = document.getElementById(`panel-${tabId}`);
+            if (panel) panel.classList.add('active');
+
+            if (tabId === 'tension') initTensionGame();
+            if (tabId === 'wishingwell') initWishingWellGame();
+            if (tabId === 'gothic-alchemy') initGothicAlchemy();
+            if (tabId === 'aquaculture') initAquaculture();
+        }
+
+        function showFloatingText(x, y, text, color = '#ffd700') {
+            const el = document.createElement('div');
+            el.className = 'floating-text';
+            el.innerText = text;
+            el.style.color = color;
+            el.style.left = `${x}px`;
+            el.style.top = `${y}px`;
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 1200);
+        }
+
+        // ====================================================
+        // 1. LÓGICA DA BARRA DE TENSÃO (PESCA 🎣)
+        // ====================================================
+        let tensionState = {
+            isReeling: false,
+            greenY: 100,
+            fishY: 140,
+            fishTargetY: 140,
+            catchProgress: 30,
+            diff: 'common',
+            caught: 0,
+            loopId: null
+        };
+
+        function setFishDifficulty(diff) {
+            tensionState.diff = diff;
+            const names = { common: 'Peixe Comum 🐟', rare: 'Peixe Raro 🐠', legendary: 'Leviatã Mítico 🦈' };
+            document.getElementById('fishDiffText').innerText = names[diff];
+            document.getElementById('fishIcon').innerText = diff === 'common' ? '🐟' : (diff === 'rare' ? '🐠' : '🦈');
+            showFloatingText(window.innerWidth / 2, window.innerHeight / 2 - 50, `Alvo: ${names[diff]}`);
+        }
+
+        function initTensionGame() {
+            if (tensionState.loopId) cancelAnimationFrame(tensionState.loopId);
+
+            const reelBtn = document.getElementById('reelBtn');
+
+            const startReel = (e) => { e.preventDefault(); tensionState.isReeling = true; };
+            const stopReel = (e) => { e.preventDefault(); tensionState.isReeling = false; };
+
+            reelBtn.onmousedown = startReel;
+            reelBtn.onmouseup = stopReel;
+            reelBtn.ontouchstart = startReel;
+            reelBtn.ontouchend = stopReel;
+
+            window.onkeydown = (e) => { if (e.code === 'Space') tensionState.isReeling = true; };
+            window.onkeyup = (e) => { if (e.code === 'Space') tensionState.isReeling = false; };
+
+            let lastChange = Date.now();
+
+            const updateTension = () => {
+                if (!document.getElementById('panel-tension').classList.contains('active')) return;
+
+                if (tensionState.isReeling) {
+                    tensionState.greenY = Math.max(0, tensionState.greenY - 3.5);
+                } else {
+                    tensionState.greenY = Math.min(200, tensionState.greenY + 2.5);
+                }
+                document.getElementById('greenZone').style.top = `${tensionState.greenY}px`;
+
+                const now = Date.now();
+                const changeInterval = tensionState.diff === 'legendary' ? 400 : (tensionState.diff === 'rare' ? 800 : 1400);
+
+                if (now - lastChange > changeInterval) {
+                    tensionState.fishTargetY = Math.random() * 220;
+                    lastChange = now;
+                }
+
+                const moveSpeed = tensionState.diff === 'legendary' ? 0.08 : (tensionState.diff === 'rare' ? 0.05 : 0.03);
+                tensionState.fishY += (tensionState.fishTargetY - tensionState.fishY) * moveSpeed;
+                document.getElementById('fishIcon').style.top = `${tensionState.fishY}px`;
+
+                const isInside = (tensionState.fishY + 15 >= tensionState.greenY) && (tensionState.fishY <= tensionState.greenY + 85);
+
+                if (isInside) {
+                    tensionState.catchProgress = Math.min(100, tensionState.catchProgress + 0.4);
+                    document.getElementById('tensionStatusText').innerText = '⚡ FISGANDO!';
+                    document.getElementById('tensionStatusText').style.color = '#2ecc71';
+                } else {
+                    tensionState.catchProgress = Math.max(0, tensionState.catchProgress - 0.3);
+                    document.getElementById('tensionStatusText').innerText = '⚠️ ESCAPANDO!';
+                    document.getElementById('tensionStatusText').style.color = '#e74c3c';
+                }
+
+                document.getElementById('catchFill').style.height = `${tensionState.catchProgress}%`;
+
+                if (tensionState.catchProgress >= 100) {
+                    tensionState.caught++;
+                    document.getElementById('fishCaughtCount').innerText = tensionState.caught;
+                    showFloatingText(window.innerWidth / 2, window.innerHeight / 2 - 20, '🎉 PEIXE CAPTURADO COM SUCESSO! 🎣', '#ffd700');
+                    tensionState.catchProgress = 30;
+                }
+
+                tensionState.loopId = requestAnimationFrame(updateTension);
+            };
+
+            tensionState.loopId = requestAnimationFrame(updateTension);
+        }
+
+        // ====================================================
+        // 2. LÓGICA DO POÇO DOS DESEJOS (CIDADE 🪙)
+        // ====================================================
+        let wellState = {
+            charging: false,
+            power: 0,
+            direction: 1,
+            diff: 'easy',
+            wind: 0,
+            combo: 0,
+            wins: 0,
+            losses: 0,
+            score: 0,
+            timer: null,
+            targetAngle: 0,
+            targetInterval: null
+        };
+
+        function setWellDifficulty(diff) {
+            wellState.diff = diff;
+            const names = { easy: 'Brisa Suave 🌱', medium: 'Ventania Arcana 💨', hardcore: 'Tempestade Mística 🌪️' };
+            document.getElementById('wellDiffText').innerText = names[diff];
+            showFloatingText(window.innerWidth / 2, window.innerHeight / 2 - 50, `Modo: ${names[diff]}`, '#ffd700');
+
+            if (diff === 'hardcore') {
+                startMovingTarget();
+            } else {
+                if (wellState.targetInterval) clearInterval(wellState.targetInterval);
+                const target = document.getElementById('wellTarget');
+                if (target) target.style.transform = 'translate(0px, 0px)';
+            }
+        }
+
+        function startMovingTarget() {
+            if (wellState.targetInterval) clearInterval(wellState.targetInterval);
+            wellState.targetInterval = setInterval(() => {
+                if (!document.getElementById('panel-wishingwell').classList.contains('active')) return;
+                if (wellState.diff !== 'hardcore') return;
+
+                wellState.targetAngle += 0.08;
+                const offsetX = Math.cos(wellState.targetAngle) * 55;
+                const offsetY = Math.sin(wellState.targetAngle) * 55;
+                const target = document.getElementById('wellTarget');
+                if (target) target.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+            }, 50);
+        }
+
+        function initWishingWellGame() {
+            const tossBtn = document.getElementById('tossBtn');
+
+            const startCharge = (e) => {
+                e.preventDefault();
+                wellState.charging = true;
+                wellState.power = 0;
+                wellState.direction = 1;
+
+                if (wellState.diff === 'easy') {
+                    wellState.wind = 0;
+                } else if (wellState.diff === 'medium') {
+                    wellState.wind = Math.floor((Math.random() - 0.5) * 20);
+                } else {
+                    wellState.wind = Math.floor((Math.random() - 0.5) * 45);
+                }
+
+                const windText = wellState.wind === 0 ? 'Nulo (0 km/h)' : `${wellState.wind > 0 ? '+' : ''}${wellState.wind} km/h ${wellState.wind > 0 ? '➡️' : '⬅️'}`;
+                document.getElementById('windLabelText').innerText = `💨 Vento: ${windText}`;
+
+                if (wellState.timer) clearInterval(wellState.timer);
+
+                const speed = wellState.diff === 'hardcore' ? 7.5 : (wellState.diff === 'medium' ? 5.0 : 3.0);
+
+                wellState.timer = setInterval(() => {
+                    wellState.power += speed * wellState.direction;
+                    if (wellState.power >= 100) { wellState.power = 100; wellState.direction = -1; }
+                    if (wellState.power <= 0) { wellState.power = 0; wellState.direction = 1; }
+
+                    document.getElementById('powerFill').style.width = `${wellState.power}%`;
+                    document.getElementById('powerText').innerText = `${Math.floor(wellState.power)}%`;
+                }, 30);
+            };
+
+            const releaseCharge = (e) => {
+                e.preventDefault();
+                if (!wellState.charging) return;
+                wellState.charging = false;
+                clearInterval(wellState.timer);
+
+                const finalPower = wellState.power;
+                throwCoin(finalPower);
+            };
+
+            tossBtn.onmousedown = startCharge;
+            tossBtn.onmouseup = releaseCharge;
+            tossBtn.ontouchstart = startCharge;
+            tossBtn.ontouchend = releaseCharge;
+
+            if (wellState.diff === 'hardcore') startMovingTarget();
+        }
+
+        function throwCoin(power) {
+            const coin = document.getElementById('coinGraphic');
+            coin.style.display = 'block';
+            coin.style.left = '50%';
+            coin.style.bottom = '10px';
+
+            const effectivePower = Math.max(0, Math.min(100, power + wellState.wind));
+            const diffFromCenter = Math.abs(effectivePower - 75);
+            const timeStr = new Date().toLocaleTimeString();
+            const powerInt = Math.floor(power);
+
+            const maxCenterMargin = wellState.diff === 'hardcore' ? 3 : (wellState.diff === 'medium' ? 5 : 8);
+            const maxWellMargin = wellState.diff === 'hardcore' ? 12 : (wellState.diff === 'medium' ? 16 : 20);
+
+            setTimeout(() => {
+                const targetY = 140 - (effectivePower - 75) * 2;
+                coin.style.top = `${targetY}px`;
+
+                setTimeout(() => {
+                    coin.style.display = 'none';
+                    let logEntry = '';
+
+                    if (diffFromCenter <= maxCenterMargin) {
+                        wellState.wins++;
+                        wellState.combo++;
+                        const comboBonus = Math.min(5, wellState.combo);
+                        const gainPoints = 500 * comboBonus;
+                        wellState.score += gainPoints;
+
+                        showFloatingText(window.innerWidth / 2, window.innerHeight / 2, `🪙 BULLSEYE HARDCORE! ${comboBonus}x COMBO! 🎉`, '#ffd700');
+                        logEntry = `<div style="color: #2ecc71;">[${timeStr}] 🎯 <b>JACKPOT PERFECT (${wellState.diff.toUpperCase()})</b> — Força ${powerInt}% (Vento: ${wellState.wind}) | +${gainPoints} pts | 🔥 Combo ${wellState.combo}x | 💎 +10 Gemas</div>`;
+                    } else if (diffFromCenter <= maxWellMargin) {
+                        wellState.wins++;
+                        wellState.combo++;
+                        const gainPoints = 200 * Math.min(3, wellState.combo);
+                        wellState.score += gainPoints;
+
+                        showFloatingText(window.innerWidth / 2, window.innerHeight / 2, `💧 Dentro do Poço! +${gainPoints} pts`, '#00e5ff');
+                        logEntry = `<div style="color: #00e5ff;">[${timeStr}] 💧 <b>DENTRO DO POÇO</b> — Força ${powerInt}% (Vento: ${wellState.wind}) | +${gainPoints} pts | 🔥 Combo ${wellState.combo}x</div>`;
+                    } else {
+                        wellState.losses++;
+                        wellState.combo = 0;
+                        wellState.score = Math.max(0, wellState.score - 100);
+
+                        showFloatingText(window.innerWidth / 2, window.innerHeight / 2, '❌ COMBO QUEBRADO! Moeda Perdida!', '#e74c3c');
+                        logEntry = `<div style="color: #e74c3c;">[${timeStr}] ❌ <b>ERRO & PERDA</b> — Força ${powerInt}% (Vento: ${wellState.wind}) | -100 pts | 💔 Combo Zerado</div>`;
+                    }
+
+                    const totalTosses = wellState.wins + wellState.losses;
+                    const acc = totalTosses > 0 ? ((wellState.wins / totalTosses) * 100).toFixed(1) : 0;
+
+                    document.getElementById('wellComboText').innerText = `${wellState.combo}x`;
+                    document.getElementById('wellWinsText').innerText = wellState.wins;
+                    document.getElementById('wellLossesText').innerText = wellState.losses;
+                    document.getElementById('wellAccuracyText').innerText = `${acc}%`;
+                    document.getElementById('wellScoreText').innerText = `${wellState.score} pts`;
+
+                    const historyLog = document.getElementById('wellHistoryLog');
+                    if (totalTosses === 1) historyLog.innerHTML = '';
+                    historyLog.innerHTML = logEntry + historyLog.innerHTML;
+                }, 500);
+            }, 50);
+        }
+
+        function clearWellHistory() {
+            wellState.wins = 0;
+            wellState.losses = 0;
+            wellState.score = 0;
+            wellState.combo = 0;
+            document.getElementById('wellWinsText').innerText = '0';
+            document.getElementById('wellLossesText').innerText = '0';
+            document.getElementById('wellComboText').innerText = '0x';
+            document.getElementById('wellAccuracyText').innerText = '0%';
+            document.getElementById('wellScoreText').innerText = '0 pts';
+            document.getElementById('wellHistoryLog').innerHTML = '<div style="color: var(--text-muted); text-align: center; margin-top: 60px;">Histórico limpo. Segure o botão para lançar uma nova moeda!</div>';
+        }
+
+        function showFloatingText(x, y, text, color = '#ffd700') {
+            const el = document.createElement('div');
+            el.className = 'floating-text';
+            el.innerText = text;
+            el.style.color = color;
+            el.style.left = `${x}px`;
+            el.style.top = `${y}px`;
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 1200);
+        }
+
+        // ====================================================
+        // 3. LÓGICA DE ALQUIMIA ARCANA GOTHIC (CÍRCULO RÚNICO 📜)
+        // ====================================================
+        const gothicRecipes = {
+            healing: { name: 'Poção de Cura Menor', flask: '🍷', req: ['🌺', '🌿', '💎'] },
+            stamina: { name: 'Elixir de Estamina', flask: '🧪', req: ['🌿', '💜', '🍄'] },
+            poison: { name: 'Extrato de Veneno Místico', flask: '🟣', req: ['🟣', '🌿', '🖤'] },
+            wisdom: { name: 'Tônico de Sabedoria', flask: '💧', req: ['💎', '🌼', '🍄'] }
+        };
+
+        let gothicState = {
+            selectedRecipe: 'healing',
+            nodes: [null, null, null, null],
+            craftedCount: 0,
+            ingredients: {
+                '🌺': 12, '🌿': 18, '💜': 9, '💎': 14,
+                '🍄': 11, '🟣': 7, '🌼': 10, '🖤': 6
+            }
+        };
+
+        function initGothicAlchemy() {
+            updateNodeSlotsUI();
+            updateIngredientCountsUI();
+        }
+
+        function filterRecipes(cat) {
+            showFloatingText(window.innerWidth / 2, window.innerHeight / 2 - 40, `Filtro: ${cat.toUpperCase()}`, '#ffd700');
+        }
+
+        function selectRecipe(recipeId) {
+            gothicState.selectedRecipe = recipeId;
+            document.querySelectorAll('.recipe-card').forEach(card => {
+                card.style.background = 'rgba(25, 20, 15, 0.6)';
+                card.style.borderColor = '#475569';
+            });
+
+            const activeCard = document.getElementById(`recipe-${recipeId}`);
+            if (activeCard) {
+                activeCard.style.background = 'rgba(40, 25, 18, 0.9)';
+                activeCard.style.borderColor = 'var(--accent-gold)';
+            }
+
+            const r = gothicRecipes[recipeId];
+            document.getElementById('gothicRecipeText').innerText = r.name;
+            document.getElementById('centralFlask').innerText = r.flask;
+
+            showFloatingText(window.innerWidth / 2, window.innerHeight / 2 - 20, `Receita Ativa: ${r.name}`, '#ffd700');
+        }
+
+        function insertIngredientToCircle(symbol, name) {
+            // Checa estoque
+            if (!gothicState.ingredients[symbol] || gothicState.ingredients[symbol] <= 0) {
+                showFloatingText(window.innerWidth / 2, window.innerHeight / 2, `⚠️ Sem ${name} suficiente!`, '#e74c3c');
+                return;
+            }
+
+            // Encontra o primeiro nó vazio (null)
+            const emptyIdx = gothicState.nodes.indexOf(null);
+            if (emptyIdx === -1) {
+                showFloatingText(window.innerWidth / 2, window.innerHeight / 2, '⚠️ Círculo Rúnico Cheio! Clique nos nós para remover.', '#e74c3c');
+                return;
+            }
+
+            gothicState.nodes[emptyIdx] = symbol;
+            gothicState.ingredients[symbol]--;
+
+            updateNodeSlotsUI();
+            updateIngredientCountsUI();
+            checkCircleMatchesRecipe();
+        }
+
+        function clearNodeSlot(nodeNum) {
+            const idx = nodeNum - 1;
+            const item = gothicState.nodes[idx];
+            if (item) {
+                gothicState.ingredients[item]++;
+                gothicState.nodes[idx] = null;
+                updateNodeSlotsUI();
+                updateIngredientCountsUI();
+                checkCircleMatchesRecipe();
+            }
+        }
+
+        function clearAllNodes() {
+            gothicState.nodes.forEach((item, idx) => {
+                if (item) {
+                    gothicState.ingredients[item]++;
+                    gothicState.nodes[idx] = null;
+                }
+            });
+            updateNodeSlotsUI();
+            updateIngredientCountsUI();
+            checkCircleMatchesRecipe();
+        }
+
+        function updateNodeSlotsUI() {
+            for (let i = 0; i < 4; i++) {
+                const contentEl = document.getElementById(`nodeContent${i + 1}`);
+                const slotEl = document.getElementById(`nodeSlot${i + 1}`);
+                const val = gothicState.nodes[i];
+
+                if (val) {
+                    contentEl.innerText = val;
+                    slotEl.style.borderColor = 'var(--accent-gold)';
+                    slotEl.style.boxShadow = '0 0 15px var(--accent-gold)';
+                } else {
+                    contentEl.innerText = '❓';
+                    slotEl.style.borderColor = '#475569';
+                    slotEl.style.boxShadow = 'none';
+                }
+            }
+        }
+
+        function updateIngredientCountsUI() {
+            document.getElementById('ingCount-red').innerText = gothicState.ingredients['🌺'];
+            document.getElementById('ingCount-green').innerText = gothicState.ingredients['🌿'];
+            document.getElementById('ingCount-purple').innerText = gothicState.ingredients['💜'];
+            document.getElementById('ingCount-blue').innerText = gothicState.ingredients['💎'];
+            document.getElementById('ingCount-brownmush').innerText = gothicState.ingredients['🍄'];
+            document.getElementById('ingCount-purpmush').innerText = gothicState.ingredients['🟣'];
+            document.getElementById('ingCount-white').innerText = gothicState.ingredients['🌼'];
+            document.getElementById('ingCount-coal').innerText = gothicState.ingredients['🖤'];
+        }
+
+        function checkCircleMatchesRecipe() {
+            const recipe = gothicRecipes[gothicState.selectedRecipe];
+            const currentItems = gothicState.nodes.filter(x => x !== null);
+
+            // Verifica se possui todos os reagentes necessários
+            const matches = recipe.req.every(reqItem => currentItems.includes(reqItem));
+
+            const flask = document.getElementById('centralFlask');
+            const statusText = document.getElementById('gothicStatusText');
+
+            if (matches && currentItems.length === recipe.req.length) {
+                flask.style.transform = 'scale(1.25)';
+                flask.style.boxShadow = '0 0 35px var(--accent-gold)';
+                statusText.innerText = '✨ REAGENTES ALINHADOS! PRONTO PARA TRANSMUTAR!';
+                statusText.style.color = '#2ecc71';
+            } else {
+                flask.style.transform = 'scale(1)';
+                flask.style.boxShadow = '0 0 25px rgba(255,215,0,0.4)';
+                statusText.innerText = 'Selecione reagentes para preencher os nós!';
+                statusText.style.color = 'var(--accent-gold)';
+            }
+        }
+
+        function transmuteGothicPotion() {
+            const recipe = gothicRecipes[gothicState.selectedRecipe];
+            const currentItems = gothicState.nodes.filter(x => x !== null);
+
+            const matches = recipe.req.every(reqItem => currentItems.includes(reqItem)) && currentItems.length === recipe.req.length;
+
+            if (matches) {
+                gothicState.craftedCount++;
+                document.getElementById('gothicCraftedCountText').innerText = gothicState.craftedCount;
+
+                // Animação de transmutação
+                const flask = document.getElementById('centralFlask');
+                flask.style.transform = 'rotate(360deg) scale(1.4)';
+
+                setTimeout(() => {
+                    flask.style.transform = 'scale(1)';
+                    showFloatingText(window.innerWidth / 2, window.innerHeight / 2, `✨ TRANSMUTAÇÃO PERFEITA! ${recipe.name} CRIA COM SUCESSO! 🎉`, '#ffd700');
+
+                    // Esvazia os nós após o craft
+                    gothicState.nodes = [null, null, null, null];
+                    updateNodeSlotsUI();
+                    checkCircleMatchesRecipe();
+                }, 400);
+
+            } else {
+                showFloatingText(window.innerWidth / 2, window.innerHeight / 2, '⚠️ Fumaça Cinza! Combinação incorreta.', '#e74c3c');
+            }
+        }
+
+        // ====================================================
+        // 4. LÓGICA DE PISCICULTURA & MERCADO (AQUACULTURE TYCOON 🐟)
+        // ====================================================
+        let aquaState = {
+            gold: 15000,
+            level: 3,
+            exp: 450,
+            maxExp: 1000,
+            harvestedKg: 43,
+            staff: { jack: false, norm: false },
+            intervalId: null,
+            market: {
+                tilapia: { name: 'Tilápia do Nilo 🐟', price: 1312, trend: 0.12 },
+                shrimp: { name: 'Camarão Imperial 🦐', price: 2160, trend: 0.08 },
+                snakehead: { name: 'Peixe Cobra 🐍', price: 1376, trend: -0.05 },
+                mussel: { name: 'Ostra Zebra 🦪', price: 2414, trend: 0.15 }
+            },
+            ponds: [
+                { id: 1, name: 'Tilápia do Nilo 🐟', count: 28, max: 40, o2: 92, purity: 96, hungry: false, aerator: true, filter: true },
+                { id: 2, name: 'Camarão Imperial 🦐', count: 15, max: 40, o2: 85, purity: 82, hungry: true, aerator: true, filter: false }
+            ]
+        };
+
+        function initAquaculture() {
+            updateAquaUI();
+
+            if (aquaState.intervalId) clearInterval(aquaState.intervalId);
+
+            // Loop em tempo real a cada 4 segundos
+            aquaState.intervalId = setInterval(() => {
+                if (!document.getElementById('panel-aquaculture').classList.contains('active')) return;
+
+                // Automação dos funcionários
+                if (aquaState.staff.norm) {
+                    aquaState.ponds.forEach(p => { p.hungry = false; });
+                }
+                if (aquaState.staff.jack) {
+                    aquaState.ponds.forEach(p => { p.purity = Math.min(100, p.purity + 5); });
+                }
+
+                // Consumo de Oxigênio e sujeira
+                aquaState.ponds.forEach(p => {
+                    if (!p.aerator) p.o2 = Math.max(10, p.o2 - 4);
+                    else p.o2 = Math.min(100, p.o2 + 2);
+
+                    if (p.hungry) p.purity = Math.max(20, p.purity - 3);
+
+                    // Crescimento da população
+                    if (p.o2 > 50 && !p.hungry && p.count < p.max) {
+                        if (Math.random() > 0.6) p.count++;
+                    }
+                });
+
+                // Flutuação aleatória do Mercado
+                for (let k in aquaState.market) {
+                    const delta = (Math.random() - 0.48) * 80;
+                    aquaState.market[k].price = Math.max(300, Math.floor(aquaState.market[k].price + delta));
+                    aquaState.market[k].trend = delta > 0 ? (delta / 1000).toFixed(2) : -(Math.abs(delta) / 1000).toFixed(2);
+                }
+
+                updateAquaUI();
+            }, 4000);
+        }
+
+        function updateAquaUI() {
+            document.getElementById('aquaGoldText').innerText = `💰 $${aquaState.gold.toLocaleString()}`;
+            document.getElementById('aquaLevelText').innerText = `⭐ Nível ${aquaState.level} (EXP ${aquaState.exp}/${aquaState.maxExp})`;
+            document.getElementById('aquaPondCountText').innerText = `${aquaState.ponds.length} / 5`;
+            document.getElementById('aquaHarvestedText').innerText = `${aquaState.harvestedKg} kg`;
+
+            const staffCount = (aquaState.staff.jack ? 1 : 0) + (aquaState.staff.norm ? 1 : 0);
+            document.getElementById('aquaStaffCountText').innerText = `${staffCount} Contratados`;
+
+            // Atualiza Viveiro 1
+            const p1 = aquaState.ponds[0];
+            if (p1) {
+                document.getElementById('pond1Count').innerText = `População: ${p1.count} / ${p1.max} Peixes`;
+                document.getElementById('pond1O2Text').innerText = `${p1.o2}%`;
+                document.getElementById('pond1O2Bar').style.width = `${p1.o2}%`;
+                document.getElementById('pond1PurityText').innerText = p1.purity > 80 ? `Limpa (${p1.purity}%)` : `Poluída (${p1.purity}%)`;
+                document.getElementById('pond1PurityBar').style.width = `${p1.purity}%`;
+                document.getElementById('pond1HungerText').innerText = p1.hungry ? '🍲 Com Fome!' : '🙂 Peixes Alimentados';
+
+                const waterBox1 = document.getElementById('pond1WaterBox');
+                if (waterBox1) {
+                    if (p1.purity < 60) waterBox1.classList.add('polluted');
+                    else waterBox1.classList.remove('polluted');
+                }
+                const bubble1 = document.getElementById('pond1BadgeBubble');
+                if (bubble1) {
+                    bubble1.innerText = p1.hungry ? '🍲 Com Fome! Precisa de Ração' : (p1.purity < 60 ? '⚠️ Água Turbia/Poluída!' : '🙂 Água Cristalina & Peixes Ativos');
+                    bubble1.style.borderColor = p1.hungry ? '#e74c3c' : 'var(--accent-gold)';
+                }
+            }
+
+            // Atualiza Viveiro 2
+            const p2 = aquaState.ponds[1];
+            if (p2) {
+                document.getElementById('pond2Count').innerText = `População: ${p2.count} / ${p2.max} Crustáceos`;
+                document.getElementById('pond2O2Text').innerText = `${p2.o2}%`;
+                document.getElementById('pond2O2Bar').style.width = `${p2.o2}%`;
+                document.getElementById('pond2PurityText').innerText = p2.purity > 80 ? `Limpa (${p2.purity}%)` : `Poluída (${p2.purity}%)`;
+                document.getElementById('pond2PurityBar').style.width = `${p2.purity}%`;
+                document.getElementById('pond2HungerText').innerText = p2.hungry ? '🍲 Com Fome!' : '🙂 Peixes Alimentados';
+
+                const waterBox2 = document.getElementById('pond2WaterBox');
+                if (waterBox2) {
+                    if (p2.purity < 60) waterBox2.classList.add('polluted');
+                    else waterBox2.classList.remove('polluted');
+                }
+                const bubble2 = document.getElementById('pond2BadgeBubble');
+                if (bubble2) {
+                    bubble2.innerText = p2.hungry ? '🍲 Com Fome! Precisa de Ração' : (p2.purity < 60 ? '⚠️ Água Turbia/Poluída!' : '🙂 Água Cristalina & Peixes Ativos');
+                    bubble2.style.borderColor = p2.hungry ? '#e74c3c' : 'var(--accent-gold)';
+                }
+            }
+
+            // Atualiza Mercado
+            let mHtml = '';
+            for (let k in aquaState.market) {
+                const item = aquaState.market[k];
+                const isUp = item.trend >= 0;
+                mHtml += `
+                    <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.4); padding: 8px; border-radius: 6px;">
+                        <span>${item.name}</span>
+                        <span style="color: ${isUp ? '#2ecc71' : '#e74c3c'}; font-weight: bold;">$${item.price.toLocaleString()}/kg ${isUp ? '📈' : '📉'} (${isUp ? '+' : ''}${(item.trend * 100).toFixed(0)}%)</span>
+                    </div>
+                `;
+            }
+            document.getElementById('aquaMarketList').innerHTML = mHtml;
+        }
+
+        function buildNewPond() {
+            if (aquaState.gold < 2000) {
+                showFloatingText(window.innerWidth / 2, window.innerHeight / 2, '⚠️ Saldo Insuficiente! ($2,000 exigidos)', '#e74c3c');
+                return;
+            }
+            if (aquaState.ponds.length >= 5) {
+                showFloatingText(window.innerWidth / 2, window.innerHeight / 2, '⚠️ Limite de Viveiros Atingido! (Máx 5)', '#e74c3c');
+                return;
+            }
+
+            aquaState.gold -= 2000;
+            const newId = aquaState.ponds.length + 1;
+            aquaState.ponds.push({
+                id: newId,
+                name: 'Peixe Cobra 🐍',
+                count: 10,
+                max: 40,
+                o2: 90,
+                purity: 90,
+                hungry: false,
+                aerator: true,
+                filter: true
+            });
+
+            showFloatingText(window.innerWidth / 2, window.innerHeight / 2, `🏗️ Viveiro #${newId} Escavado com Sucesso! 🎉`, '#ffd700');
+            updateAquaUI();
+        }
+
+        function installAerator() {
+            if (aquaState.gold < 800) {
+                showFloatingText(window.innerWidth / 2, window.innerHeight / 2, '⚠️ Saldo Insuficiente! ($800 exigidos)', '#e74c3c');
+                return;
+            }
+            aquaState.gold -= 800;
+            aquaState.ponds.forEach(p => { p.aerator = true; p.o2 = 100; });
+            showFloatingText(window.innerWidth / 2, window.innerHeight / 2, '💨 Aeradores Instalados e Ativados em Todos os Viveiros! ⚡', '#2ecc71');
+            updateAquaUI();
+        }
+
+        function installGenerator() {
+            if (aquaState.gold < 1500) {
+                showFloatingText(window.innerWidth / 2, window.innerHeight / 2, '⚠️ Saldo Insuficiente! ($1,500 exigidos)', '#e74c3c');
+                return;
+            }
+            aquaState.gold -= 1500;
+            showFloatingText(window.innerWidth / 2, window.innerHeight / 2, '⚡ Gerador Elétrico de Alta Capacidade Instalado! 💡', '#ffd700');
+            updateAquaUI();
+        }
+
+        function installWaterFilter() {
+            if (aquaState.gold < 1200) {
+                showFloatingText(window.innerWidth / 2, window.innerHeight / 2, '⚠️ Saldo Insuficiente! ($1,200 exigidos)', '#e74c3c');
+                return;
+            }
+            aquaState.gold -= 1200;
+            aquaState.ponds.forEach(p => { p.filter = true; p.purity = 100; });
+            showFloatingText(window.innerWidth / 2, window.innerHeight / 2, '🧹 Sistema de Purificação Instalado! Água Cristalina! 💧', '#00e5ff');
+            updateAquaUI();
+        }
+
+        function feedPond(id) {
+            if (aquaState.gold < 30) return;
+            aquaState.gold -= 30;
+            const p = aquaState.ponds.find(x => x.id === id);
+            if (p) {
+                p.hungry = false;
+                showFloatingText(window.innerWidth / 2, window.innerHeight / 2, `🌾 Viveiro #${id} Alimentado!`, '#2ecc71');
+                updateAquaUI();
+            }
+        }
+
+        function feedAllPonds() {
+            if (aquaState.gold < 150) {
+                showFloatingText(window.innerWidth / 2, window.innerHeight / 2, '⚠️ Saldo Insuficiente! ($150 exigidos)', '#e74c3c');
+                return;
+            }
+            aquaState.gold -= 150;
+            aquaState.ponds.forEach(p => p.hungry = false);
+            showFloatingText(window.innerWidth / 2, window.innerHeight / 2, '🌾 Todos os Viveiros Alimentados com Ração Nutritiva!', '#2ecc71');
+            updateAquaUI();
+        }
+
+        function cleanPond(id) {
+            if (aquaState.gold < 50) return;
+            aquaState.gold -= 50;
+            const p = aquaState.ponds.find(x => x.id === id);
+            if (p) {
+                p.purity = 100;
+                showFloatingText(window.innerWidth / 2, window.innerHeight / 2, `🧹 Água do Viveiro #${id} Drenada e Purificada!`, '#00e5ff');
+                updateAquaUI();
+            }
+        }
+
+        function harvestPond(id) {
+            const p = aquaState.ponds.find(x => x.id === id);
+            if (p && p.count > 5) {
+                const kg = p.count;
+                aquaState.harvestedKg += kg;
+                p.count = 5;
+
+                // Ganho de EXP
+                aquaState.exp += kg * 10;
+                if (aquaState.exp >= aquaState.maxExp) {
+                    aquaState.level++;
+                    aquaState.exp -= aquaState.maxExp;
+                    aquaState.maxExp += 500;
+                    showFloatingText(window.innerWidth / 2, window.innerHeight / 2, `⭐ LEVEL UP! Nível ${aquaState.level} de Piscicultura! 🎉`, '#ffd700');
+                }
+
+                showFloatingText(window.innerWidth / 2, window.innerHeight / 2, `🎣 Colheita Concluída! +${kg}kg de Peixes Estocados!`, '#2ecc71');
+                updateAquaUI();
+            }
+        }
+
+        function hireStaff(type) {
+            if (type === 'jack') {
+                if (aquaState.gold < 630) return;
+                aquaState.gold -= 630;
+                aquaState.staff.jack = true;
+                showFloatingText(window.innerWidth / 2, window.innerHeight / 2, '👷 Jack Contratado! Limpeza de Água Automática Ativada!', '#ffd700');
+            } else if (type === 'norm') {
+                if (aquaState.gold < 980) return;
+                aquaState.gold -= 980;
+                aquaState.staff.norm = true;
+                showFloatingText(window.innerWidth / 2, window.innerHeight / 2, '👨‍🍳 Norm Contratado! Alimentação Automática Ativada!', '#ffd700');
+            }
+            updateAquaUI();
+        }
+
+        function sellInventoryToMarket() {
+            if (aquaState.harvestedKg <= 0) {
+                showFloatingText(window.innerWidth / 2, window.innerHeight / 2, '⚠️ Nenhum Peixe no Estoque para Vender!', '#e74c3c');
+                return;
+            }
+
+            const totalGain = aquaState.harvestedKg * aquaState.market.tilapia.price;
+            aquaState.gold += totalGain;
+            showFloatingText(window.innerWidth / 2, window.innerHeight / 2, `💰 VENDA REALIZADA NO PICO! +$${totalGain.toLocaleString()} Faturados! 🎉`, '#ffd700');
+
+            aquaState.harvestedKg = 0;
+            updateAquaUI();
+        }
+
+        function completeCustomerOrder(id) {
+            aquaState.gold += 3500;
+            aquaState.exp += 400;
+
+            if (aquaState.exp >= aquaState.maxExp) {
+                aquaState.level++;
+                aquaState.exp -= aquaState.maxExp;
+                aquaState.maxExp += 500;
+            }
+
+            showFloatingText(window.innerWidth / 2, window.innerHeight / 2, '📦 Pedido de Cliente Entregue! +$3,500 e +400 EXP! 🎉', '#ffd700');
+            document.getElementById('aquaOrdersList').innerHTML = '<div style="color: #2ecc71; text-align: center; padding: 10px;">✅ Todos os pedidos de clientes atendidos! Aguardando novos pedidos...</div>';
+            updateAquaUI();
+        }
+
+        function triggerAquaDayTick() {
+            const upkeep = aquaState.ponds.length * 120;
+            aquaState.gold = Math.max(0, aquaState.gold - upkeep);
+
+            for (let k in aquaState.market) {
+                const delta = (Math.random() - 0.45) * 150;
+                aquaState.market[k].price = Math.max(400, Math.floor(aquaState.market[k].price + delta));
+            }
+
+            showFloatingText(window.innerWidth / 2, window.innerHeight / 2, `⏩ Novo Dia Avançado! Manutenção: -$${upkeep}`, '#0284c7');
+            updateAquaUI();
+        }
+
+        // Inicializa o jogo padrão ao carregar
+        window.onload = () => {
+            initTensionGame();
+        };
+    </script>
+</body>
+</html>

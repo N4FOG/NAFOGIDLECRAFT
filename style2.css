@@ -1,0 +1,1619 @@
+/* ============================================================
+   STYLE2.CSS — Idle Craft Premium Visual Overhaul
+   Estilo Gacha RPG (inspirado em jogos como a referência)
+   Todas as classes coexistem com style.css (sobrescrevem)
+   ============================================================ */
+
+/* ==========================================
+   FASE 1 — FUNDO TEMÁTICO E AMBIENTAÇÃO
+   ========================================== */
+
+/* Background cenográfico com paisagem fantasy */
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    background: 
+        /* Camada de estrelas/partículas distantes */
+        radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.3), transparent),
+        radial-gradient(1px 1px at 30% 60%, rgba(255,255,255,0.2), transparent),
+        radial-gradient(1.5px 1.5px at 50% 10%, rgba(255,255,255,0.4), transparent),
+        radial-gradient(1px 1px at 70% 40%, rgba(255,255,255,0.2), transparent),
+        radial-gradient(1px 1px at 90% 80%, rgba(255,255,255,0.3), transparent),
+        radial-gradient(1.5px 1.5px at 15% 85%, rgba(255,255,255,0.15), transparent),
+        radial-gradient(1px 1px at 45% 75%, rgba(255,255,255,0.25), transparent),
+        radial-gradient(1px 1px at 80% 15%, rgba(255,255,255,0.2), transparent),
+        radial-gradient(2px 2px at 25% 45%, rgba(255,215,0,0.15), transparent),
+        radial-gradient(1px 1px at 65% 55%, rgba(255,215,0,0.1), transparent),
+        /* Gradiente base escuro com tons quentes */
+        linear-gradient(180deg, 
+            rgba(5, 8, 15, 0.92) 0%,
+            rgba(10, 15, 30, 0.85) 30%,
+            rgba(15, 10, 20, 0.88) 60%,
+            rgba(5, 5, 10, 0.95) 100%
+        );
+}
+
+/* Segunda camada: brilho ambiente vindo do centro */
+body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: 
+        radial-gradient(ellipse at 50% 30%, rgba(255, 153, 68, 0.04) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 70%, rgba(255, 215, 0, 0.03) 0%, transparent 50%),
+        radial-gradient(ellipse at 20% 80%, rgba(100, 150, 255, 0.02) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+/* Textura de pergaminho/papel no container do jogo */
+.game-container {
+    position: relative;
+    background: rgba(8, 14, 22, 0.75);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 
+        0 20px 50px rgba(0, 0, 0, 0.7),
+        0 0 80px rgba(255, 153, 68, 0.08),
+        0 0 120px rgba(255, 215, 0, 0.04),
+        inset 0 1px 0 rgba(255, 215, 0, 0.06);
+    border: 1px solid rgba(255, 215, 0, 0.08);
+    transition: all 0.5s ease;
+}
+
+/* Efeito de brilho nas bordas do container */
+.game-container::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: 25px;
+    background: linear-gradient(135deg, 
+        rgba(255, 215, 0, 0.15), 
+        transparent 30%, 
+        transparent 70%, 
+        rgba(255, 215, 0, 0.08));
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* ==========================================
+   FASE 2 — CARDS DOURADOS (ESTILO ORNAMENTAL)
+   ========================================== */
+
+/* ---- Base: Todos os cards do jogo ---- */
+.game-container .inventory-slot,
+.game-container .resource-card,
+.game-container .recipe-card,
+.game-container .pet-card:not(.enshrined),
+.game-container .prop-card,
+.game-container .academy-card,
+.game-container .potion-card,
+.game-container .tool-card,
+.game-container .tech-upgrade,
+.game-container .rune-recipe-card,
+.game-container .equip-option {
+    position: relative;
+    background: linear-gradient(160deg, 
+        rgba(20, 30, 45, 0.8), 
+        rgba(12, 18, 28, 0.9));
+    border: 1.5px solid rgba(255, 215, 0, 0.12);
+    border-radius: 14px;
+    box-shadow: 
+        0 2px 8px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 215, 0, 0.04),
+        0 0 15px rgba(0, 0, 0, 0.15);
+    transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Brilho sutil na borda superior dos cards */
+.game-container .inventory-slot::before,
+.game-container .resource-card::before,
+.game-container .recipe-card::before,
+.game-container .prop-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 15%;
+    right: 15%;
+    height: 1px;
+    background: linear-gradient(90deg, 
+        transparent, 
+        rgba(255, 215, 0, 0.2), 
+        transparent);
+    pointer-events: none;
+}
+
+/* Cantos decorativos (dourados) - top-left */
+.game-container .inventory-slot::after,
+.game-container .resource-card::after,
+.game-container .recipe-card::after,
+.game-container .prop-card::after {
+    content: '';
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 12px;
+    height: 12px;
+    border-color: rgba(255, 215, 0, 0.15);
+    border-style: solid;
+    border-width: 1px 0 0 1px;
+    border-radius: 3px 0 0 0;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+/* Hover: revela cantos e intensifica borda */
+.game-container .inventory-slot:hover::after,
+.game-container .resource-card.unlocked:hover::after,
+.game-container .recipe-card.unlocked:hover::after,
+.game-container .prop-card:hover::after {
+    opacity: 1;
+}
+
+/* ---- Inventory Slot específico ---- */
+.game-container .inventory-slot {
+    min-height: 130px;
+    border-color: rgba(255, 215, 0, 0.08);
+}
+
+.game-container .inventory-slot.filled {
+    border-color: rgba(255, 215, 0, 0.15);
+    background: linear-gradient(160deg, 
+        rgba(25, 35, 55, 0.85), 
+        rgba(15, 22, 35, 0.95));
+}
+
+.game-container .inventory-slot.filled:hover {
+    border-color: rgba(255, 215, 0, 0.4);
+    box-shadow: 
+        0 6px 20px rgba(0, 0, 0, 0.4),
+        0 0 20px rgba(255, 215, 0, 0.08),
+        inset 0 0 20px rgba(255, 215, 0, 0.02);
+    transform: translateY(-3px);
+}
+
+/* ---- Resource / Recipe Cards ---- */
+.resource-card.unlocked,
+.recipe-card.unlocked {
+    border-color: rgba(255, 215, 0, 0.12) !important;
+    background: linear-gradient(160deg, 
+        rgba(20, 35, 50, 0.85), 
+        rgba(10, 20, 30, 0.95)) !important;
+}
+
+.resource-card.unlocked:hover,
+.recipe-card.unlocked:hover {
+    border-color: rgba(255, 215, 0, 0.4) !important;
+    box-shadow: 
+        0 10px 25px rgba(0, 0, 0, 0.4),
+        0 0 30px rgba(255, 215, 0, 0.08),
+        inset 0 0 20px rgba(255, 215, 0, 0.02) !important;
+    transform: translateY(-4px) !important;
+}
+
+/* ---- Pet Cards ---- */
+.pet-card {
+    border-color: rgba(201, 106, 201, 0.15) !important;
+}
+
+.pet-card.owned {
+    border-color: rgba(255, 215, 0, 0.2) !important;
+    background: linear-gradient(160deg, 
+        rgba(35, 30, 55, 0.85), 
+        rgba(20, 15, 35, 0.95)) !important;
+}
+
+.pet-card.active {
+    border-color: rgba(74, 255, 74, 0.4) !important;
+    box-shadow: 
+        0 0 25px rgba(74, 255, 74, 0.15),
+        inset 0 0 15px rgba(74, 255, 74, 0.03) !important;
+}
+
+.pet-card.enshrined {
+    border-color: rgba(255, 215, 0, 0.4) !important;
+    background: linear-gradient(160deg, 
+        rgba(40, 35, 20, 0.9), 
+        rgba(25, 20, 10, 0.95)) !important;
+    box-shadow: 
+        0 0 30px rgba(255, 215, 0, 0.12),
+        inset 0 0 40px rgba(255, 215, 0, 0.03) !important;
+}
+
+/* ---- Property Cards ---- */
+.prop-card {
+    border-color: rgba(100, 200, 100, 0.12) !important;
+}
+
+.prop-card:hover {
+    border-color: rgba(100, 200, 100, 0.35) !important;
+    box-shadow: 
+        0 6px 20px rgba(0, 0, 0, 0.3),
+        0 0 20px rgba(100, 200, 100, 0.06) !important;
+    transform: translateY(-3px);
+}
+
+/* ---- Tech Upgrades ---- */
+.tech-upgrade {
+    border-color: rgba(74, 201, 122, 0.12) !important;
+}
+
+.tech-upgrade:hover {
+    border-color: rgba(74, 201, 122, 0.35) !important;
+}
+
+/* ---- Academy Cards ---- */
+.academy-card {
+    border-color: rgba(100, 150, 255, 0.12) !important;
+}
+
+/* ---- Tool Cards ---- */
+.tool-card {
+    border-color: rgba(201, 164, 74, 0.15) !important;
+}
+
+.tool-card:hover {
+    border-color: rgba(201, 164, 74, 0.35) !important;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* ---- Potion Cards ---- */
+.potion-card {
+    border-color: rgba(74, 154, 255, 0.12) !important;
+}
+
+.potion-card:hover {
+    border-color: rgba(74, 154, 255, 0.35) !important;
+    transform: translateY(-3px);
+}
+
+/* ---- Rune Recipe Cards ---- */
+.rune-recipe-card {
+    border-color: rgba(201, 106, 201, 0.12) !important;
+}
+
+.rune-recipe-card:hover {
+    border-color: rgba(201, 106, 201, 0.35) !important;
+}
+
+/* ---- Equip Option (smithing) ---- */
+.equip-option {
+    border-color: rgba(255, 215, 0, 0.1) !important;
+}
+
+.equip-option:hover {
+    border-color: rgba(255, 215, 0, 0.35) !important;
+    transform: translateY(-2px);
+}
+
+/* ==========================================
+   FASE 3 — BADGES DE RARIDADE (SSR/UR etc.)
+   ========================================== */
+
+/* Container de badge sobre o card */
+.badge-container {
+    position: absolute;
+    top: -1px;
+    right: -1px;
+    z-index: 10;
+    pointer-events: none;
+}
+
+/* Badge de raridade estilo gacha */
+.rarity-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px 10px;
+    font-size: 0.6em;
+    font-weight: 800;
+    font-family: 'Cinzel', serif;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border-radius: 0 12px 0 10px;
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    min-width: 28px;
+    position: absolute;
+    top: -1px;
+    right: -1px;
+}
+
+/* Cores por raridade (texto definido pelo script inline no index2, não por ::after) */
+.rarity-badge.common {
+    background: linear-gradient(135deg, #8a9aa8, #6a7a88);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+}
+
+.rarity-badge.uncommon {
+    background: linear-gradient(135deg, #4aff4a, #2ab82a);
+    box-shadow: 0 1px 6px rgba(74,255,74,0.3);
+}
+
+.rarity-badge.rare {
+    background: linear-gradient(135deg, #4a9aff, #2068d0);
+    box-shadow: 0 1px 8px rgba(74,154,255,0.3);
+}
+
+.rarity-badge.epic {
+    background: linear-gradient(135deg, #c96ac9, #9a309a);
+    box-shadow: 0 1px 10px rgba(201,106,201,0.3);
+}
+
+.rarity-badge.legendary {
+    background: linear-gradient(135deg, #ffd700, #ff8c00, #ffd700);
+    background-size: 200% 200%;
+    animation: legendaryShimmer 2s ease-in-out infinite;
+    box-shadow: 0 1px 15px rgba(255,215,0,0.4);
+}
+
+.rarity-badge.ancient {
+    background: linear-gradient(135deg, #ff44aa, #cc0088, #ff44aa);
+    background-size: 200% 200%;
+    animation: legendaryShimmer 1.5s ease-in-out infinite;
+    box-shadow: 0 1px 20px rgba(255,68,170,0.4);
+}
+
+/* Animação shimmer para lendário/ancestral */
+@keyframes legendaryShimmer {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+/* Brilho pulsante em cards lendários/ancestrais */
+.inventory-slot .rarity-badge.legendary ~ .item-name,
+.pet-card .rarity-badge.legendary ~ .pet-name {
+    animation: goldPulse 2s ease-in-out infinite;
+}
+
+@keyframes goldPulse {
+    0%, 100% { text-shadow: 0 0 5px rgba(255,215,0,0.3); }
+    50% { text-shadow: 0 0 15px rgba(255,215,0,0.6), 0 0 30px rgba(255,215,0,0.2); }
+}
+
+/* Badge de "NOVO" para itens não visualizados */
+.new-item-badge {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    z-index: 10;
+    background: linear-gradient(135deg, #ff4444, #cc0000);
+    color: #fff;
+    font-size: 0.55em;
+    font-weight: 800;
+    padding: 1px 6px;
+    border-radius: 4px;
+    animation: newPulse 1.5s ease-in-out infinite;
+    font-family: 'Outfit', sans-serif;
+    letter-spacing: 0.5px;
+}
+
+@keyframes newPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+/* Shimmer hover em cards raros */
+.inventory-slot.filled:hover::before,
+.resource-card.unlocked:hover::before,
+.recipe-card.unlocked:hover::before {
+    background: linear-gradient(90deg, 
+        transparent, 
+        rgba(255, 215, 0, 0.3), 
+        transparent);
+    left: -100%;
+    right: auto;
+    width: 60%;
+    height: 2px;
+    animation: shimmerHover 0.8s ease-in-out;
+}
+
+@keyframes shimmerHover {
+    0% { left: -60%; }
+    100% { left: 150%; }
+}
+
+/* Efeito shimmer em legendários/ancestrais - barra de luz */
+.inventory-slot:has(.rarity-badge.legendary)::before,
+.inventory-slot:has(.rarity-badge.ancient)::before {
+    display: none; /* evitar conflito */
+}
+
+/* Glow na borda de cards raros no inventário */
+.inventory-slot.filled:has(.rarity-badge.rare) {
+    border-color: rgba(74, 154, 255, 0.2) !important;
+}
+.inventory-slot.filled:has(.rarity-badge.epic) {
+    border-color: rgba(201, 106, 201, 0.2) !important;
+}
+.inventory-slot.filled:has(.rarity-badge.legendary) {
+    border-color: rgba(255, 215, 0, 0.3) !important;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.08) !important;
+}
+.inventory-slot.filled:has(.rarity-badge.ancient) {
+    border-color: rgba(255, 68, 170, 0.3) !important;
+    box-shadow: 0 0 20px rgba(255, 68, 170, 0.08) !important;
+}
+
+/* ==========================================
+   FASE 4 — TOP BAR ESTILO GACHA
+   ========================================== */
+
+.top-stats-bar {
+    background: rgba(5, 10, 18, 0.88) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    border-bottom: 1px solid rgba(255, 215, 0, 0.1) !important;
+    box-shadow: 
+        0 4px 20px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 215, 0, 0.04) !important;
+    padding: 8px 20px !important;
+}
+
+.top-res-item {
+    padding: 6px 14px !important;
+    border-radius: 10px !important;
+    background: rgba(255, 255, 255, 0.03) !important;
+    border: 1px solid rgba(255, 255, 255, 0.04) !important;
+    transition: all 0.25s ease !important;
+    position: relative;
+}
+
+.top-res-item:hover {
+    background: rgba(255, 255, 255, 0.06) !important;
+    border-color: rgba(255, 215, 0, 0.2) !important;
+    transform: translateY(-1px);
+}
+
+.top-res-item .top-bar-tooltip {
+    border: 1px solid rgba(255, 215, 0, 0.15) !important;
+    background: rgba(8, 14, 22, 0.97) !important;
+    backdrop-filter: blur(12px) !important;
+    border-radius: 10px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Separadores entre recursos */
+.top-res-item + .top-res-item {
+    margin-left: 4px;
+}
+
+.top-res-item + .top-res-item::before {
+    content: '';
+    position: absolute;
+    left: -4px;
+    top: 20%;
+    bottom: 20%;
+    width: 1px;
+    background: linear-gradient(180deg, 
+        transparent, 
+        rgba(255, 215, 0, 0.1), 
+        transparent);
+}
+
+/* Destaque no gold */
+.top-res-item:has(.top-res-icon .game-icon[alt*="Gold"]),
+.top-res-item:has([id*="Gold"]),
+.top-res-item:has([id*="gold"]) {
+    border-color: rgba(255, 215, 0, 0.15) !important;
+    background: rgba(255, 215, 0, 0.03) !important;
+}
+
+/* ==========================================
+   FASE 5 — MICRO-INTERAÇÕES E ACABAMENTO
+   ========================================== */
+
+/* ---- 5.1 Botões aprimorados ---- */
+
+/* Botões de menu na sidebar */
+.menu-btn {
+    border-radius: 12px !important;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.menu-btn:hover {
+    transform: translateX(6px) !important;
+    box-shadow: 
+        4px 4px 15px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+}
+
+/* Brilho lateral nos botões ao hover */
+.menu-btn::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 10%;
+    bottom: 10%;
+    width: 3px;
+    background: var(--primary-color, #ffd700);
+    border-radius: 0 3px 3px 0;
+    opacity: 0;
+    transition: opacity 0.3s ease, top 0.3s ease, bottom 0.3s ease;
+}
+
+.menu-btn:hover::after {
+    opacity: 1;
+    top: 15%;
+    bottom: 15%;
+}
+
+.menu-btn.active::after {
+    opacity: 1;
+    top: 10%;
+    bottom: 10%;
+}
+
+/* ---- Botões principais (ação) ---- */
+.farm-btn, .craft-btn, .combat-btn, .prop-btn, 
+.pet-btn, .tech-btn, .academy-btn, .potion-btn,
+.tool-buy-btn, .ng-start-btn {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+}
+
+.farm-btn:hover:not(:disabled),
+.craft-btn:hover:not(:disabled),
+.combat-btn:hover:not(:disabled),
+.prop-btn.upgrade:hover:not(:disabled),
+.pet-btn.buy:hover,
+.tech-btn:hover:not(:disabled),
+.academy-btn:hover:not(:disabled),
+.potion-btn:hover:not(:disabled),
+.tool-buy-btn:hover:not(:disabled) {
+    transform: translateY(-2px) !important;
+    box-shadow: 
+        0 6px 20px rgba(0, 0, 0, 0.3),
+        0 0 15px rgba(var(--primary-rgb, 255, 215, 0), 0.15) !important;
+}
+
+/* Ripple effect nos botões (ondulação ao clicar) */
+.farm-btn:active:not(:disabled),
+.craft-btn:active:not(:disabled),
+.combat-btn:active:not(:disabled),
+.prop-btn:active:not(:disabled) {
+    transform: scale(0.97) !important;
+}
+
+/* ---- Menu Principal ---- */
+.menu-btn-main {
+    transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.menu-btn-main:hover {
+    transform: scale(1.04) !important;
+}
+
+/* ---- 5.2 Tooltips refinados ---- */
+
+/* Tooltip dos top bar items */
+.top-bar-tooltip {
+    background: rgba(8, 14, 22, 0.96) !important;
+    backdrop-filter: blur(16px) !important;
+    border: 1px solid rgba(255, 215, 0, 0.15) !important;
+    border-radius: 12px !important;
+    padding: 12px 14px !important;
+    box-shadow: 
+        0 10px 40px rgba(0, 0, 0, 0.5),
+        0 0 20px rgba(255, 215, 0, 0.04) !important;
+}
+
+.tooltip-header {
+    color: var(--primary-color, #ffd700) !important;
+    font-family: 'Cinzel', serif !important;
+    font-size: 0.85em !important;
+    border-bottom: 1px solid rgba(255, 215, 0, 0.1) !important;
+    padding-bottom: 6px !important;
+    margin-bottom: 6px !important;
+}
+
+/* Custom tooltip (new game screen) */
+.custom-tooltip-box {
+    background: rgba(8, 14, 22, 0.97) !important;
+    backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(255, 215, 0, 0.15) !important;
+    border-radius: 10px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* ---- 5.3 Animações de entrada ---- */
+
+/* Stagger animation para grids de cards */
+@keyframes cardEntrance {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Respeita preferência do usuário por animações reduzidas */
+@media (prefers-reduced-motion: reduce) {
+    .resources-grid .resource-card,
+    .recipes-grid .recipe-card,
+    .inventory-grid .inventory-slot,
+    .property-grid .prop-card,
+    .pets-grid .pet-card {
+        animation: none !important;
+        opacity: 1 !important;
+    }
+    .rarity-badge.legendary,
+    .rarity-badge.ancient {
+        animation: none !important;
+    }
+    .buff-tag {
+        animation: none !important;
+    }
+}
+
+.resources-grid .resource-card,
+.recipes-grid .recipe-card,
+.inventory-grid .inventory-slot,
+.property-grid .prop-card,
+.pets-grid .pet-card {
+    animation: cardEntrance 0.4s ease-out forwards;
+    opacity: 0;
+}
+
+/* Stagger delays */
+.resources-grid .resource-card:nth-child(1),
+.recipes-grid .recipe-card:nth-child(1),
+.inventory-grid .inventory-slot:nth-child(1),
+.property-grid .prop-card:nth-child(1),
+.pets-grid .pet-card:nth-child(1) { animation-delay: 0.02s; }
+
+.resources-grid .resource-card:nth-child(2),
+.recipes-grid .recipe-card:nth-child(2),
+.inventory-grid .inventory-slot:nth-child(2),
+.property-grid .prop-card:nth-child(2),
+.pets-grid .pet-card:nth-child(2) { animation-delay: 0.06s; }
+
+.resources-grid .resource-card:nth-child(3),
+.recipes-grid .recipe-card:nth-child(3),
+.inventory-grid .inventory-slot:nth-child(3),
+.property-grid .prop-card:nth-child(3),
+.pets-grid .pet-card:nth-child(3) { animation-delay: 0.10s; }
+
+.resources-grid .resource-card:nth-child(4),
+.recipes-grid .recipe-card:nth-child(4),
+.inventory-grid .inventory-slot:nth-child(4),
+.property-grid .prop-card:nth-child(4),
+.pets-grid .pet-card:nth-child(4) { animation-delay: 0.14s; }
+
+.resources-grid .resource-card:nth-child(5),
+.recipes-grid .recipe-card:nth-child(5),
+.inventory-grid .inventory-slot:nth-child(5),
+.property-grid .prop-card:nth-child(5),
+.pets-grid .pet-card:nth-child(5) { animation-delay: 0.18s; }
+
+.resources-grid .resource-card:nth-child(6),
+.recipes-grid .recipe-card:nth-child(6),
+.inventory-grid .inventory-slot:nth-child(6),
+.property-grid .prop-card:nth-child(6),
+.pets-grid .pet-card:nth-child(6) { animation-delay: 0.22s; }
+
+.resources-grid .resource-card:nth-child(7),
+.recipes-grid .recipe-card:nth-child(7),
+.inventory-grid .inventory-slot:nth-child(7),
+.property-grid .prop-card:nth-child(7),
+.pets-grid .pet-card:nth-child(7) { animation-delay: 0.26s; }
+
+.resources-grid .resource-card:nth-child(8),
+.recipes-grid .recipe-card:nth-child(8),
+.inventory-grid .inventory-slot:nth-child(8),
+.property-grid .prop-card:nth-child(8),
+.pets-grid .pet-card:nth-child(8) { animation-delay: 0.30s; }
+
+/* ---- 5.4 Scrollbar personalizada ---- */
+
+/* Scrollbar global */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(10, 18, 26, 0.5);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, rgba(255, 153, 68, 0.3), rgba(255, 215, 0, 0.2));
+    border-radius: 3px;
+    transition: background 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, rgba(255, 153, 68, 0.5), rgba(255, 215, 0, 0.4));
+}
+
+/* Scrollbar específica para áreas de conteúdo */
+.content-area::-webkit-scrollbar,
+.skill-detail::-webkit-scrollbar,
+.inventory-page::-webkit-scrollbar {
+    width: 4px;
+}
+
+/* Firefox scrollbar */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 153, 68, 0.3) rgba(10, 18, 26, 0.3);
+}
+
+/* ---- 5.5 Modais refinados ---- */
+
+/* Modal padrão do jogo */
+.game-modal,
+.item-info-modal,
+#settingsModal .modal-content,
+#keybindingsModal .modal-content,
+#rankingModal .modal-content,
+#forgeSpecModal,
+#sawmillSpecModal {
+    background: rgba(10, 18, 28, 0.97) !important;
+    backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 215, 0, 0.12) !important;
+    border-radius: 18px !important;
+    box-shadow: 
+        0 20px 60px rgba(0, 0, 0, 0.6),
+        0 0 40px rgba(255, 215, 0, 0.04) !important;
+}
+
+/* Header dos modais */
+.game-modal .modal-header,
+.item-info-modal .modal-header,
+#settingsModal .modal-header,
+#keybindingsModal .modal-header {
+    border-bottom: 1px solid rgba(255, 215, 0, 0.1) !important;
+}
+
+.game-modal .modal-header h3,
+.item-info-modal .modal-header h3,
+#settingsModal .modal-header h3 {
+    color: var(--primary-color, #ffd700) !important;
+    font-family: 'Cinzel', serif !important;
+}
+
+/* ---- 5.6 Notificações refinadas ---- */
+
+.notification-toast {
+    background: rgba(10, 18, 28, 0.95) !important;
+    backdrop-filter: blur(16px) !important;
+    border: 1px solid rgba(255, 215, 0, 0.1) !important;
+    border-left: 3px solid var(--primary-color, #ffd700) !important;
+    border-radius: 12px !important;
+    box-shadow: 
+        0 10px 30px rgba(0, 0, 0, 0.4),
+        0 0 20px rgba(255, 215, 0, 0.03) !important;
+    padding: 12px 18px !important;
+}
+
+/* ---- 5.7 Page titles refinados ---- */
+
+.page-title {
+    position: relative;
+    padding-bottom: 14px !important;
+    margin-bottom: 25px !important;
+}
+
+.page-title::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, 
+        var(--primary-color, #ffd700), 
+        transparent 80%);
+    border-radius: 1px;
+}
+
+/* ---- 5.8 Content area refinada ---- */
+
+.content-area {
+    background: rgba(8, 14, 22, 0.85) !important;
+    border: 1px solid rgba(255, 215, 0, 0.06) !important;
+    border-radius: 18px !important;
+}
+
+/* ---- 5.9 Sidebar refinada ---- */
+
+.sidebar {
+    background: rgba(5, 10, 18, 0.92) !important;
+    border: 1px solid rgba(255, 215, 0, 0.06) !important;
+    box-shadow: 
+        0 10px 40px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 215, 0, 0.03) !important;
+}
+
+.sidebar-title {
+    position: relative;
+    border-bottom: none !important;
+    padding-bottom: 14px !important;
+}
+
+.sidebar-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 20%;
+    right: 20%;
+    height: 1px;
+    background: linear-gradient(90deg, 
+        transparent, 
+        var(--primary-color, #ffd700), 
+        transparent);
+}
+
+.sidebar-category {
+    font-size: 0.75em !important;
+    letter-spacing: 2px !important;
+}
+
+/* ---- 5.10 Player info bar refinada ---- */
+
+.player-info-bar {
+    background: linear-gradient(135deg, 
+        rgba(255, 215, 0, 0.04), 
+        rgba(255, 215, 0, 0.01)) !important;
+    border: 1px solid rgba(255, 215, 0, 0.08) !important;
+    border-radius: 12px !important;
+}
+
+/* ---- 5.11 Stat rows refinadas ---- */
+
+.stat-row {
+    background: rgba(255, 255, 255, 0.02) !important;
+    border: 1px solid rgba(255, 255, 255, 0.03) !important;
+    border-radius: 8px !important;
+}
+
+/* ---- 5.12 Combat area refinada ---- */
+
+.combat-area {
+    background: rgba(25, 10, 10, 0.85) !important;
+    border: 1px solid rgba(255, 68, 68, 0.1) !important;
+    border-radius: 18px !important;
+}
+
+.combat-title {
+    text-shadow: 0 0 20px rgba(255, 68, 68, 0.3) !important;
+}
+
+/* ---- 5.13 Enemy select refinado ---- */
+
+.enemy-select {
+    background: rgba(10, 18, 28, 0.9) !important;
+    border: 1px solid rgba(255, 68, 68, 0.1) !important;
+    border-radius: 10px !important;
+}
+
+/* ---- 5.14 Arena shop / Combat shop refinado ---- */
+
+.shop-tab {
+    border-radius: 10px !important;
+    border: 1px solid rgba(255, 215, 0, 0.08) !important;
+    background: rgba(10, 18, 28, 0.8) !important;
+    transition: all 0.25s ease !important;
+}
+
+.shop-tab:hover {
+    background: rgba(255, 215, 0, 0.06) !important;
+}
+
+.shop-tab.active {
+    background: linear-gradient(135deg, 
+        rgba(255, 215, 0, 0.15), 
+        rgba(255, 153, 68, 0.1)) !important;
+    color: var(--primary-color, #ffd700) !important;
+    border-color: rgba(255, 215, 0, 0.3) !important;
+}
+
+/* ---- 5.15 Dungeon area ---- */
+
+.menu-btn.dungeon {
+    border-color: rgba(138, 74, 201, 0.2) !important;
+}
+
+.menu-btn.property {
+    border-color: rgba(106, 201, 106, 0.2) !important;
+}
+
+/* ---- 5.16 Section titles refinados ---- */
+
+.ng-section {
+    border: 1px solid rgba(255, 215, 0, 0.06) !important;
+    background: rgba(255, 255, 255, 0.02) !important;
+    border-radius: 16px !important;
+}
+
+.ng-section-title {
+    letter-spacing: 2px !important;
+    font-size: 0.7em !important;
+}
+
+/* ---- 5.17 Class cards refinados ---- */
+
+.ng-class-card {
+    border-radius: 14px !important;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+}
+
+.ng-class-card:hover {
+    transform: translateY(-4px) !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* ---- 5.18 Equipment slots (character page) ---- */
+
+.slot-icon {
+    font-size: 2em !important;
+}
+
+/* ---- 5.19 Skill detail page ---- */
+
+.skill-detail {
+    background: rgba(8, 14, 22, 0.85) !important;
+    border: 1px solid rgba(255, 215, 0, 0.06) !important;
+    border-radius: 18px !important;
+}
+
+/* ---- 5.20 Total level container ---- */
+
+.total-level-container {
+    border: 1px solid rgba(255, 215, 0, 0.08) !important;
+    border-radius: 14px !important;
+    background: rgba(0, 0, 0, 0.3) !important;
+}
+
+/* ---- 5.21 Equipped items (character page) ---- */
+
+.equipped-item-name {
+    transition: all 0.25s ease !important;
+}
+
+.equipped-item-name:hover {
+    filter: brightness(1.2);
+}
+
+/* ---- 5.22 Crafting process ---- */
+
+.recipe-ingredients {
+    background: rgba(0, 0, 0, 0.2) !important;
+    border-radius: 10px !important;
+    border: 1px solid rgba(255, 255, 255, 0.03) !important;
+}
+
+/* ---- 5.23 Keyboard config ---- */
+
+.kb-key-cell {
+    border-radius: 8px !important;
+    transition: all 0.2s ease !important;
+}
+
+.kb-key-cell:hover {
+    border-color: var(--primary-color, #ffd700) !important;
+    background: rgba(255, 215, 0, 0.04) !important;
+}
+
+/* ---- 5.24 Menu main screen ---- */
+
+#mainMenuScreen {
+    background: radial-gradient(ellipse at 50% 30%, 
+        rgba(255, 153, 68, 0.03), 
+        transparent 60%),
+        linear-gradient(180deg, 
+        rgba(5, 8, 15, 0.98), 
+        rgba(8, 14, 22, 0.99)) !important;
+}
+
+.menu-title {
+    text-shadow: 
+        0 0 30px rgba(255, 215, 0, 0.3),
+        0 2px 4px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* ---- 5.25 New game screen ---- */
+
+#newGameScreen {
+    background: radial-gradient(ellipse at 50% 30%, 
+        rgba(100, 150, 255, 0.02), 
+        transparent 60%),
+        linear-gradient(180deg, 
+        rgba(5, 8, 15, 0.98), 
+        rgba(8, 14, 22, 0.99)) !important;
+}
+
+/* ---- 5.26 Ranking modal ---- */
+
+#rankingModal .modal-content {
+    max-height: 80vh !important;
+    overflow-y: auto !important;
+}
+
+/* ---- 5.27 Dungeon detail ---- */
+
+.dungeon-detail-title {
+    color: var(--primary-color, #ffd700) !important;
+}
+
+/* ---- 5.28 Pet enshrine glow ---- */
+
+.pet-card.enshrined {
+    position: relative;
+}
+
+.pet-card.enshrined::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, 
+        rgba(255, 215, 0, 0.15), 
+        transparent, 
+        rgba(255, 215, 0, 0.1));
+    z-index: -1;
+    animation: enshrineGlow 3s ease-in-out infinite;
+}
+
+@keyframes enshrineGlow {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+
+/* ---- 5.29 World boss page ---- */
+
+#worldbossPage .page-title {
+    color: var(--primary-color, #ffd700) !important;
+}
+
+/* ---- 5.30 Notification style selector ---- */
+
+.notif-style-btn {
+    border-radius: 8px !important;
+    transition: all 0.2s ease !important;
+}
+
+.notif-style-btn.active-style {
+    border-color: var(--primary-color, #ffd700) !important;
+    background: rgba(255, 215, 0, 0.06) !important;
+}
+
+/* ---- 5.31 Theme buttons ---- */
+
+.theme-btn {
+    border-radius: 8px !important;
+    transition: all 0.25s ease !important;
+}
+
+.theme-btn.active-theme {
+    border-color: var(--primary-color, #ffd700) !important;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.15) !important;
+}
+
+/* ---- 5.32 Mobile menu ---- */
+
+#mobileMenuBtn {
+    border-radius: 10px !important;
+    background: rgba(10, 18, 28, 0.9) !important;
+    border: 1px solid rgba(255, 215, 0, 0.1) !important;
+}
+
+/* ---- 5.33 Loading states ---- */
+
+#rankingLoading {
+    color: var(--primary-color, #ffd700) !important;
+    font-family: 'Cinzel', serif !important;
+}
+
+/* ---- 5.34 Save/Load buttons ---- */
+
+.save-load-btn {
+    border-radius: 10px !important;
+    transition: all 0.25s ease !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+.save-load-btn:hover {
+    background: rgba(255, 255, 255, 0.08) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* ---- 5.35 Combat controls ---- */
+
+.combat-btn {
+    border-radius: 12px !important;
+    font-family: 'Cinzel', serif !important;
+    letter-spacing: 1px !important;
+}
+
+.combat-btn.reset {
+    background: rgba(68, 68, 68, 0.8) !important;
+}
+
+/* ---- 5.36 Health bars refinadas ---- */
+
+.combat-health-bar {
+    border-radius: 14px !important;
+    overflow: hidden !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* ---- 5.37 VS indicator ---- */
+
+.combat-vs {
+    font-family: 'Cinzel', serif !important;
+    text-shadow: 0 0 20px rgba(255, 215, 0, 0.3) !important;
+}
+
+/* ---- 5.38 Mana/Stamina bar ---- */
+
+.food-indicator {
+    border-radius: 10px !important;
+    border: 1px solid rgba(255, 215, 0, 0.06) !important;
+    background: rgba(10, 18, 28, 0.8) !important;
+}
+
+/* ---- 5.39 Skill info box ---- */
+
+.skill-info {
+    border: 1px solid rgba(255, 255, 255, 0.03) !important;
+    border-radius: 12px !important;
+}
+
+/* ---- 5.40 Academy grid cards ---- */
+
+.academy-grid .academy-card {
+    border-radius: 16px !important;
+}
+
+.academy-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3) !important;
+    border-color: rgba(100, 150, 255, 0.3) !important;
+}
+
+/* ---- 5.41 Tech categories ---- */
+
+.tech-category {
+    border: 1px solid rgba(74, 201, 122, 0.06) !important;
+    border-radius: 18px !important;
+    background: rgba(8, 14, 22, 0.8) !important;
+}
+
+.tech-header {
+    border-bottom: 1px solid rgba(74, 201, 122, 0.1) !important;
+}
+
+/* ---- 5.42 Equipment filter tabs ---- */
+
+.eq-subtab-btn {
+    border-radius: 20px !important;
+    transition: all 0.25s ease !important;
+    font-family: 'Outfit', sans-serif !important;
+}
+
+.eq-subtab-btn.active {
+    box-shadow: 0 0 15px rgba(255, 153, 68, 0.3) !important;
+}
+
+/* ---- 5.43 Rune recipe cards ---- */
+
+.rune-recipe-card {
+    border-radius: 14px !important;
+    transition: all 0.3s ease !important;
+}
+
+/* ---- 5.44 Item info modal ---- */
+
+.item-info-modal {
+    background: rgba(10, 18, 28, 0.97) !important;
+    backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 215, 0, 0.15) !important;
+    border-radius: 18px !important;
+    box-shadow: 
+        0 20px 60px rgba(0, 0, 0, 0.6),
+        0 0 40px rgba(255, 215, 0, 0.06) !important;
+}
+
+/* ---- 5.45 Pet-specific refinements ---- */
+
+.pet-icon {
+    filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.5)) 
+            drop-shadow(0 0 12px rgba(255, 215, 0, 0.2)) !important;
+}
+
+/* ---- 5.46 Forge spec modal ---- */
+
+#forgeSpecModal,
+#sawmillSpecModal {
+    border-radius: 18px !important;
+}
+
+/* ---- 5.47 Admin panel ---- */
+
+#adminPanelPage {
+    position: relative;
+}
+
+/* ---- 5.48 Observatory page ---- */
+
+#observatoryPage .page-title {
+    font-family: 'Cinzel', serif !important;
+}
+
+/* ---- 5.49 Changelog on main menu ---- */
+
+.menu-changelog {
+    border: 1px solid rgba(255, 215, 0, 0.06) !important;
+    border-radius: 14px !important;
+    background: rgba(255, 255, 255, 0.02) !important;
+}
+
+.menu-changelog-title {
+    font-family: 'Cinzel', serif !important;
+    color: var(--primary-color, #ffd700) !important;
+}
+
+/* ---- 5.50 Accessibility / Selection ---- */
+
+::selection {
+    background: rgba(255, 215, 0, 0.15);
+    color: #fff;
+}
+
+/* ---- 5.51 Focus indicators ---- */
+
+*:focus-visible {
+    outline: 2px solid rgba(255, 215, 0, 0.4);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+/* ---- 5.52 Smooth transitions em elementos específicos ---- */
+.game-container .sidebar .menu-btn,
+.game-container .menu-btn-main,
+.game-container .farm-btn,
+.game-container .craft-btn,
+.game-container .combat-btn,
+.game-container .prop-btn,
+.game-container .pet-btn,
+.game-container .tech-btn,
+.game-container .academy-btn,
+.game-container .potion-btn,
+.game-container .tool-buy-btn,
+.game-container .ng-start-btn,
+.game-container .ng-class-card,
+.game-container .ng-avatar-btn,
+.game-container .shop-tab,
+.game-container .save-load-btn,
+.game-container .notif-style-btn {
+    transition-property: background-color, border-color, color, box-shadow, transform;
+    transition-duration: 0.2s;
+    transition-timing-function: ease;
+}
+
+/* ============================================================
+   ASSETS VISUAIS — SVG ICONS, CENÁRIO, DECORAÇÕES
+   ============================================================ */
+
+/* ----------------------------------------------------------
+   1. CENA DE FUNDO CENOGRÁFICO (Montanhas, Lua, Nevoeiro)
+   ---------------------------------------------------------- */
+
+#bgScene {
+    position: fixed;
+    inset: 0;
+    z-index: -3;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+/* Estrelas (partículas mais densas que a versão body::before) */
+#bgStars {
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(1px 1px at 5% 8%, rgba(255,255,255,0.5), transparent),
+        radial-gradient(1.5px 1.5px at 15% 3%, rgba(255,255,255,0.6), transparent),
+        radial-gradient(1px 1px at 22% 15%, rgba(255,255,255,0.3), transparent),
+        radial-gradient(1px 1px at 35% 5%, rgba(255,255,255,0.4), transparent),
+        radial-gradient(1.5px 1.5px at 42% 12%, rgba(255,200,150,0.5), transparent),
+        radial-gradient(1px 1px at 55% 8%, rgba(255,255,255,0.3), transparent),
+        radial-gradient(1px 1px at 68% 18%, rgba(255,255,255,0.5), transparent),
+        radial-gradient(1.5px 1.5px at 78% 6%, rgba(255,200,150,0.4), transparent),
+        radial-gradient(1px 1px at 88% 14%, rgba(255,255,255,0.3), transparent),
+        radial-gradient(1px 1px at 95% 4%, rgba(255,255,255,0.6), transparent),
+        radial-gradient(1.5px 1.5px at 50% 3%, rgba(255,215,0,0.2), transparent),
+        radial-gradient(1px 1px at 30% 20%, rgba(255,215,0,0.15), transparent),
+        radial-gradient(1px 1px at 70% 10%, rgba(255,215,0,0.1), transparent);
+    animation: starTwinkle 4s ease-in-out infinite alternate;
+}
+
+@keyframes starTwinkle {
+    0% { opacity: 0.6; }
+    100% { opacity: 1; }
+}
+
+/* Lua */
+#bgMoon {
+    position: absolute;
+    top: 4%;
+    right: 12%;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 40% 40%, rgba(255,220,180,0.15), rgba(255,180,120,0.05) 60%, transparent 70%);
+    box-shadow: 
+        0 0 40px rgba(255,200,150,0.08),
+        0 0 80px rgba(255,200,150,0.04),
+        0 0 120px rgba(255,200,150,0.02);
+    animation: moonGlow 6s ease-in-out infinite alternate;
+}
+
+/* Lua crescente (círculo com sobreposição) */
+#bgMoon::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 12px;
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, rgba(255,230,200,0.2), rgba(255,200,150,0.08) 50%, transparent 65%);
+}
+
+@keyframes moonGlow {
+    0% { box-shadow: 0 0 40px rgba(255,200,150,0.06), 0 0 80px rgba(255,200,150,0.03); }
+    100% { box-shadow: 0 0 60px rgba(255,200,150,0.1), 0 0 100px rgba(255,200,150,0.05), 0 0 140px rgba(255,200,150,0.02); }
+}
+
+/* Montanhas (silhuetas via clip-path + gradientes) */
+#bgMountains {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 45%;
+    background: 
+        /* Montanha fundo (mais escura) */
+        linear-gradient(180deg, transparent 0%, rgba(5,8,15,0.3) 20%, rgba(5,8,15,0.6) 100%),
+        /* Picos - esquerda */
+        radial-gradient(ellipse 35% 40% at 10% 100%, rgba(8,14,24,0.7) 50%, transparent 70%),
+        radial-gradient(ellipse 20% 30% at 25% 100%, rgba(10,18,28,0.6) 40%, transparent 65%),
+        /* Pico central (maior) */
+        radial-gradient(ellipse 40% 45% at 50% 100%, rgba(6,12,22,0.8) 55%, transparent 75%),
+        /* Picos - direita */
+        radial-gradient(ellipse 25% 35% at 70% 100%, rgba(10,18,28,0.6) 45%, transparent 70%),
+        radial-gradient(ellipse 30% 38% at 88% 100%, rgba(8,14,24,0.7) 50%, transparent 72%);
+}
+
+/* Camada de neve nos picos */
+#bgMountains::before {
+    content: '';
+    position: absolute;
+    bottom: 42%;
+    left: 8%;
+    width: 6%;
+    height: 4%;
+    background: radial-gradient(ellipse 50% 100%, rgba(200,220,240,0.08), transparent);
+    border-radius: 50%;
+}
+
+#bgMountains::after {
+    content: '';
+    position: absolute;
+    bottom: 40%;
+    right: 25%;
+    width: 5%;
+    height: 3%;
+    background: radial-gradient(ellipse 50% 100%, rgba(200,220,240,0.06), transparent);
+    border-radius: 50%;
+}
+
+/* Nevoeiro/bruma sutil */
+#bgFog {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 30%;
+    background: linear-gradient(0deg, 
+        rgba(5,8,15,0.3) 0%, 
+        transparent 100%);
+    animation: fogMove 12s ease-in-out infinite alternate;
+}
+
+@keyframes fogMove {
+    0% { opacity: 0.4; transform: translateX(-2%); }
+    100% { opacity: 0.7; transform: translateX(2%); }
+}
+
+/*----------------------------------------------------------
+   2. BRASÕES DAS 6 CASAS (SVG data URIs)
+   ---------------------------------------------------------- */
+
+.house-crest {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    flex-shrink: 0;
+}
+
+/* Guardiões do Norte - Lobo + Floco de Neve */
+.house-crest-guardiao_norte {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cdefs%3E%3ClinearGradient id='g1' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23aaccff'/%3E%3Cstop offset='100%25' stop-color='%235da4ff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='24' cy='24' r='22' fill='none' stroke='url(%23g1)' stroke-width='2' opacity='0.6'/%3E%3Cpath d='M16 30c0-6 4-10 8-10s8 4 8 10c0 2-1 4-2 5l-6-3-6 3c-1-1-2-3-2-5z' fill='none' stroke='url(%23g1)' stroke-width='2'/%3E%3Cpath d='M20 26c0-2 2-3 4-3s4 1 4 3' fill='none' stroke='url(%23g1)' stroke-width='1.5'/%3E%3Ccircle cx='22' cy='24' r='1.5' fill='%23aaccff'/%3E%3Ccircle cx='26' cy='24' r='1.5' fill='%23aaccff'/%3E%3C!-- Snowflake --%3E%3Cpath d='M24 14 L24 18 M22 15 L24 17 L26 15 M22 17 L24 15 L26 17' stroke='%23aaccff' stroke-width='1' opacity='0.5'/%3E%3C/svg%3E");
+}
+
+/* Leões de Ouro - Leão + Coroa */
+.house-crest-leao_ouro {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cdefs%3E%3ClinearGradient id='g2' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23ffd700'/%3E%3Cstop offset='100%25' stop-color='%23d4af37'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='24' cy='24' r='22' fill='none' stroke='url(%23g2)' stroke-width='2' opacity='0.6'/%3E%3C!-- Crown --%3E%3Cpath d='M16 16l3 4 5-6 5 6 3-4v4H16z' fill='url(%23g2)' opacity='0.8'/%3E%3C!-- Lion face --%3E%3Cpath d='M17 30c0-6 3-10 7-10s7 4 7 10c0 2-1 4-2 5l-5-3-5 3c-1-1-2-3-2-5z' fill='none' stroke='url(%23g2)' stroke-width='2'/%3E%3Cpath d='M20 27c0-2 2-3 4-3s4 1 4 3' fill='none' stroke='url(%23g2)' stroke-width='1.5'/%3E%3Ccircle cx='22' cy='25' r='1.5' fill='%23ffd700'/%3E%3Ccircle cx='26' cy='25' r='1.5' fill='%23ffd700'/%3E%3C/svg%3E");
+}
+
+/* Senhores do Fogo - Dragão + Chama */
+.house-crest-senhor_fogo {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cdefs%3E%3ClinearGradient id='g3' x1='0%25' y1='100%25' x2='0%25' y2='0%25'%3E%3Cstop offset='0%25' stop-color='%23ff2222'/%3E%3Cstop offset='100%25' stop-color='%23ff9944'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='24' cy='24' r='22' fill='none' stroke='%23ff6644' stroke-width='2' opacity='0.6'/%3E%3C!-- Flame --%3E%3Cpath d='M24 14c-3 5-6 8-6 12 0 4 3 6 6 6s6-2 6-6c0-4-3-7-6-12z' fill='url(%23g3)' opacity='0.7'/%3E%3Cpath d='M24 16c-2 4-4 6-4 9 0 3 2 4 4 4s4-1 4-4c0-3-2-5-4-9z' fill='%23fff8e0' opacity='0.4'/%3E%3Cpath d='M15 26c3-2 5-3 8-3' stroke='%23ff6644' stroke-width='1' opacity='0.5'/%3E%3Cpath d='M33 26c-3-2-5-3-8-3' stroke='%23ff6644' stroke-width='1' opacity='0.5'/%3E%3C/svg%3E");
+}
+
+/* Irmandade do Mar Negro - Navio + Ondas */
+.house-crest-mar_negro {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cdefs%3E%3ClinearGradient id='g4' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2300ffd2'/%3E%3Cstop offset='100%25' stop-color='%233a8a9a'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='24' cy='24' r='22' fill='none' stroke='url(%23g4)' stroke-width='2' opacity='0.6'/%3E%3C!-- Ship hull --%3E%3Cpath d='M14 28l4-8h12l4 8z' fill='none' stroke='url(%23g4)' stroke-width='2'/%3E%3C!-- Mast --%3E%3Cline x1='24' y1='20' x2='24' y2='14' stroke='url(%23g4)' stroke-width='2'/%3E%3C!-- Sail --%3E%3Cpath d='M24 14l-6 6h6z' fill='url(%23g4)' opacity='0.5'/%3E%3C!-- Waves --%3E%3Cpath d='M10 32c4-2 8-2 12 0s8 2 12 0 8-2 12 0' stroke='url(%23g4)' stroke-width='1.5' fill='none' opacity='0.5'/%3E%3C/svg%3E");
+}
+
+/* Jardins Eternos - Rosa + Folhas */
+.house-crest-jardim_eterno {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cdefs%3E%3ClinearGradient id='g5' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%237acc7a'/%3E%3Cstop offset='100%25' stop-color='%234aff4a'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='24' cy='24' r='22' fill='none' stroke='url(%23g5)' stroke-width='2' opacity='0.6'/%3E%3C!-- Leaves --%3E%3Cpath d='M24 14c-2 2-2 5 0 7s5 0 7-2-2-7-7-5z' fill='url(%23g5)' opacity='0.4'/%3E%3Cpath d='M24 14c2 2 2 5 0 7s-5 0-7-2 2-7 7-5z' fill='url(%23g5)' opacity='0.4'/%3E%3C!-- Rose center --%3E%3Ccircle cx='24' cy='22' r='5' fill='none' stroke='%237acc7a' stroke-width='1.5'/%3E%3Ccircle cx='24' cy='22' r='3' fill='none' stroke='%234aff4a' stroke-width='1'/%3E%3Ccircle cx='24' cy='22' r='1.5' fill='%234aff4a'/%3E%3Cpath d='M22 28l2 4 2-4' stroke='%237acc7a' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+}
+
+/* A Última Guarda - Escudo + Cruz */
+.house-crest-ultima_guarda {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cdefs%3E%3ClinearGradient id='g6' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23d4a373'/%3E%3Cstop offset='100%25' stop-color='%23c9a44a'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='24' cy='24' r='22' fill='none' stroke='url(%23g6)' stroke-width='2' opacity='0.6'/%3E%3C!-- Shield --%3E%3Cpath d='M16 14v12c0 5 4 8 8 10 4-2 8-5 8-10V14l-8-3-8 3z' fill='none' stroke='url(%23g6)' stroke-width='2'/%3E%3C!-- Cross --%3E%3Cline x1='24' y1='18' x2='24' y2='28' stroke='url(%23g6)' stroke-width='2'/%3E%3Cline x1='20' y1='23' x2='28' y2='23' stroke='url(%23g6)' stroke-width='2'/%3E%3C/svg%3E");
+}
+
+/* (Removido: sidebar-title::before genérico que quebrava layout) */
+
+/*----------------------------------------------------------
+   3. GEMS DE RARIDADE (CSS puro - sem SVGs)
+   ---------------------------------------------------------- */
+
+.rarity-gem {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    transform: rotate(45deg);
+    margin-right: 4px;
+    vertical-align: middle;
+    flex-shrink: 0;
+}
+
+.rarity-gem.common {
+    background: linear-gradient(135deg, #8a9aa8, #6a7a88);
+    box-shadow: 0 0 4px rgba(138,154,168,0.3);
+}
+.rarity-gem.uncommon {
+    background: linear-gradient(135deg, #4aff4a, #2ab82a);
+    box-shadow: 0 0 6px rgba(74,255,74,0.3);
+}
+.rarity-gem.rare {
+    background: linear-gradient(135deg, #4a9aff, #2068d0);
+    box-shadow: 0 0 8px rgba(74,154,255,0.3);
+}
+.rarity-gem.epic {
+    background: linear-gradient(135deg, #c96ac9, #9a309a);
+    box-shadow: 0 0 10px rgba(201,106,201,0.3);
+}
+.rarity-gem.legendary {
+    background: linear-gradient(135deg, #ffd700, #ff8c00);
+    box-shadow: 0 0 12px rgba(255,215,0,0.4);
+    animation: gemPulse 2s ease-in-out infinite;
+}
+.rarity-gem.ancient {
+    background: linear-gradient(135deg, #ff44aa, #cc0088);
+    box-shadow: 0 0 14px rgba(255,68,170,0.4);
+    animation: gemPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes gemPulse {
+    0%, 100% { transform: rotate(45deg) scale(1); }
+    50% { transform: rotate(45deg) scale(1.2); }
+}
+
+/*----------------------------------------------------------
+   4. ORNAMENTOS DE CARD (cantos decorativos expandidos)
+   ---------------------------------------------------------- */
+
+/* (border-image removido pois substituía a borda sólida no hover) */
+
+/*----------------------------------------------------------
+   5. ÍCONES DE GRUPO RACIAL (SVG data URIs)
+   ---------------------------------------------------------- */
+
+.race-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    flex-shrink: 0;
+}
+
+.race-icon-humans {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='8' r='4' fill='none' stroke='%23ffd700' stroke-width='1.5'/%3E%3Cpath d='M6 22c0-3 3-6 6-6s6 3 6 6' fill='none' stroke='%23ffd700' stroke-width='1.5'/%3E%3C/svg%3E");
+}
+
+.race-icon-fantastic {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='8' r='4' fill='none' stroke='%234aff4a' stroke-width='1.5'/%3E%3Cpath d='M6 22c0-3 3-6 6-6s6 3 6 6' fill='none' stroke='%234aff4a' stroke-width='1.5'/%3E%3Cpath d='M12 4l2-2M10 6l-2-2' stroke='%234aff4a' stroke-width='1' opacity='0.5'/%3E%3C/svg%3E");
+}
+
+.race-icon-darkness {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='10' fill='none' stroke='%239966ff' stroke-width='1.5'/%3E%3Ccircle cx='9' cy='10' r='1.5' fill='%239966ff'/%3E%3Ccircle cx='15' cy='10' r='1.5' fill='%239966ff'/%3E%3Cpath d='M8 16c2 2 6 2 8 0' stroke='%239966ff' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+}
+
+.race-icon-celestials {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='10' r='4' fill='none' stroke='%234a9aff' stroke-width='1.5'/%3E%3Cpath d='M6 22c0-3 3-5 6-5s6 2 6 5' fill='none' stroke='%234a9aff' stroke-width='1.5'/%3E%3Cpath d='M12 2v3M12 7v-2M9 3l2 2M13 3l-2 2' stroke='%23ffd700' stroke-width='1' opacity='0.6'/%3E%3C/svg%3E");
+}
+
+.race-icon-differents {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='7' y='5' width='10' height='14' rx='3' fill='none' stroke='%23c9a44a' stroke-width='1.5'/%3E%3Ccircle cx='12' cy='10' r='2' fill='none' stroke='%23c9a44a' stroke-width='1'/%3E%3Ccircle cx='12' cy='16' r='1.5' fill='%23c9a44a' opacity='0.5'/%3E%3C/svg%3E");
+}
+
+/*----------------------------------------------------------
+   6. BACKGROUND DO MENU PRINCIPAL (cenário ampliado)
+   ---------------------------------------------------------- */
+
+/* O menu inicial ganha uma versão ampliada do cenário */
+#mainMenuScreen::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(ellipse 60% 30% at 50% 80%, rgba(5,8,15,0.8), transparent),
+        radial-gradient(ellipse 30% 20% at 15% 85%, rgba(8,14,24,0.6), transparent),
+        radial-gradient(ellipse 40% 25% at 85% 83%, rgba(8,14,24,0.6), transparent);
+    pointer-events: none;
+}
+
+/*----------------------------------------------------------
+   7. DECORAÇÃO DO LOADING/RANKING
+   ---------------------------------------------------------- */
+
+#rankingLoading::before {
+    content: '';
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-right: 8px;
+    border: 2px solid rgba(255,215,0,0.3);
+    border-top-color: #ffd700;
+    border-radius: 50%;
+    animation: rankingSpin 0.8s linear infinite;
+    vertical-align: middle;
+}
+
+@keyframes rankingSpin {
+    to { transform: rotate(360deg); }
+}

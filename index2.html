@@ -9,9 +9,17 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style2.css">
 </head>
 
 <body style="padding-top: 75px; align-items: flex-start;">
+    <!-- Cena de Fundo Cenográfico (montanhas, lua, atmosfera) -->
+    <div id="bgScene" aria-hidden="true">
+        <div id="bgMountains"></div>
+        <div id="bgMoon"></div>
+        <div id="bgFog"></div>
+        <div id="bgStars"></div>
+    </div>
     <script>
         var tempThemeColors = null;
         var tempFont = null;
@@ -7173,6 +7181,161 @@
     <script src="js/worldboss.js"></script>
     <script src="js/inspect.js"></script>
 
+    <!-- ===== INJECTOR DE BADGES DE RARIDADE (estilo gacha) ===== -->
+    <script>
+    // Injects rarity badges (R/SR/SSR/UR/LR/UR+) into inventory/equipment cards
+    // by reading inline style colors without modifying original JS files.
+    (function(){
+        'use strict';
+        const C2R = {
+            '#ffffff':'common','#fff':'common',
+            '#4aff4a':'uncommon',
+            '#4a9aff':'rare',
+            '#c96ac9':'epic',
+            '#ffd700':'legendary',
+            '#ff44aa':'ancient'
+        };
+        const BADGE_TEXT = { common:'R', uncommon:'SR', rare:'SSR', epic:'UR', legendary:'LR', ancient:'UR+' };
+        var _debounceTimer = null;
+        var _idleCount = 0;
+        
+        function inject(){
+            var found = 0;
+            // Inventory slots
+            document.querySelectorAll('.inventory-slot.filled:not(.has-badge)').forEach(function(el){
+                var nameEl = el.querySelector('.item-name');
+                if(!nameEl||!nameEl.style.color) return;
+                var cls = C2R[nameEl.style.color.toLowerCase().trim()];
+                if(!cls) return;
+                var badge = document.createElement('span');
+                badge.className = 'rarity-badge '+cls;
+                badge.textContent = BADGE_TEXT[cls] || cls;
+                el.style.position='relative';
+                el.appendChild(badge);
+                el.classList.add('has-badge');
+                found++;
+            });
+            // Equip options (smithing forge)
+            document.querySelectorAll('.equip-option:not(.has-badge)').forEach(function(el){
+                var nameEl = el.querySelector('[style*="color"]');
+                if(!nameEl||!nameEl.style.color) return;
+                var cls = C2R[nameEl.style.color.toLowerCase().trim()];
+                if(!cls) return;
+                var badge = document.createElement('span');
+                badge.className = 'rarity-badge '+cls;
+                badge.textContent = BADGE_TEXT[cls] || cls;
+                badge.style.fontSize='0.55em'; badge.style.padding='1px 7px';
+                el.style.position='relative';
+                el.appendChild(badge);
+                el.classList.add('has-badge');
+                found++;
+            });
+            // Equipped items on character page
+            document.querySelectorAll('.equipped-item-name:not(.has-badge)').forEach(function(el){
+                if(!el.style.color) return;
+                var cls = C2R[el.style.color.toLowerCase().trim()];
+                if(!cls) return;
+                var badge = document.createElement('span');
+                badge.className = 'rarity-badge '+cls;
+                badge.textContent = BADGE_TEXT[cls] || cls;
+                badge.style.position='relative'; badge.style.display='inline-block';
+                badge.style.top='auto'; badge.style.right='auto';
+                badge.style.marginLeft='6px'; badge.style.fontSize='0.55em';
+                badge.style.padding='1px 8px'; badge.style.borderRadius='10px';
+                el.parentNode.appendChild(badge);
+                el.classList.add('has-badge');
+                found++;
+            });
+            // Auto-stop interval when idle
+            if(found === 0) _idleCount++;
+            else _idleCount = 0;
+            if(_idleCount > 10 && window._badgeInterval) {
+                clearInterval(window._badgeInterval);
+                window._badgeInterval = null;
+            }
+        }
+        
+        // MutationObserver with debounce
+        var _badgeObserver = new MutationObserver(function(){
+            clearTimeout(_debounceTimer);
+            _debounceTimer = setTimeout(inject, 150);
+        });
+        
+        // Startup
+        function start(){
+            setTimeout(inject, 600);
+            _badgeObserver.observe(document.body, { childList: true, subtree: true });
+            window._badgeInterval = setInterval(inject, 3000);
+        }
+        
+        if(document.readyState === 'loading')
+            document.addEventListener('DOMContentLoaded', start);
+        else
+            start();
+        
+        window.injectRarityBadges = inject;
+    })();
+
+    <!-- ===== INJECTOR DE BRASÕES DAS CASAS (SVG crests) ===== -->
+    <script>
+    // Injeta o brasão SVG da casa selecionada na sidebar e no perfil do jogador.
+    // Disparado pelo hook em updatePlayerInfoBar (já chamado em continue, new game, theme change)
+    (function(){
+        'use strict';
+        
+        function injectHouseCrest() {
+            if (typeof gameState === 'undefined' || !gameState.player) return;
+            var classId = gameState.player.classId || gameState.selectedTheme;
+            if (!classId) return;
+            
+            var crestClass = 'house-crest-' + classId;
+            var titleStr = classId.replace(/_/g, ' ').replace(/\b\w/g, function(l){ return l.toUpperCase(); });
+            
+            // 1. Sidebar: primeiro .sidebar-title ("⚡ MENU PRINCIPAL")
+            var sidebarTitle = document.querySelector('.sidebar-title');
+            if (sidebarTitle) {
+                sidebarTitle.querySelectorAll('.house-crest').forEach(function(el){ el.remove(); });
+                var crest = document.createElement('span');
+                crest.className = 'house-crest ' + crestClass;
+                crest.title = titleStr;
+                sidebarTitle.insertBefore(crest, sidebarTitle.firstChild);
+            }
+            
+            // 2. Player Info Bar: ao lado do nome
+            var nameEl = document.getElementById('sidebarPlayerName');
+            if (nameEl) {
+                nameEl.parentNode.querySelectorAll('.house-crest.crest-inline').forEach(function(el){ el.remove(); });
+                var crest2 = document.createElement('span');
+                crest2.className = 'house-crest ' + crestClass + ' crest-inline';
+                crest2.style.cssText = 'width:24px;height:24px;display:inline-block;margin-right:6px;vertical-align:middle;';
+                crest2.title = titleStr;
+                nameEl.parentNode.insertBefore(crest2, nameEl);
+            }
+            
+            // 3. Profile modal (só quando aberto)
+            var profileTitle = document.querySelector('#profileModal .modal-header h3');
+            if (profileTitle) {
+                profileTitle.querySelectorAll('.house-crest').forEach(function(el){ el.remove(); });
+                var crest3 = document.createElement('span');
+                crest3.className = 'house-crest ' + crestClass;
+                crest3.style.cssText = 'width:26px;height:26px;display:inline-block;margin-right:8px;vertical-align:middle;';
+                profileTitle.insertBefore(crest3, profileTitle.firstChild);
+            }
+        }
+        
+        // Hook na função original updatePlayerInfoBar
+        var origUpdate = window.updatePlayerInfoBar;
+        if (typeof origUpdate === 'function') {
+            window.updatePlayerInfoBar = function() {
+                origUpdate();
+                // requestAnimationFrame garante que o DOM já foi atualizado
+                requestAnimationFrame(injectHouseCrest);
+            };
+        }
+        
+        window.injectHouseCrest = injectHouseCrest;
+    })();
+    </script>
 
 </body>
 

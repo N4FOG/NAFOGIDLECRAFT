@@ -191,9 +191,12 @@
                 if (!window.eqFilters) {
                     window.eqFilters = {
                         category: 'all',
+                        subCategory: 'all',
                         rarity: 'all',
                         stat: 'all',
-                        sortBy: 'gs_desc'
+                        sortBy: 'gs_desc',
+                        search: '',
+                        specificItem: 'all'
                     };
                 }
 
@@ -218,16 +221,42 @@
                     const eq = getEquipmentItemData(item.id);
                     if (!eq) return false;
 
-                    // 1. Categoria (Tipo de Item)
+                    // 1. Categoria & Subcategoria
                     if (window.eqFilters.category !== 'all') {
                         const slot = eq.slot;
+                        const wSkill = eq.weaponSkillType || 'melee';
+                        const sub = window.eqFilters.subCategory || 'all';
+
                         if (window.eqFilters.category === 'weapon') {
                             if (slot !== 'weapon') return false;
+                            if (sub === 'weapon_melee' && wSkill !== 'melee') return false;
+                            if (sub === 'weapon_distance' && wSkill !== 'distance') return false;
+                            if (sub === 'weapon_magic' && wSkill !== 'magic') return false;
                         } else if (window.eqFilters.category === 'armor') {
                             if (!['armor', 'helmet', 'shield', 'pants', 'boots'].includes(slot)) return false;
+                            if (sub !== 'all' && slot !== sub) return false;
                         } else if (window.eqFilters.category === 'accessory') {
                             if (!['ring', 'amulet'].includes(slot)) return false;
+                            if (sub !== 'all' && slot !== sub) return false;
                         }
+                    }
+
+                    // 1b. Busca por Nome
+                    if (window.eqFilters.search && window.eqFilters.search.trim() !== '') {
+                        const search = window.eqFilters.search.trim().toLowerCase();
+                        const name = (eq.name || '').toLowerCase();
+                        const desc = (eq.desc || '').toLowerCase();
+                        if (!name.includes(search) && !desc.includes(search)) return false;
+                    }
+
+                    // 1c. Filtro por Item Específico (baseId)
+                    if (window.eqFilters.specificItem && window.eqFilters.specificItem !== 'all') {
+                        let baseId = item.id;
+                        if (item.id.startsWith('inst_')) {
+                            const inst = gameState.equipment.instances?.[item.id];
+                            if (inst) baseId = inst.id;
+                        }
+                        if (baseId !== window.eqFilters.specificItem) return false;
                     }
 
                     // 2. Raridade
@@ -331,10 +360,156 @@
             }
         }
 
+        // Renderizar Sub-abas de Equipamentos (Armas -> Melee, Arcos, Magia | Armaduras -> Elmos, Peitorais, etc)
+        window.renderEqSubTabs = function() {
+            const containers = document.querySelectorAll('#eqSubTabsContainer');
+            if (!containers || containers.length === 0) return;
+
+            const cat = window.eqFilters?.category || 'all';
+            const activeSub = window.eqFilters?.subCategory || 'all';
+            const activeRarity = window.eqFilters?.rarity || 'all';
+            const activeSpecific = window.eqFilters?.specificItem || 'all';
+
+            let subTabs = [];
+            if (cat === 'weapon') {
+                subTabs = [
+                    { id: 'all', label: '⚔️ Todas Armas' },
+                    { id: 'weapon_melee', label: '🗡️ Corpo a Corpo' },
+                    { id: 'weapon_distance', label: '🏹 Distância (Arcos)' },
+                    { id: 'weapon_magic', label: '🪄 Magia (Cajados)' }
+                ];
+            } else if (cat === 'armor') {
+                subTabs = [
+                    { id: 'all', label: '🛡️ Todas Peças' },
+                    { id: 'helmet', label: '🪖 Elmos' },
+                    { id: 'armor', label: '🥋 Peitorais' },
+                    { id: 'shield', label: '🔰 Escudos' },
+                    { id: 'pants', label: '🦵 Grevas' },
+                    { id: 'boots', label: '👢 Botas' }
+                ];
+            } else if (cat === 'accessory') {
+                subTabs = [
+                    { id: 'all', label: '💍 Todos Acessórios' },
+                    { id: 'ring', label: '💍 Anéis' },
+                    { id: 'amulet', label: '📿 Amuletos' }
+                ];
+            }
+
+            containers.forEach(container => {
+                if (subTabs.length === 0) {
+                    container.style.display = 'none';
+                    container.innerHTML = '';
+                    return;
+                }
+
+                // --- Linha 1: Sub-abas de tipo ---
+                let html = '<div class="eq-subtabs-row">';
+                html += subTabs.map(st => `
+                    <button class="eq-subtab-btn ${st.id === activeSub ? 'active' : ''}" onclick="setEqFilterSubCategory('${st.id}')">
+                        ${st.label}
+                    </button>
+                `).join('');
+                html += '</div>';
+
+                // --- Linha 2: Pills de Raridade (quando subcategoria ativa) ---
+                if (activeSub !== 'all') {
+                    const rarityPills = [
+                        { id: 'all', label: '🌈 Todas', color: '#a0aec0' },
+                        { id: 'common', label: 'Comum', color: '#fff' },
+                        { id: 'uncommon', label: 'Incomum', color: '#4aff4a' },
+                        { id: 'rare', label: 'Raro', color: '#4a9aff' },
+                        { id: 'epic', label: 'Épico', color: '#c96ac9' },
+                        { id: 'legendary', label: 'Lendário', color: '#ffd700' },
+                        { id: 'ancient', label: 'Ancestral', color: '#ff44aa' }
+                    ];
+
+                    html += '<div class="eq-subtabs-row eq-rarity-row">';
+                    html += '<span class="eq-row-label">Raridade:</span>';
+                    html += rarityPills.map(r => `
+                        <button class="eq-subtab-btn eq-rarity-pill ${r.id === activeRarity ? 'active' : ''}"
+                                style="${r.id === activeRarity ? `background:${r.color}; color:#0f1928; border-color:${r.color};` : `border-color:${r.color}40; color:${r.color};`}"
+                                onclick="setEqFilterRarityPill('${r.id}')">
+                            ${r.label}
+                        </button>
+                    `).join('');
+                    html += '</div>';
+
+                    // --- Linha 3: Pills de Itens Individuais ---
+                    // Coletar os itens base únicos que existem no inventário do jogador nessa subcategoria
+                    const uniqueItems = new Map(); // baseId -> { name, icon, rarity }
+                    for (let [id, qty] of Object.entries(gameState.equipment.inventory)) {
+                        if (qty <= 0) continue;
+                        const eq = getEquipmentItemData(id);
+                        if (!eq) continue;
+
+                        // Determinar baseId (para instâncias pegar o id original)
+                        let baseId = id;
+                        if (id.startsWith('inst_')) {
+                            const inst = gameState.equipment.instances?.[id];
+                            if (inst) baseId = inst.id;
+                        }
+
+                        // Verificar se pertence à subcategoria ativa
+                        const slot = eq.slot;
+                        const wSkill = eq.weaponSkillType || 'melee';
+                        let matches = false;
+
+                        if (cat === 'weapon' && slot === 'weapon') {
+                            if (activeSub === 'weapon_melee' && wSkill === 'melee') matches = true;
+                            if (activeSub === 'weapon_distance' && wSkill === 'distance') matches = true;
+                            if (activeSub === 'weapon_magic' && wSkill === 'magic') matches = true;
+                        } else if (cat === 'armor') {
+                            if (slot === activeSub) matches = true;
+                        } else if (cat === 'accessory') {
+                            if (slot === activeSub) matches = true;
+                        }
+
+                        if (matches && !uniqueItems.has(baseId)) {
+                            const baseDef = equipmentData[baseId];
+                            if (baseDef) {
+                                uniqueItems.set(baseId, {
+                                    name: baseDef.name,
+                                    icon: baseDef.icon,
+                                    rarity: baseDef.rarity
+                                });
+                            }
+                        }
+                    }
+
+                    if (uniqueItems.size > 0) {
+                        // Ordenar por raridade
+                        const rarOrder = { common: 1, uncommon: 2, rare: 3, epic: 4, legendary: 5, ancient: 6 };
+                        const sorted = [...uniqueItems.entries()].sort((a, b) => (rarOrder[a[1].rarity] || 0) - (rarOrder[b[1].rarity] || 0));
+
+                        html += '<div class="eq-subtabs-row eq-specific-row">';
+                        html += '<span class="eq-row-label">Item:</span>';
+                        html += `<button class="eq-subtab-btn eq-specific-pill ${'all' === activeSpecific ? 'active' : ''}" onclick="setEqFilterSpecificItem('all')">Todos</button>`;
+                        html += sorted.map(([baseId, info]) => {
+                            const rc = typeof rarityColors !== 'undefined' ? (rarityColors[info.rarity] || '#fff') : '#fff';
+                            return `
+                                <button class="eq-subtab-btn eq-specific-pill ${baseId === activeSpecific ? 'active' : ''}"
+                                        style="${baseId === activeSpecific ? `background:${rc}; color:#0f1928; border-color:${rc};` : `border-color:${rc}40; color:${rc};`}"
+                                        onclick="setEqFilterSpecificItem('${baseId}')">
+                                    ${info.icon} ${info.name}
+                                </button>`;
+                        }).join('');
+                        html += '</div>';
+                    }
+                }
+
+                container.style.display = 'block';
+                container.innerHTML = html;
+            });
+        };
+
         // Funções Globais de Controle de Filtros
         window.setEqFilterCategory = function(cat) {
             if (!window.eqFilters) window.eqFilters = {};
             window.eqFilters.category = cat;
+            window.eqFilters.subCategory = 'all';
+            window.eqFilters.specificItem = 'all';
+            window.eqFilters.rarity = 'all';
+            document.querySelectorAll('#eqFilterRarity').forEach(el => el.value = 'all');
             
             // Atualizar estado visual das abas
             const tabs = ['all', 'weapon', 'armor', 'accessory'];
@@ -344,6 +519,39 @@
                     else el.classList.remove('active');
                 });
             });
+
+            window.renderEqSubTabs();
+            updateInventory();
+        };
+
+        window.setEqFilterSubCategory = function(subCat) {
+            if (!window.eqFilters) window.eqFilters = {};
+            window.eqFilters.subCategory = subCat;
+            window.eqFilters.specificItem = 'all';
+            window.eqFilters.rarity = 'all';
+            document.querySelectorAll('#eqFilterRarity').forEach(el => el.value = 'all');
+            window.renderEqSubTabs();
+            updateInventory();
+        };
+
+        window.setEqFilterRarityPill = function(rarity) {
+            if (!window.eqFilters) window.eqFilters = {};
+            window.eqFilters.rarity = rarity;
+            document.querySelectorAll('#eqFilterRarity').forEach(el => el.value = rarity);
+            window.renderEqSubTabs();
+            updateInventory();
+        };
+
+        window.setEqFilterSpecificItem = function(baseId) {
+            if (!window.eqFilters) window.eqFilters = {};
+            window.eqFilters.specificItem = baseId;
+            window.renderEqSubTabs();
+            updateInventory();
+        };
+
+        window.setEqFilterSearch = function(query) {
+            if (!window.eqFilters) window.eqFilters = {};
+            window.eqFilters.search = query;
             updateInventory();
         };
 
