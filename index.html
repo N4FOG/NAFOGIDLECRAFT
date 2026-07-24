@@ -2627,7 +2627,19 @@
                                 <input type="number" id="admWBMaxBuff" value="7" min="1" max="100" style="padding:8px 12px; background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:#fff; font-family:'Outfit'; font-size:0.85em;">
                             </div>
 
-                            <!-- Ações rápidas -->
+                            <!-- Controles de Buff do Chefe Global -->
+                            <div style="display:flex; flex-direction:column; gap:6px;">
+                                <label style="font-size:0.85em; color:#aaa; font-weight:bold;">🧪 Injetar Buff no Chefe:</label>
+                                <select id="admWBBuffSelect" style="padding:8px 12px; background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:#fff; font-family:'Outfit'; font-size:0.85em; cursor:pointer;">
+                                    <option value="">Selecione um buff...</option>
+                                </select>
+                                <div style="display:flex; gap:6px;">
+                                    <button onclick="admInjectWBBuff()" style="flex:1; padding:9px; background:linear-gradient(135deg,#2e7d32,#1b5e20); border:1px solid rgba(76,175,80,0.4); border-radius:6px; color:#81c784; font-family:'Outfit'; font-weight:bold; cursor:pointer;">💉 Injetar Buff</button>
+                                    <button onclick="admRemoveWBBuff()" style="flex:1; padding:9px; background:linear-gradient(135deg,#b71c1c,#7f0000); border:1px solid rgba(244,67,54,0.4); border-radius:6px; color:#ef9a9a; font-family:'Outfit'; font-weight:bold; cursor:pointer;">🗑️ Remover Buff</button>
+                                </div>
+                            </div>
+
+                        <!-- Ações rápidas -->
                             <div style="display:flex; flex-direction:column; gap:6px; justify-content:flex-end;">
                                 <button onclick="admKillBoss()" style="padding:9px; background:linear-gradient(135deg,#6c3483,#4a235a); border:1px solid rgba(155,89,182,0.4); border-radius:6px; color:#d896ff; font-family:'Outfit'; font-weight:bold; cursor:pointer;">💀 Encerrar Chefe Atual</button>
                                 <button onclick="admRefreshWBStatus()" style="padding:9px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#ccc; font-family:'Outfit'; cursor:pointer;">🔄 Atualizar Status</button>

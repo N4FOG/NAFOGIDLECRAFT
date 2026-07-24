@@ -597,7 +597,7 @@
                     }[p.effectType] || `+${p.effectValue}%`;
                     
                     globalTags.push(`
-                        <div class="buff-tag potion" style="display:flex; align-items:center; gap:6px; padding:5px 12px; border-radius:12px; background:rgba(20,26,35,0.92); border:1px solid #c96ac9; font-size:0.82em; font-family:'Outfit'; font-weight: bold; pointer-events: auto;">
+                        <div class="buff-tag potion" onclick="showPage('alchemy')" title="🧪 ${potion.name}\n📊 ${effectLabel}\n⏱️ Restam ${mins}m ${secs}s\n🖱️ Clique para ir à Alquimia" style="display:flex; align-items:center; gap:6px; padding:5px 12px; border-radius:12px; background:rgba(20,26,35,0.92); border:1px solid #c96ac9; font-size:0.82em; font-family:'Outfit'; font-weight: bold; cursor:pointer; pointer-events: auto; transition:all 0.15s ease;" onmouseover="this.style.borderColor='#dca8ff';this.style.boxShadow='0 0 10px rgba(201,106,201,0.3)'" onmouseout="this.style.borderColor='#c96ac9';this.style.boxShadow='none'">
                             <span style="font-size:1.15em;">${potion.icon}</span>
                             <span style="color:#dca8ff;">${potion.name}:</span>
                             <span style="color:#eee; font-weight:normal;">${effectLabel}</span>
@@ -623,16 +623,14 @@
                         }[pet.effectType] || `+${val}%`;
                         
                         globalTags.push(`
-                            <div class="buff-tag pet" style="display:flex; align-items:center; gap:6px; padding:5px 12px; border-radius:12px; background:rgba(20,26,35,0.92); border:1px solid #4aff4a; font-size:0.82em; font-family:'Outfit'; font-weight: bold; pointer-events: auto;">
+                            <div class="buff-tag pet" onclick="showPage('pets')" title="🐾 ${pet.name} (Nv. ${petLvl})\n📊 ${effectLabel}\n🖱️ Clique para ir aos Mascotes" style="display:flex; align-items:center; gap:6px; padding:5px 12px; border-radius:12px; background:rgba(20,26,35,0.92); border:1px solid #4aff4a; font-size:0.82em; font-family:'Outfit'; font-weight: bold; cursor:pointer; pointer-events: auto; transition:all 0.15s ease;" onmouseover="this.style.borderColor='#a8ffa8';this.style.boxShadow='0 0 10px rgba(74,255,74,0.3)'" onmouseout="this.style.borderColor='#4aff4a';this.style.boxShadow='none'">
                                 <span style="font-size:1.15em;">${pet.icon}</span>
                                 <span style="color:#a8ffa8;">${pet.name} (Nv. ${petLvl}):</span>
                                 <span style="color:#eee; font-weight:normal;">${effectLabel}</span>
                             </div>
                         `);
                     }
-                }
-
-                // Buff do Chefe Global (Bênção do Titã)
+                }                        // Buff do Chefe Global (Bênção do Titã)
                 if (gameState.worldBossBuff && gameState.worldBossBuff.expiresAt) {
                     if (now < gameState.worldBossBuff.expiresAt) {
                         const remaining = gameState.worldBossBuff.expiresAt - now;
@@ -645,12 +643,13 @@
                         } else {
                             timeStr = `${mins}:${secs.toString().padStart(2, '0')}`;
                         }
-                        
+                        const wbName = gameState.worldBossBuff.bossName || 'Chefe Global';
+                        const wbValue = gameState.worldBossBuff.value || 0;
                         globalTags.push(`
-                            <div class="buff-tag worldboss" style="display:flex; align-items:center; gap:6px; padding:5px 12px; border-radius:12px; background:rgba(20,26,35,0.92); border:1px solid #9b59b6; font-size:0.82em; font-family:'Outfit'; font-weight: bold; pointer-events: auto;">
+                            <div class="buff-tag worldboss" onclick="showPage('worldboss')" title="👑 ${gameState.worldBossBuff.name || 'Bênção do Titã'}\n✨ +${wbValue}% em TODAS as atividades\n🐉 Concedido por: ${wbName}\n🖱️ Clique para ir aos Chefes Globais" style="display:flex; align-items:center; gap:6px; padding:5px 12px; border-radius:12px; background:rgba(20,26,35,0.92); border:1px solid #9b59b6; font-size:0.82em; font-family:'Outfit'; font-weight: bold; cursor:pointer; pointer-events: auto; transition:all 0.15s ease;" onmouseover="this.style.borderColor='#d896ff';this.style.boxShadow='0 0 10px rgba(155,89,182,0.3)'" onmouseout="this.style.borderColor='#9b59b6';this.style.boxShadow='none'">
                                 <span style="font-size:1.15em;">👑</span>
                                 <span style="color:#d896ff;">Bênção do Titã:</span>
-                                <span style="color:#eee; font-weight:normal;">+${gameState.worldBossBuff.value}% tudo</span>
+                                <span style="color:#eee; font-weight:normal;">+${wbValue}% tudo</span>
                                 <span class="buff-timer" style="background:rgba(0,0,0,0.4); padding:1px 6px; border-radius:10px; font-size:0.9em; font-weight:bold; color:#ff9944; font-family:monospace;">${timeStr}</span>
                             </div>
                         `);
@@ -687,9 +686,26 @@
                         else if (window.activeGlobalEvent === 'gaia_blessing') icon = '🍃';
                         else if (window.activeGlobalEvent === 'frenzy_forge') icon = '🔥';
                         else if (window.activeGlobalEvent === 'arena_fury') icon = '👺';
+                        
+                        // Mapa de evento → página
+                        const eventPageMap = {
+                            'star_shower': 'mining',
+                            'gaia_blessing': 'woodcutting',
+                            'frenzy_forge': 'smithing',
+                            'arena_fury': 'combat'
+                        };
+                        const targetPage = eventPageMap[window.activeGlobalEvent] || 'worldboss';
+                        
+                        const eventTooltipMap = {
+                            'star_shower': '🌠 +20% Minérios Raros',
+                            'gaia_blessing': '🍃 Coleta Dupla 🌲🌿',
+                            'frenzy_forge': '🔥 Crafting e Smithing 2x',
+                            'arena_fury': '👺 Monstros Fortes, 2x Ouro/Loot'
+                        };
+                        const tooltipDesc = eventTooltipMap[window.activeGlobalEvent] || 'Evento Global ativo!';
 
                         globalTags.push(`
-                            <div class="buff-tag globalevent" style="display:flex; align-items:center; gap:6px; padding:5px 12px; border-radius:12px; background:rgba(20,26,35,0.92); border:1px solid #ffd700; font-size:0.82em; font-family:'Outfit'; font-weight: bold; pointer-events: auto;">
+                            <div class="buff-tag globalevent" onclick="showPage('${targetPage}')" title="${icon} ${eventMapName}\n✨ ${tooltipDesc}\n⏱️ Resta ${timeStr}\n🖱️ Clique para ir à página relacionada" style="display:flex; align-items:center; gap:6px; padding:5px 12px; border-radius:12px; background:rgba(20,26,35,0.92); border:1px solid #ffd700; font-size:0.82em; font-family:'Outfit'; font-weight: bold; cursor:pointer; pointer-events: auto; transition:all 0.15s ease;" onmouseover="this.style.borderColor='#fff4a0';this.style.boxShadow='0 0 10px rgba(255,215,0,0.3)'" onmouseout="this.style.borderColor='#ffd700';this.style.boxShadow='none'">
                                 <span style="font-size:1.15em;">${icon}</span>
                                 <span style="color:#ffd700;">${eventMapName}:</span>
                                 <span class="buff-timer" style="background:rgba(0,0,0,0.4); padding:1px 6px; border-radius:10px; font-size:0.9em; font-weight:bold; color:#ff9944; font-family:monospace;">${timeStr}</span>

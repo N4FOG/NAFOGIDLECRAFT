@@ -274,6 +274,64 @@ window.FirebaseService = {
     await setDoc(bossRef, { hp: 0, defeatTime: Date.now() }, { merge: true });
   },
 
+  /**
+   * Injeta um buff específico no chefe global ativo.
+   */
+  adminInjectBuff: async function(buffId) {
+    const bossRef = doc(db, "worldboss", "current");
+    const bossList = window.worldBossesList || [];
+    const bossSnap = await getDoc(bossRef);
+    const bossData = bossSnap.exists() ? bossSnap.data() : null;
+    const bossName = bossData?.name || 'Chefe Global';
+    
+    // Encontrar o buff pelo id na worldBossesList
+    let buffData = null;
+    for (const boss of bossList) {
+      if (boss.buff && boss.buff.id === buffId) {
+        buffData = boss.buff;
+        break;
+      }
+    }
+    
+    if (!buffData) {
+      // Buff genérico fallback
+      const now = Date.now();
+      await setDoc(bossRef, {
+        activeBuff: {
+          id: buffId,
+          name: "Bênção do Titã",
+          icon: "👑",
+          desc: "Bênção administrativa",
+          value: 5,
+          bossName: bossName,
+          expiresAt: now + (4 * 60 * 60 * 1000)
+        }
+      }, { merge: true });
+      return;
+    }
+    
+    const now = Date.now();
+    await setDoc(bossRef, {
+      activeBuff: {
+        id: buffData.id,
+        name: buffData.name,
+        icon: buffData.icon,
+        desc: buffData.desc,
+        value: buffData.value,
+        bossName: bossName,
+        expiresAt: now + (4 * 60 * 60 * 1000)
+      }
+    }, { merge: true });
+  },
+
+  /**
+   * Remove o buff ativo do chefe global.
+   */
+  adminRemoveBuff: async function() {
+    const bossRef = doc(db, "worldboss", "current");
+    await setDoc(bossRef, { activeBuff: null }, { merge: true });
+  },
+
   // ==========================================
   // POÇO DOS DESEJOS (WISHING WELL)
   // ==========================================

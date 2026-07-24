@@ -115,6 +115,9 @@ const worldBossesList = [
     }
 ];
 
+// Expõe globalmente para scripts que carregam depois (ex: módulos)
+window.worldBossesList = worldBossesList;
+
 function initWorldBoss() {
     if (!window.FirebaseService) {
         document.getElementById('worldbossContainer').innerHTML = '<div style="text-align:center; padding: 40px; color:#ff4444;">Erro de conexão com o servidor. Tente novamente mais tarde.</div>';
@@ -757,6 +760,21 @@ async function admRefreshWBStatus() {
         el.innerHTML = '<span style="color:#ff6b6b;">Firebase não disponível.</span>';
         return;
     }
+    // Atualiza dropdown de buffs disponíveis
+    const buffSelect = document.getElementById('admWBBuffSelect');
+    if (buffSelect) {
+        const currentVal = buffSelect.value;
+        buffSelect.innerHTML = '<option value="">Selecione um buff...</option>';
+        worldBossesList.forEach(b => {
+            if (!b.buff) return;
+            const opt = document.createElement('option');
+            opt.value = b.buff.id;
+            opt.textContent = `${b.buff.icon} ${b.buff.name} (+${b.buff.value}% · ${b.name})`;
+            buffSelect.appendChild(opt);
+        });
+        if (currentVal) buffSelect.value = currentVal;
+    }
+
     el.innerHTML = 'Carregando...';
     try {
         const boss = currentWorldBoss;
@@ -828,6 +846,42 @@ async function admKillBoss() {
         showNotification('❌ Erro', e.message, 'error');
     }
 }
+
+/**
+ * Injeta um buff específico no chefe global ativo.
+ */
+window.admInjectWBBuff = async function() {
+    if (!window.FirebaseService) return showNotification('❌ Erro', 'Firebase não disponível.', 'error');
+    const select = document.getElementById('admWBBuffSelect');
+    if (!select || !select.value) {
+        return showNotification('❌ Erro', 'Selecione um buff para injetar.', 'error');
+    }
+    const buffId = select.value;
+    try {
+        await window.FirebaseService.adminInjectBuff(buffId);
+        const boss = worldBossesList.find(b => b.buff?.id === buffId);
+        const buffName = boss?.buff?.name || buffId;
+        showNotification('✅ Buff Injetado!', `${buffName} ativado no chefe global!`, 'success');
+        setTimeout(admRefreshWBStatus, 1500);
+    } catch (e) {
+        showNotification('❌ Erro', e.message, 'error');
+    }
+};
+
+/**
+ * Remove o buff ativo do chefe global.
+ */
+window.admRemoveWBBuff = async function() {
+    if (!window.FirebaseService) return showNotification('❌ Erro', 'Firebase não disponível.', 'error');
+    if (!confirm('Remover o buff ativo do chefe global?')) return;
+    try {
+        await window.FirebaseService.adminRemoveBuff();
+        showNotification('✅ Buff Removido!', 'Buff do chefe global removido.', 'info');
+        setTimeout(admRefreshWBStatus, 1500);
+    } catch (e) {
+        showNotification('❌ Erro', e.message, 'error');
+    }
+};
 
 // Expõe globalmente para garantir acesso via onclick no HTML
 window.admRefreshWBStatus = admRefreshWBStatus;
