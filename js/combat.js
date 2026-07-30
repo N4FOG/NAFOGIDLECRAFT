@@ -1488,13 +1488,19 @@
         function renderArenaPage() {
             const el = document.getElementById('arenaPageContent');
             if (!el) return;
+            if (!gameState.arena) {
+                gameState.arena = { wave:1, wins:0, streak:0, bestStreak:0, stamina:5, maxStamina:5, lastStaminaRegen:0, arenaCoins:0, weeklyPoints:0, shopPurchased:{}, battleLog:[], inBattle:false, autoMode:false, currentEnemy:null, playerHP:0, enemyHP:0, defenseMode:false, cooldowns:{}, pendingRage:false, lastAction:null, autoInterval:null, arenaTab:'battle' };
+            }
+            if (!gameState.combat) {
+                gameState.combat = { maxPlayerHealth: 100, playerHealth: 100 };
+            }
             const a = gameState.arena;
             if (a.maxWave === undefined) a.maxWave = a.wave || 1;
             a.stamina = a.maxStamina || 5; // Stamina desativada temporariamente (sempre cheia)
             const classSkill = getArenaClassSkill();
             const rank = getArenaRank();
-            const enemy = a.currentEnemy || arenaEnemies[Math.min(a.wave - 1, arenaEnemies.length - 1)];
-            const maxP = gameState.combat.maxPlayerHealth;
+            const enemy = a.currentEnemy || arenaEnemies[Math.min((a.wave || 1) - 1, arenaEnemies.length - 1)];
+            const maxP = gameState.combat?.maxPlayerHealth || 100;
             const playerEl = getPlayerElement();
             const cdLeft = a.cooldowns?.skill || 0;
             const tab = a.arenaTab || 'battle';
@@ -2093,4 +2099,7 @@ ${arenaEnemies.map((e, i) => {
             showNotification('🍖 Comida!', `Recuperou ${heal} de vida.`, 'success');
             updateUI();
         }
+
+        window.renderArenaPage = renderArenaPage;
+        window.tickArenaStamina = tickArenaStamina;
 

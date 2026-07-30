@@ -1288,16 +1288,16 @@
 
             <!-- QUICK LINKS: botoes de atalho rapido -->
             <div class="sidebar-quick-links layout-editable" id="sidebarQuickLinks" data-layout-label="⚡ Atalhos Rápidos" style="display: none; grid-template-columns: repeat(4, 1fr); gap: 4px; margin: 6px 8px; margin-top: 4px;">
-                <button class="menu-btn inventory layout-editable" id="qlBtnInventory" data-layout-label="📦 Botão Inventário" onclick="showPage('inventory')" style="padding: 6px 2px; justify-content: center; text-align: center; gap: 3px; font-size: 0.72em; transition: all 0.2s ease;">
+                <button class="menu-btn inventory layout-editable" id="qlBtnInventory" data-layout-label="📦 Botão Inventário" onclick="showPage('inventory')" style="padding: 6px 2px; justify-content: center; text-align: center; gap: 3px; font-size: 1.00em; transition: all 0.2s ease;">
                     <img src="img/07_chest.png" class="game-icon" alt="Inventário"><span>Inventário</span>
                 </button>
-                <button class="menu-btn property layout-editable" id="qlBtnProperty" data-layout-label="🏡 Botão Propriedade" onclick="showPage('property')" style="padding: 6px 2px; justify-content: center; text-align: center; gap: 3px; font-size: 0.72em; transition: all 0.2s ease;">
+                <button class="menu-btn property layout-editable" id="qlBtnProperty" data-layout-label="🏡 Botão Propriedade" onclick="showPage('property')" style="padding: 6px 2px; justify-content: center; text-align: center; gap: 3px; font-size: 1.00em; transition: all 0.2s ease;">
                     <img src="img/20_house.png" class="game-icon" alt="Propriedade"><span>Propriedade</span>
                 </button>
-                <button class="menu-btn layout-editable" id="qlBtnCharacter" data-layout-label="🧙 Botão Personagem" onclick="showPage('character')" style="padding: 6px 2px; justify-content: center; text-align: center; gap: 3px; font-size: 0.72em; transition: all 0.2s ease;">
+                <button class="menu-btn layout-editable" id="qlBtnCharacter" data-layout-label="🧙 Botão Personagem" onclick="showPage('character')" style="padding: 6px 2px; justify-content: center; text-align: center; gap: 3px; font-size: 1.00em; transition: all 0.2s ease;">
                     <img src="img/24_mage.png" class="game-icon" alt="Personagem"><span>Personagem</span>
                 </button>
-                <button class="menu-btn pets layout-editable" id="qlBtnPets" data-layout-label="🐉 Botão Mascotes" onclick="showPage('pets')" style="padding: 6px 2px; justify-content: center; text-align: center; gap: 3px; font-size: 0.72em; transition: all 0.2s ease;">
+                <button class="menu-btn pets layout-editable" id="qlBtnPets" data-layout-label="🐉 Botão Mascotes" onclick="showPage('pets')" style="padding: 6px 2px; justify-content: center; text-align: center; gap: 3px; font-size: 1.00em; transition: all 0.2s ease;">
                     <img src="img/25_dragon.png" class="game-icon" alt="Mascotes"><span>Mascotes</span>
                 </button>
             </div>
@@ -1308,7 +1308,7 @@
                 <div class="stat-row layout-editable" data-layout-label="🏆 Nível Total"><span class="stat-label"><img src="img/04_trophy.png" class="game-icon-sm" alt="" style="vertical-align:middle;"> Nível Total:</span><span class="stat-value" id="sidebarLevel">6/300</span></div>
                 <div class="stat-row layout-editable" data-layout-label="👷 Trabalhadores"><span class="stat-label"><img src="img/26_worker.png" class="game-icon-sm" alt="" style="vertical-align:middle;"> Trabalhadores:</span><span class="stat-value" id="sidebarWorkers">0/0</span></div>
                 <!-- Perícias de Combate (Minimizar / Expandir) -->
-                <div class="sidebar-section-title" onclick="toggleSidebarCombatSkills()" style="margin-top:8px; margin-bottom:8px; font-size:0.75em; color:#ff9944; text-transform:uppercase; letter-spacing:1px; border-bottom:1px solid rgba(255,153,68,0.15); padding-bottom:3px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; user-select:none;" title="Clique para minimizar/expandir">
+                <div class="sidebar-section-title" onclick="toggleSidebarCombatSkills()" style="margin-top:0px; margin-bottom:0px; font-size:0.75em; color:#ff9944; text-transform:uppercase; letter-spacing:1px; border-bottom:1px solid rgba(255,153,68,0.15); padding-bottom:3px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; user-select:none;" title="Clique para minimizar/expandir">
                     <span>🗡️ Perícias de Combate</span>
                     <span id="sidebarCombatSkillsToggleBtn" style="font-weight:bold; font-size:1.1em; color:#ffaa44; line-height:1;">-</span>
                 </div>
@@ -7166,11 +7166,21 @@
     <script src="js/alchemy.js"></script>
     <script src="js/enchanting.js"></script>
     <script src="js/smithing.js"></script>
-    <script src="js/combat.js"></script>
     <script src="js/layout-editor.js"></script>
     <script src="js/worldboss.js"></script>
     <script src="js/inspect.js"></script>
 
+    <!-- Brasas Ambientais Flutuantes (Etapa 5) -->
+    <div class="ambient-embers" id="ambientEmbers">
+        <div class="ember e1"></div>
+        <div class="ember e2"></div>
+        <div class="ember e3"></div>
+        <div class="ember e4"></div>
+        <div class="ember e5"></div>
+        <div class="ember e6"></div>
+        <div class="ember e7"></div>
+        <div class="ember e8"></div>
+    </div>
 
 </body>
 

@@ -586,7 +586,7 @@
             else if (page === 'runeforge') updateRuneforgePage();
             else if (page === 'observatory') renderObservatory();
             else if (page === 'runar') updateRunarPage();
-            else if (page === 'combat') renderArenaPage();
+            else if (page === 'combat') { if (typeof window.renderArenaPage === 'function') window.renderArenaPage(); }
             else if (page === 'woodcutting' || page === 'mining' || page === 'fishing' || page === 'herbalism') updateResourcesPage(page);
             else if (page === 'cooking') updateCookingPage();
             else if (page === 'crafting') updateCraftingPage();

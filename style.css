@@ -377,7 +377,7 @@
             background: #2a3a4a;
             color: #fff;
             border: 2px solid #3a4a5a;
-            padding: 8px 15px;
+            padding: 1px 15px;
             border-radius: 10px;
             cursor: pointer;
             font-size: 1em;
@@ -530,12 +530,14 @@
 
         .stat-row {
             display: flex;
-            justify-content: space-between;
+            
             color: #fff;
-            margin-bottom: 10px;
-            padding: 5px 10px;
+            margin-bottom: 5px;
+            padding: 0px 10px;
             background: rgba(0, 0, 0, 0.2);
             border-radius: 5px;
+	    justify-content: space-between;
+    	    align-items: center;
         }
 
         .stat-label {
@@ -566,6 +568,7 @@
         .stat-value {
             color: #ffd700;
             font-weight: bold;
+	    font-size: 15px !important;
         }
 
         .sell-item-btn {
@@ -3017,7 +3020,7 @@
     text-align: right;
 }
 
-/* ===== SELETOR DE TEMAS NO RODAPﾃ� ===== */
+/* ===== SELETOR DE TEMAS NO RODAPﾃ  ===== */
 .theme-switcher-container {
     grid-column: 1 / -1;
     display: flex;
@@ -3083,7 +3086,7 @@
     transition: width 0.05s linear;
 }
 
-/* ===== PLAYER-INFO-BAR: BOTﾃ髭S DE Aﾃ�グ ===== */
+/* ===== PLAYER-INFO-BAR: BOTﾃ髭S DE Aﾃ グ ===== */
 .player-info-bar {
     display: flex;
     align-items: center;
@@ -3346,7 +3349,7 @@
 .achievement-bonus { font-size: 0.75em; color: #4aff4a; margin-top: 4px; font-weight: 600; }
 .achievement-locked-badge { font-size: 0.75em; color: #666; margin-top: 4px; }
 
-/* ===== CONFIGURAﾃ�髭S ===== */
+/* ===== CONFIGURAﾃ 髭S ===== */
 .settings-theme-grid {
     display: flex;
     gap: 10px;
@@ -3541,7 +3544,7 @@
 .achievement-bonus { font-size: 0.75em; color: #4aff4a; margin-top: 4px; font-weight: 600; }
 .achievement-locked-badge { font-size: 0.75em; color: #666; margin-top: 4px; }
 
-/* ===== CONFIGURAﾃ�髭S ===== */
+/* ===== CONFIGURAﾃ 髭S ===== */
 .settings-theme-grid {
     display: flex;
     gap: 10px;
@@ -3576,7 +3579,7 @@
 .settings-save-btn.reset { border-color: rgba(200,60,60,0.5); }
 .settings-save-btn.reset:hover { background: rgba(200,60,60,0.2); border-color: #c83c3c; color: #ff8888; }
 
-/* ===== SELETOR DE ESTILO DE NOTIFICAﾃ�髭S ===== */
+/* ===== SELETOR DE ESTILO DE NOTIFICAﾃ 髭S ===== */
 .settings-notification-grid {
     display: flex;
     gap: 8px;
@@ -3613,12 +3616,12 @@
     box-shadow: 0 0 10px rgba(74, 154, 74, 0.25);
 }
 
-/* ===== CORES DAS NOTIFICAﾃ�髭S PADRﾃグ ===== */
+/* ===== CORES DAS NOTIFICAﾃ 髭S PADRﾃグ ===== */
 .notification-toast.success { border-left-color: #4a9a4a; }
 .notification-toast.error { border-left-color: #c83c3c; }
 .notification-toast.info { border-left-color: #4a64aa; }
 
-/* ===== NOTIFICAﾃ�グ ESTILO 1: NEON GLOW ===== */
+/* ===== NOTIFICAﾃ グ ESTILO 1: NEON GLOW ===== */
 .notification-toast.notif-style1 {
     background: rgba(10, 15, 22, 0.95);
     border: 1px solid rgba(255, 215, 0, 0.4);
@@ -3645,7 +3648,7 @@
     box-shadow: 0 0 15px rgba(74, 154, 255, 0.2);
 }
 
-/* ===== NOTIFICAﾃ�グ ESTILO 2: MODERN COMPACT COM TIMER ===== */
+/* ===== NOTIFICAﾃ グ ESTILO 2: MODERN COMPACT COM TIMER ===== */
 .notification-toast.notif-style2 {
     background: rgba(20, 26, 35, 0.98);
     border: 1px solid rgba(255, 255, 255, 0.08);
@@ -4002,7 +4005,7 @@
     border-image: linear-gradient(to right, #ffd700, #ff00ff, #00ffff) 1 !important;
 }
 
-/* ===== NOTIFICAﾃ�グ ESTILO 3: ULTRA COMPACT / DISCRETO ===== */
+/* ===== NOTIFICAﾃ グ ESTILO 3: ULTRA COMPACT / DISCRETO ===== */
 .notification-toast.notif-style3 {
     background: rgba(12, 17, 24, 0.92) !important;
     border: 1px solid rgba(255, 255, 255, 0.15) !important;
@@ -7505,7 +7508,7 @@ body::before {
     background: linear-gradient(145deg, rgba(14, 22, 32, 0.8), rgba(8, 14, 22, 0.9)) !important;
     border: 1px solid rgba(255, 215, 0, 0.14) !important;
     border-radius: 14px !important;
-    padding: 14px !important;
+    padding: 5px !important;
     box-shadow: 
         inset 0 1px 0 rgba(255, 255, 255, 0.05),
         0 8px 24px rgba(0, 0, 0, 0.4) !important;
@@ -7518,7 +7521,7 @@ body::before {
     letter-spacing: 1.5px !important;
     color: #ff9944 !important;
     background: linear-gradient(90deg, rgba(255, 153, 68, 0.12), transparent) !important;
-    padding: 6px 10px !important;
+    padding: 1px 10px !important;
     border-left: 3px solid #ff9944 !important;
     border-radius: 4px !important;
     margin-top: 14px !important;
@@ -7908,24 +7911,235 @@ body::before {
     text-align: center;
 }
 
-/* 5. TÍTULOS COM ARABESCOS DOURADOS (← TÍTULO →) */
-.ornate-title-wrapper {
+/* ==========================================================================
+   ETAPA 5: PARTÍCULAS AMBIENTAIS & MICRO-INTERAÇÕES AAA
+   ========================================================================== */
+
+/* 1. VARREDURA DE LUZ (SHINE SWEEP) EM BOTÕES E CARDS PREMIUM */
+.button-premium,
+.button-buy-green,
+.arena-tab-btn.active,
+.shine-swipe {
+    position: relative;
+    overflow: hidden !important;
+}
+
+.button-premium::before,
+.button-buy-green::before,
+.shine-swipe::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        45deg,
+        transparent 45%,
+        rgba(255, 255, 255, 0.22) 50%,
+        transparent 55%
+    );
+    transform: rotate(30deg);
+    animation: shineSweep 4.5s infinite ease-in-out;
+    pointer-events: none;
+}
+
+@keyframes shineSweep {
+    0% { transform: translateX(-120%) rotate(30deg); }
+    22%, 100% { transform: translateX(120%) rotate(30deg); }
+}
+
+/* 2. BRASAS AMBIENTAIS FLUTUANTES VÍVIDAS */
+.ambient-embers {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    width: 360px;
+    height: 100vh;
+    pointer-events: none !important;
+    z-index: 9999 !important;
+    overflow: hidden;
+}
+
+.ember {
+    position: absolute;
+    bottom: -15px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #ffe600 0%, #ff8800 50%, #ff2200 90%);
+    box-shadow: 0 0 12px #ffaa00, 0 0 22px #ff3300;
+    opacity: 0;
+    animation: riseEmber 5s infinite cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.ember.e1 { left: 15%; width: 6px; height: 6px; animation-delay: 0s; animation-duration: 4.8s; }
+.ember.e2 { left: 40%; width: 8px; height: 8px; animation-delay: 1.1s; animation-duration: 6.2s; }
+.ember.e3 { left: 65%; width: 5px; height: 5px; animation-delay: 2.2s; animation-duration: 4.2s; }
+.ember.e4 { left: 82%; width: 7px; height: 7px; animation-delay: 3.5s; animation-duration: 6.8s; }
+.ember.e5 { left: 30%; width: 5px; height: 5px; animation-delay: 4.0s; animation-duration: 5.2s; }
+.ember.e6 { left: 55%; width: 8px; height: 8px; animation-delay: 0.6s; animation-duration: 5.9s; }
+.ember.e7 { left: 75%; width: 6px; height: 6px; animation-delay: 1.8s; animation-duration: 5.5s; }
+.ember.e8 { left: 92%; width: 4px; height: 4px; animation-delay: 2.9s; animation-duration: 4.9s; }
+
+@keyframes riseEmber {
+    0% { transform: translateY(0) translateX(0) scale(0.8); opacity: 0; }
+    15% { opacity: 0.95; }
+    75% { opacity: 0.7; }
+    100% { transform: translateY(-500px) translateX(-40px) scale(0.2); opacity: 0; }
+}
+
+/* 3. REFINAMENTO DE NOTIFICAÇÕES TOAST AAA */
+.notification,
+.toast-premium {
+    background: linear-gradient(135deg, rgba(16, 26, 38, 0.95), rgba(8, 14, 22, 0.98)) !important;
+    border: 1px solid rgba(255, 215, 0, 0.3) !important;
+    border-radius: 12px !important;
+    box-shadow: 
+        inset 0 1px 0 rgba(255, 255, 255, 0.15),
+        0 10px 30px rgba(0, 0, 0, 0.6),
+        0 0 20px rgba(255, 215, 0, 0.2) !important;
+    backdrop-filter: blur(12px) !important;
+    color: #fff !important;
+    animation: toastSlideIn 0.35s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+}
+
+@keyframes toastSlideIn {
+    0% { transform: translateY(-20px) scale(0.95); opacity: 0; }
+    100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+/* 4. ANIMAÇÃO DE PULSO DOURADO AO INTERAGIR */
+.pulse-gold-active {
+    animation: pulseGold 2s infinite ease-in-out !important;
+}
+
+/* ==========================================================================
+   ETAPA 3 REFORMULADA: ARMAZÉM REAL & EQUIPAMENTOS (INDEX4)
+   ========================================================================== */
+
+/* DASHBOARD HEADER DO ARMAZÉM */
+.vault-dashboard-header {
+    background: linear-gradient(160deg, rgba(16, 26, 40, 0.95), rgba(8, 14, 22, 0.98)) !important;
+    border-radius: 16px !important;
+    padding: 22px 24px !important;
     display: flex;
-    align-items: center;
-    justify-content: center;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.vault-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 12px;
 }
 
-.ornate-title-wrapper::before,
-.ornate-title-wrapper::after {
-    content: '❖ ───';
-    color: rgba(255, 215, 0, 0.5);
-    font-size: 0.8em;
-    letter-spacing: -2px;
+.vault-stat-card {
+    background: rgba(8, 14, 22, 0.8);
+    border: 1px solid rgba(255, 215, 0, 0.15);
+    border-radius: 10px;
+    padding: 10px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
 
-.ornate-title-wrapper::after {
-    content: '─── ❖';
+.vstat-label {
+    font-size: 0.76em;
+    color: #8fa0b5;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
+
+.vstat-value {
+    font-size: 1.2em;
+    font-weight: 700;
+    color: #ffffff;
+    font-family: 'Cinzel', serif;
+}
+
+.vstat-bar-track {
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 4px;
+}
+
+.vstat-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ff9900, #ffd700);
+}
+
+.vault-actions-bar {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* FILTROS E SUB-TABS DO ARMAZÉM */
+.eq-filters-bar-v4 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 14px;
+}
+
+.eq-quick-tabs-v4 {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.eq-quick-tabs-v4 .eq-tab-btn {
+    background: linear-gradient(145deg, rgba(22, 34, 48, 0.8), rgba(12, 20, 30, 0.9)) !important;
+    border: 1px solid rgba(170, 190, 220, 0.16) !important;
+    color: #b0c8e8 !important;
+    padding: 7px 14px !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    font-size: 0.85em !important;
+    transition: all 0.2s ease !important;
+}
+
+.eq-quick-tabs-v4 .eq-tab-btn.active {
+    background: linear-gradient(160deg, #c99824 0%, #ffd700 50%, #b58210 100%) !important;
+    border-color: rgba(255, 235, 150, 0.6) !important;
+    color: #0b121a !important;
+    font-weight: 800 !important;
+    box-shadow: 0 0 14px rgba(255, 215, 0, 0.3) !important;
+}
+
+/* CAMPOS NEON DO FILTRO AVANÇADO */
+.neon-input-v4,
+.neon-select-v4 {
+    width: 100%;
+    background: rgba(6, 12, 18, 0.9) !important;
+    border: 1px solid rgba(255, 215, 0, 0.22) !important;
+    border-radius: 6px !important;
+    color: #ffffff !important;
+    padding: 8px 12px !important;
+    font-family: 'Outfit', sans-serif !important;
+    font-size: 0.88em !important;
+    transition: all 0.25s ease !important;
+}
+
+.neon-input-v4:focus,
+.neon-select-v4:focus {
+    outline: none !important;
+    border-color: #ffd700 !important;
+    box-shadow: 0 0 12px rgba(255, 215, 0, 0.3) !important;
+}
+
+/* GRIDS E SLOTS 3D DO INVENTÁRIO V4 */
+.inventory-grid-v4,
+.equipment-grid-v4 {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)) !important;
+    gap: 12px !important;
+}
+
+
 
 

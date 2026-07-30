@@ -140,6 +140,103 @@
             updateUI();
         }
 
+        window.resFilters = window.resFilters || { category: 'all', search: '' };
+
+        function getResourceCategory(key) {
+            if (key.includes('log') || key.includes('plank') || key.includes('wood')) return 'wood';
+            if (key.includes('ore') || key.includes('bar')) return 'ore';
+            if (key.includes('Fish') || key.includes('fish')) return 'fish';
+            if (key.includes('herb') || key.includes('flower')) return 'herb';
+            if (key.includes('potion') || key.includes('elixir') || key.includes('scroll')) return 'potion';
+            return 'other';
+        }
+
+        window.setResFilterCategory = function(cat) {
+            if (!window.resFilters) window.resFilters = { category: 'all', search: '' };
+            window.resFilters.category = cat;
+            const tabs = ['all', 'wood', 'ore', 'fish', 'herb', 'potion'];
+            tabs.forEach(t => {
+                const btn = document.getElementById(`res-tab-${t}`);
+                if (btn) {
+                    if (t === cat) btn.classList.add('active');
+                    else btn.classList.remove('active');
+                }
+            });
+            updateInventory();
+        };
+
+        window.setResFilterSearch = function(term) {
+            if (!window.resFilters) window.resFilters = { category: 'all', search: '' };
+            window.resFilters.search = (term || '').toLowerCase().trim();
+            updateInventory();
+        };
+
+        window.sellResourcesByFilter = function() {
+            const cat = window.resFilters?.category || 'all';
+            const search = window.resFilters?.search || '';
+            let count = 0;
+            let totalGold = 0;
+            const toSell = [];
+
+            inventoryItems.forEach(item => {
+                const amt = gameState.inventory[item.key] || 0;
+                if (amt <= 0) return;
+                const itemCat = getResourceCategory(item.key);
+                if (cat !== 'all' && itemCat !== cat) return;
+                if (search && !item.name.toLowerCase().includes(search) && !item.key.toLowerCase().includes(search)) return;
+
+                const val = (item.value || 1) * amt;
+                totalGold += val;
+                count += amt;
+                toSell.push({ key: item.key, amount: amt });
+            });
+
+            if (toSell.length === 0) {
+                showNotification('ℹ️ Nenhum item', 'Nenhum recurso encontrado no filtro ativo.', 'warning');
+                return;
+            }
+
+            if (confirm(`Deseja vender ${count} recurso(s) do filtro ativo por ${totalGold.toLocaleString()} 💰?`)) {
+                toSell.forEach(i => {
+                    gameState.inventory[i.key] = 0;
+                });
+                gameState.gold += totalGold;
+                showNotification('💰 Venda Concluída!', `Vendeu ${count} recurso(s) por +${totalGold.toLocaleString()} 💰!`, 'success');
+                updateUI();
+            }
+        };
+
+        window.sellEquipmentByFilter = function() {
+            if (!window.getFilteredEquipmentList) return;
+            const list = window.getFilteredEquipmentList();
+            if (!list || list.length === 0) {
+                showNotification('ℹ️ Nenhum item', 'Nenhum equipamento encontrado no filtro ativo.', 'warning');
+                return;
+            }
+
+            let totalGold = 0;
+            list.forEach(item => {
+                const eq = getEquipmentItemData(item.id);
+                if (eq) totalGold += (eq.price || 10);
+            });
+
+            if (confirm(`Deseja vender ${list.length} equipamento(s) do filtro ativo por ${totalGold.toLocaleString()} 💰?`)) {
+                list.forEach(item => {
+                    if (item.isInstance) {
+                        delete gameState.equipment.instances[item.id];
+                        delete gameState.equipment.inventory[item.id];
+                    } else {
+                        if (gameState.equipment.inventory[item.id] > 0) {
+                            gameState.equipment.inventory[item.id]--;
+                        }
+                    }
+                });
+                gameState.gold += totalGold;
+                showNotification('⚔️ Venda de Equipamentos!', `Vendeu ${list.length} equipamento(s) por +${totalGold.toLocaleString()} 💰!`, 'success');
+                updateUI();
+            }
+        };
+
         function updateInventory() {
             if (typeof window.hideEquipmentComparison === 'function') {
                 window.hideEquipmentComparison();
@@ -148,13 +245,22 @@
             if (grid) {
                 grid.innerHTML = '';
 
-                // Coletar itens com quantidade > 0
+                // Coletar itens com quantidade > 0 e aplicar filtro de categoria/busca
+                const resCat = window.resFilters?.category || 'all';
+                const resSearch = window.resFilters?.search || '';
+
                 const itemsWithAmount = inventoryItems
                     .map(item => ({
                         ...item,
                         amount: gameState.inventory[item.key] || 0
                     }))
-                    .filter(item => item.amount > 0);
+                    .filter(item => {
+                        if (item.amount <= 0) return false;
+                        const itemCat = getResourceCategory(item.key);
+                        if (resCat !== 'all' && itemCat !== resCat) return false;
+                        if (resSearch && !item.name.toLowerCase().includes(resSearch) && !item.key.toLowerCase().includes(resSearch)) return false;
+                        return true;
+                    });
 
                 // Criar slots baseado no número de espaços do banco
                 for (let i = 0; i < gameState.bankSlots; i++) {
@@ -312,6 +418,7 @@
                     }
                     return 0;
                 });
+                window.lastFilteredEquipmentList = filtered;
 
                 if (available.length === 0) {
                     eqGrid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; color:#aaa; padding:20px; font-family:'Outfit', sans-serif;">Nenhum equipamento guardado no seu inventário.</div>`;
@@ -518,11 +625,23 @@
                         }).join('');
                         html += '</div>';
                     }
+                    // --- Linha 4: Ação de Venda por Filtro ---
+                    html += `
+                        <div class="eq-subtabs-row" style="justify-content: flex-end; margin-top: 6px; padding-top: 6px; border-top: 1px dashed rgba(255,215,0,0.15);">
+                            <button class="button-premium sell-all-btn" onclick="sellEquipmentByFilter()" style="background: linear-gradient(160deg, #e65100, #bf360c); border-color: #ff9e80; color: #fff; padding: 5px 12px; font-size: 0.78em;">
+                                🏷️ Vender Equipamentos Deste Filtro
+                            </button>
+                        </div>
+                    `;
                 }
 
                 container.style.display = 'block';
                 container.innerHTML = html;
             });
+        };
+
+        window.getFilteredEquipmentList = function() {
+            return window.lastFilteredEquipmentList || [];
         };
 
         // Funções Globais de Controle de Filtros

@@ -154,7 +154,9 @@
             propertyTickInterval = setInterval(propertyTick, 10000);
 
             // Tick de stamina da arena a cada 5s (internamente verifica 10s)
-            setInterval(tickArenaStamina, 5000);
+            setInterval(() => {
+                if (typeof window.tickArenaStamina === 'function') window.tickArenaStamina();
+            }, 5000);
 
             // Iniciar loop rápido de progresso das barras
             startUIProgressLoop();
