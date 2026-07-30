@@ -1,0 +1,2136 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚔️ Taskbar Hero - 10 Níveis por Bioma & Progressão de HP Contínua</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #ff9944;
+            --primary-glow: rgba(255, 153, 68, 0.5);
+            --bg-dark: #070a0f;
+            --panel-bg: rgba(13, 20, 33, 0.88);
+            --border-glow: rgba(255, 153, 68, 0.35);
+            --gold: #ffd700;
+            --gold-glow: rgba(255, 215, 0, 0.4);
+            --green: #4aff4a;
+            --blue: #4a9aff;
+            --purple: #c96ac9;
+            --red: #ff4444;
+            --ancient: #ff44aa;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            background: #04060a;
+            color: #e2e8f0;
+            font-family: 'Outfit', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(255, 153, 68, 0.08) 0%, transparent 60%),
+                radial-gradient(circle at 80% 80%, rgba(74, 154, 255, 0.05) 0%, transparent 50%);
+        }
+
+        /* --- PAINEL PRINCIPAL --- */
+        .demo-container {
+            flex: 1;
+            padding: 24px;
+            max-width: 1240px;
+            margin: 0 auto;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+        }
+
+        .demo-header {
+            background: linear-gradient(135deg, rgba(22, 33, 54, 0.95), rgba(10, 16, 28, 0.95));
+            border: 1px solid var(--border-glow);
+            border-radius: 16px;
+            padding: 22px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .demo-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary), var(--gold), transparent);
+        }
+
+        .demo-header h1 {
+            font-family: 'Cinzel', serif;
+            color: var(--gold);
+            font-size: 2.1em;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.8);
+            letter-spacing: 1px;
+        }
+
+        .demo-badge {
+            background: linear-gradient(135deg, rgba(255, 153, 68, 0.2), rgba(255, 215, 0, 0.1));
+            border: 1px solid var(--primary);
+            color: #ffaa55;
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 0.45em;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            box-shadow: 0 0 12px var(--primary-glow);
+            vertical-align: middle;
+        }
+
+        /* --- CONTROLES DA SIMULAÇÃO E SELEÇÃO DE NÍVEIS --- */
+        .controls-panel {
+            background: var(--panel-bg);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 22px 28px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 18px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .control-group label {
+            font-size: 0.85em;
+            color: #cbd5e0;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .control-group select, .control-group button, .control-group input[type="number"] {
+            background: rgba(8, 14, 24, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            color: #fff;
+            padding: 11px 16px;
+            border-radius: 10px;
+            font-size: 0.9em;
+            font-weight: 600;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .control-group select:hover, .control-group button:hover, .control-group input:hover {
+            border-color: var(--primary);
+            background: rgba(18, 28, 45, 0.9);
+            box-shadow: 0 0 14px var(--primary-glow);
+            transform: translateY(-1px);
+        }
+
+        .btn-action {
+            background: linear-gradient(135deg, #ff9944, #e67e22) !important;
+            color: #080f1a !important;
+            font-weight: 800 !important;
+            border: none !important;
+            box-shadow: 0 4px 15px rgba(255, 153, 68, 0.3) !important;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-pip {
+            background: linear-gradient(135deg, #4a9aff, #0055ff) !important;
+            color: #fff !important;
+            font-weight: 800 !important;
+            border: none !important;
+            box-shadow: 0 4px 15px rgba(74, 154, 255, 0.4) !important;
+            text-transform: uppercase;
+        }
+
+        .btn-pip:hover {
+            transform: translateY(-2px) scale(1.01) !important;
+            box-shadow: 0 6px 20px rgba(74, 154, 255, 0.6) !important;
+        }
+
+        .btn-boss-test {
+            background: linear-gradient(135deg, #ff4444, #cc0000) !important;
+            color: #fff !important;
+            font-weight: 800 !important;
+            border: none !important;
+            box-shadow: 0 4px 15px rgba(255, 68, 68, 0.4) !important;
+        }
+
+        .btn-boss-test:hover {
+            transform: translateY(-2px) scale(1.01) !important;
+            box-shadow: 0 6px 20px rgba(255, 68, 68, 0.6) !important;
+        }
+
+        /* --- BESTIÁRIO INTEGRADO --- */
+        .bestiary-panel {
+            background: var(--panel-bg);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 20px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .bestiary-header {
+            font-size: 1.1em;
+            font-weight: 800;
+            color: var(--gold);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .bestiary-tabs {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .bestiary-tab-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #a0aec0;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .bestiary-tab-btn.active, .bestiary-tab-btn:hover {
+            background: var(--primary);
+            color: #080f1a;
+            border-color: var(--primary);
+            box-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        .bestiary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 12px;
+            max-height: 220px;
+            overflow-y: auto;
+            padding-right: 6px;
+        }
+
+        .bestiary-card {
+            background: rgba(8, 14, 24, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: transform 0.2s ease;
+        }
+
+        .bestiary-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--primary);
+        }
+
+        .bestiary-card .icon {
+            font-size: 1.6em;
+        }
+
+        .bestiary-card .info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .bestiary-card .name {
+            font-size: 0.82em;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .bestiary-card .element {
+            font-size: 0.7em;
+            color: #ff9944;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        /* METRICAS DA CORRIDA */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, rgba(16, 25, 42, 0.8), rgba(10, 16, 28, 0.8));
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(255, 153, 68, 0.3);
+        }
+
+        .stat-icon {
+            font-size: 2.2em;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stat-info .value {
+            font-size: 1.55em;
+            font-weight: 900;
+            color: #fff;
+            line-height: 1.1;
+        }
+
+        .stat-info .label {
+            font-size: 0.75em;
+            color: #8a99ad;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 2px;
+        }
+
+        /* PAINEL DE INVENTÁRIO */
+        .loot-inventory-panel {
+            background: var(--panel-bg);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 20px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .loot-header {
+            font-size: 1.1em;
+            font-weight: 800;
+            color: var(--gold);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .loot-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            min-height: 60px;
+            background: rgba(5, 10, 18, 0.6);
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px dashed rgba(255,255,255,0.1);
+        }
+
+        .loot-item-pill {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 700;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid;
+            animation: popIn 0.3s ease-out;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.4); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* ============================================================ */
+        /* --- TASKBAR HERO: WIDGET DO RODAPÉ --- */
+        /* ============================================================ */
+        .tbh-wrapper {
+            width: 100%;
+            margin-top: auto;
+            position: relative;
+            z-index: 1000;
+        }
+
+        .tbh-bar {
+            width: 100%;
+            height: 140px;
+            background: #05080e;
+            border-top: 3px solid var(--primary);
+            box-shadow: 
+                0 -10px 30px rgba(0, 0, 0, 0.9), 
+                0 -2px 15px var(--primary-glow),
+                inset 0 2px 10px rgba(255, 153, 68, 0.2);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            transition: filter 0.3s ease, border-color 0.4s ease;
+        }
+
+        .tbh-bar.boss-active {
+            border-top-color: var(--red);
+            box-shadow: 0 -10px 35px rgba(255, 68, 68, 0.6), inset 0 2px 15px rgba(255, 68, 68, 0.3);
+        }
+
+        .tbh-bar.shake {
+            animation: screenShake 0.3s ease-in-out;
+        }
+
+        @keyframes screenShake {
+            0%, 100% { transform: translateY(0); }
+            20% { transform: translateY(-4px) translateX(3px); }
+            40% { transform: translateY(4px) translateX(-3px); }
+            60% { transform: translateY(-2px) translateX(2px); }
+            80% { transform: translateY(2px) translateX(-2px); }
+        }
+
+        /* BADGE DE BIOMA E NÍVEL ATUAL NO RODAPÉ */
+        .biome-level-badge {
+            position: absolute;
+            top: 14px;
+            right: 320px;
+            z-index: 26;
+            background: rgba(255, 153, 68, 0.25);
+            border: 1px solid var(--primary);
+            color: #ffaa55;
+            padding: 5px 14px;
+            border-radius: 16px;
+            font-size: 0.78em;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 0 12px var(--primary-glow);
+        }
+
+        /* BARRA DE VIDA DO BOSS */
+        .boss-top-hud {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 25;
+            width: 420px;
+            background: rgba(15, 5, 8, 0.92);
+            border: 1px solid var(--red);
+            border-radius: 12px;
+            padding: 8px 16px;
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            box-shadow: 0 0 25px rgba(255, 68, 68, 0.6);
+            animation: slideDownBoss 0.4s ease-out;
+        }
+
+        @keyframes slideDownBoss {
+            from { transform: translate(-50%, -30px); opacity: 0; }
+            to { transform: translate(-50%, 0); opacity: 1; }
+        }
+
+        .boss-title-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.82em;
+            font-weight: 900;
+            color: var(--red);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .boss-hp-track {
+            width: 100%;
+            height: 12px;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 68, 68, 0.4);
+        }
+
+        .boss-hp-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff1111, #ff6666);
+            width: 100%;
+            transition: width 0.15s ease;
+            box-shadow: 0 0 10px #ff1111;
+        }
+
+        /* PARALLAX E AMBIENTE */
+        .tbh-sky {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            transition: background 0.8s ease;
+        }
+
+        .biome-ice-sky { background: linear-gradient(to bottom, #061527 0%, #112a4a 60%, #1e4270 100%); }
+        .biome-fire-sky { background: linear-gradient(to bottom, #1a0505 0%, #3a0d0d 60%, #5c1414 100%); }
+        .biome-water-sky { background: linear-gradient(to bottom, #041424 0%, #0a2d4d 60%, #11497a 100%); }
+        .biome-wind-sky { background: linear-gradient(to bottom, #091a1a 0%, #143535 60%, #205252 100%); }
+        .biome-earth-sky { background: linear-gradient(to bottom, #141009 0%, #2c2214 60%, #473720 100%); }
+        .biome-dark-sky { background: linear-gradient(to bottom, #0a0410 0%, #180824 60%, #280d3b 100%); }
+        .biome-holy-sky { background: linear-gradient(to bottom, #1f1b0a 0%, #3d3514 60%, #615420 100%); }
+        .biome-lightning-sky { background: linear-gradient(to bottom, #15091f 0%, #2c1240 60%, #461c66 100%); }
+
+        .tbh-particles-layer {
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .ambient-particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: floatParticle linear infinite;
+        }
+
+        @keyframes floatParticle {
+            0% { transform: translateY(100px) translateX(0) rotate(0deg); opacity: 0; }
+            20% { opacity: 0.8; }
+            80% { opacity: 0.8; }
+            100% { transform: translateY(-20px) translateX(-100px) rotate(360deg); opacity: 0; }
+        }
+
+        .tbh-parallax-bg {
+            position: absolute;
+            inset: 0;
+            z-index: 3;
+            opacity: 0.5;
+            background-repeat: repeat-x;
+            background-size: contain;
+            animation: moveBg 18s linear infinite;
+            transition: opacity 0.5s ease;
+        }
+
+        .biome-ice { background-image: radial-gradient(circle, rgba(74, 154, 255, 0.4) 2px, transparent 2px); background-size: 24px 24px; }
+        .biome-fire { background-image: radial-gradient(circle, rgba(255, 100, 50, 0.4) 2px, transparent 2px); background-size: 30px 30px; }
+        .biome-water { background-image: radial-gradient(circle, rgba(0, 210, 255, 0.4) 2px, transparent 2px); background-size: 26px 26px; }
+        .biome-wind { background-image: radial-gradient(circle, rgba(74, 255, 200, 0.4) 2px, transparent 2px); background-size: 22px 22px; }
+        .biome-earth { background-image: radial-gradient(circle, rgba(200, 150, 80, 0.4) 2px, transparent 2px); background-size: 28px 28px; }
+        .biome-dark { background-image: radial-gradient(circle, rgba(186, 85, 211, 0.4) 2px, transparent 2px); background-size: 20px 20px; }
+        .biome-holy { background-image: radial-gradient(circle, rgba(255, 215, 0, 0.4) 2px, transparent 2px); background-size: 25px 25px; }
+        .biome-lightning { background-image: radial-gradient(circle, rgba(200, 100, 255, 0.4) 2px, transparent 2px); background-size: 22px 22px; }
+
+        @keyframes moveBg {
+            from { background-position-x: 0; }
+            to { background-position-x: -1000px; }
+        }
+
+        .tbh-ground {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 32px;
+            background: linear-gradient(to bottom, #182638, #0a101a);
+            border-top: 3px solid #2c425c;
+            z-index: 4;
+            overflow: hidden;
+        }
+
+        .tbh-ground-pattern {
+            width: 200%;
+            height: 100%;
+            background: repeating-linear-gradient(90deg, rgba(255,153,68,0.06) 0px, rgba(255,153,68,0.06) 25px, transparent 25px, transparent 50px);
+            animation: moveGround 1s linear infinite;
+        }
+
+        @keyframes moveGround {
+            from { transform: translateX(0); }
+            to { transform: translateX(-50px); }
+        }
+
+        /* STAGE E HERÓI */
+        .tbh-stage {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            z-index: 5;
+            display: flex;
+            align-items: center;
+        }
+
+        .tbh-hero-container {
+            position: absolute;
+            left: 140px;
+            bottom: 26px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 10;
+        }
+
+        .tbh-hero-aura {
+            position: absolute;
+            inset: -10px;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--primary-glow) 0%, transparent 70%);
+            animation: auraPulse 1.2s ease-in-out infinite alternate;
+            pointer-events: none;
+        }
+
+        @keyframes auraPulse {
+            0% { transform: scale(0.9); opacity: 0.5; }
+            100% { transform: scale(1.2); opacity: 0.9; }
+        }
+
+        .tbh-hero {
+            position: relative;
+            font-size: 2.7em;
+            filter: drop-shadow(0 6px 10px rgba(0,0,0,0.7));
+            animation: heroBobbing 0.35s ease-in-out infinite alternate;
+            display: inline-block;
+        }
+
+        @keyframes heroBobbing {
+            0% { transform: translateY(0) rotate(0deg); }
+            100% { transform: translateY(-5px) rotate(4deg); }
+        }
+
+        .tbh-weapon-overlay {
+            position: absolute;
+            right: -14px;
+            top: -2px;
+            font-size: 0.6em;
+            transform-origin: bottom left;
+            animation: weaponSwing 0.35s ease-in-out infinite alternate;
+            filter: drop-shadow(0 0 6px var(--gold));
+        }
+
+        @keyframes weaponSwing {
+            0% { transform: rotate(-12deg); }
+            100% { transform: rotate(18deg); }
+        }
+
+        .tbh-hero.attacking {
+            animation: heroSlash 0.22s ease-out !important;
+        }
+
+        @keyframes heroSlash {
+            0% { transform: translateX(0) scale(1); }
+            50% { transform: translateX(25px) scale(1.2) rotate(10deg); }
+            100% { transform: translateX(0) scale(1); }
+        }
+
+        /* PROJETÉIS E CORTE */
+        .projectile {
+            position: absolute;
+            bottom: 45px;
+            font-size: 1.6em;
+            pointer-events: none;
+            z-index: 14;
+            filter: drop-shadow(0 0 8px var(--gold));
+            transition: left 0.3s linear;
+        }
+
+        .projectile.arrow { transform: rotate(-10deg); }
+        .projectile.magic { font-size: 1.8em; filter: drop-shadow(0 0 14px var(--purple)); animation: magicPulse 0.2s linear infinite alternate; }
+
+        @keyframes magicPulse {
+            0% { transform: scale(0.9) rotate(0deg); }
+            100% { transform: scale(1.2) rotate(180deg); }
+        }
+
+        .slash-effect {
+            position: absolute;
+            left: 50px;
+            top: -10px;
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: slashArc 0.25s ease-out forwards;
+            z-index: 12;
+        }
+
+        .slash-sword { border-right: 4px solid #ffffff; border-top: 4px solid var(--primary); filter: drop-shadow(0 0 10px #ffffff); }
+        .slash-silver { border-right: 4px solid #4a9aff; border-top: 4px solid #e0f0ff; filter: drop-shadow(0 0 12px #4a9aff); }
+        .slash-gold { border-right: 4px solid #ffd700; border-top: 4px solid #ffaa00; filter: drop-shadow(0 0 15px #ffd700); }
+
+        @keyframes slashArc {
+            0% { transform: scale(0.3) rotate(-45deg); opacity: 1; }
+            100% { transform: scale(1.6) rotate(90deg); opacity: 0; }
+        }
+
+        .impact-burst {
+            position: absolute;
+            bottom: 40px;
+            font-size: 2.2em;
+            pointer-events: none;
+            z-index: 15;
+            animation: burstPop 0.3s ease-out forwards;
+        }
+
+        @keyframes burstPop {
+            0% { transform: scale(0.4); opacity: 1; }
+            50% { transform: scale(1.4); opacity: 0.9; }
+            100% { transform: scale(1.8); opacity: 0; }
+        }
+
+        .flying-loot-item {
+            position: absolute;
+            z-index: 50;
+            font-size: 1.8em;
+            font-weight: 800;
+            pointer-events: none;
+            animation: flyToHud 0.8s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+            filter: drop-shadow(0 0 12px var(--gold));
+        }
+
+        @keyframes flyToHud {
+            0% { transform: scale(0.6) translateY(0); opacity: 1; }
+            50% { transform: scale(1.4) translateY(-40px); }
+            100% { transform: scale(0.4) translateY(-80px) translateX(-200px); opacity: 0; }
+        }
+
+        /* PET ACOMPANHANTE */
+        .tbh-pet {
+            font-size: 1.7em;
+            animation: petHop 0.45s ease-in-out infinite alternate;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.6));
+        }
+
+        @keyframes petHop {
+            0% { transform: translateY(0) scaleX(1); }
+            100% { transform: translateY(-7px) scaleX(0.92); }
+        }
+
+        /* ENTIDADES SPAWNADAS E BOSS */
+        .tbh-entity {
+            position: absolute;
+            bottom: 26px;
+            font-size: 2.5em;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            filter: drop-shadow(0 6px 8px rgba(0,0,0,0.6));
+            transition: opacity 0.2s ease;
+        }
+
+        .tbh-entity.boss-monster {
+            font-size: 4em !important;
+            filter: drop-shadow(0 0 25px var(--red)) !important;
+            animation: bossStance 0.6s ease-in-out infinite alternate !important;
+        }
+
+        @keyframes bossStance {
+            0% { transform: translateY(0) scale(1); }
+            100% { transform: translateY(-6px) scale(1.05); }
+        }
+
+        .monster-hp-bar {
+            width: 52px;
+            height: 6px;
+            background: rgba(0,0,0,0.8);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 3px;
+            position: absolute;
+            top: -14px;
+            overflow: hidden;
+        }
+
+        .monster-hp-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff4444, #ff8888);
+            width: 100%;
+            transition: width 0.15s ease;
+        }
+
+        .tbh-entity.monster { animation: monsterWalk 0.45s ease-in-out infinite alternate; }
+
+        @keyframes monsterWalk {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-4px); }
+        }
+
+        .tbh-entity.hit { animation: entityHit 0.25s ease-out !important; }
+
+        @keyframes entityHit {
+            0% { transform: scale(1); filter: brightness(1); }
+            50% { transform: scale(1.35) rotate(-18deg); filter: brightness(2.5) drop-shadow(0 0 20px red); }
+            100% { transform: scale(0); opacity: 0; }
+        }
+
+        /* POPUPS DE DANO E RECOMPENSAS */
+        .tbh-popup {
+            position: absolute;
+            font-weight: 900;
+            font-size: 0.95em;
+            pointer-events: none;
+            z-index: 20;
+            animation: popupFloat 0.85s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+            text-shadow: 0 2px 6px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.8);
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .tbh-popup.damage { color: #ff4444; font-size: 1.15em; text-shadow: 0 0 8px rgba(255,68,68,0.6); }
+        .tbh-popup.crit { color: #ffd700; font-size: 1.45em; text-shadow: 0 0 14px #ffd700, 0 0 25px var(--primary); }
+        .tbh-popup.gold { color: #ffe100; font-size: 1.05em; text-shadow: 0 0 8px rgba(255,225,0,0.6); }
+        .tbh-popup.xp { color: #4a9aff; font-size: 1.05em; text-shadow: 0 0 8px rgba(74,154,255,0.6); }
+        .tbh-popup.item { color: #ff44aa; font-size: 1.2em; text-shadow: 0 0 12px rgba(255,68,170,0.8); }
+
+        @keyframes popupFloat {
+            0% { opacity: 0; transform: translateY(10px) scale(0.5); }
+            20% { opacity: 1; transform: translateY(-15px) scale(1.3); }
+            80% { opacity: 1; }
+            100% { opacity: 0; transform: translateY(-60px) scale(1); }
+        }
+
+        /* HUD SOBREPOSTO NA BARRA */
+        .tbh-hud {
+            position: absolute;
+            left: 24px;
+            top: 12px;
+            z-index: 15;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            background: linear-gradient(135deg, rgba(8, 14, 24, 0.85), rgba(4, 7, 12, 0.85));
+            padding: 8px 18px;
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            backdrop-filter: blur(6px);
+        }
+
+        .tbh-bar-container {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            width: 130px;
+        }
+
+        .tbh-bar-label {
+            font-size: 0.68em;
+            color: #cbd5e0;
+            font-weight: 800;
+            display: flex;
+            justify-content: space-between;
+            letter-spacing: 0.5px;
+        }
+
+        .tbh-progress-track {
+            width: 100%;
+            height: 8px;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.08);
+            position: relative;
+        }
+
+        .tbh-progress-fill {
+            height: 100%;
+            transition: width 0.25s ease;
+            border-radius: 6px;
+            position: relative;
+        }
+
+        .tbh-progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 40%;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 6px 6px 0 0;
+        }
+
+        .fill-hp { background: linear-gradient(90deg, #ff3333, #ff6666); box-shadow: 0 0 8px rgba(255,51,51,0.5); }
+        .fill-xp { background: linear-gradient(90deg, #3399ff, #00d2ff); box-shadow: 0 0 8px rgba(51,153,255,0.5); }
+
+        .tbh-controls-mini {
+            position: absolute;
+            right: 24px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 15;
+            display: flex;
+            gap: 10px;
+        }
+
+        .tbh-mini-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.85em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'Outfit', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tbh-mini-btn:hover {
+            background: var(--primary);
+            color: #080f1a;
+            border-color: var(--primary);
+            box-shadow: 0 0 14px var(--primary-glow);
+            transform: translateY(-1px);
+        }
+
+        /* MODAL EXPANDIDO DE CONFIGURAÇÕES AO VIVO */
+        .tbh-expanded-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(4, 7, 12, 0.94);
+            z-index: 5000;
+            backdrop-filter: blur(12px);
+            padding: 40px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tbh-expanded-content {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-glow);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 950px;
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+            box-shadow: 0 0 60px rgba(255, 153, 68, 0.25);
+            position: relative;
+        }
+
+        .config-grid-settings {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 18px;
+            background: rgba(5, 10, 18, 0.7);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .config-field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .config-field label {
+            font-size: 0.85em;
+            font-weight: 800;
+            color: var(--gold);
+            text-transform: uppercase;
+        }
+
+        .config-field input, .config-field select {
+            background: rgba(15, 23, 38, 0.9);
+            border: 1px solid rgba(255,255,255,0.15);
+            color: #fff;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 0.95em;
+            font-weight: 700;
+            outline: none;
+        }
+
+        .config-field input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        .skill-explosion {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 153, 68, 0.8) 0%, rgba(255, 68, 68, 0.5) 40%, transparent 70%);
+            pointer-events: none;
+            z-index: 30;
+            animation: skillExplode 0.6s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+        }
+
+        @keyframes skillExplode {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+            50% { opacity: 0.9; }
+            100% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- PAINEL SUPERIOR DE DEMONSTRAÇÃO -->
+    <div class="demo-container">
+        
+        <div class="demo-header">
+            <h1>⚔️ Taskbar Hero <span class="demo-badge">10 Níveis por Bioma & HP Escalável</span></h1>
+            <div style="font-size: 0.9em; color: #a0aec0; font-weight: 600;">8 Biomas x 10 Níveis (+15% HP/nível) · Continuidade Perfeita de Bioma para Bioma!</div>
+        </div>
+
+        <!-- CONTROLES DA SIMULAÇÃO (BIOMAS E NÍVEIS) -->
+        <div class="controls-panel">
+            <div class="control-group">
+                <label>🌍 Bioma Elemental do Cenário:</label>
+                <select id="selectBiome" onchange="changeBiome(this.value)">
+                    <option value="ice">❄️ Bioma 1: Montanhas Glaciais (Gelo)</option>
+                    <option value="fire">🔥 Bioma 2: Vale de Magma (Fogo)</option>
+                    <option value="water">💧 Bioma 3: Pântano & Marés (Água)</option>
+                    <option value="wind">🌪️ Bioma 4: Picos da Tempestade (Ar/Vento)</option>
+                    <option value="earth">🪨 Bioma 5: Cavernas & Ruínas (Terra)</option>
+                    <option value="dark">🌑 Bioma 6: Abismo Amaldiçoado (Sombras)</option>
+                    <option value="holy">✨ Bioma 7: Reino Celestial (Luz)</option>
+                    <option value="lightning">⚡ Bioma 8: Planície Trovão (Eletricidade)</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label>🚩 Nível do Bioma (1 a 10):</label>
+                <select id="selectBiomeLevel" onchange="changeBiomeLevel(this.value)">
+                    <option value="1">Nível 1 (+0% HP)</option>
+                    <option value="2">Nível 2 (+15% HP)</option>
+                    <option value="3">Nível 3 (+30% HP)</option>
+                    <option value="4">Nível 4 (+45% HP)</option>
+                    <option value="5">Nível 5 (+60% HP)</option>
+                    <option value="6">Nível 6 (+75% HP)</option>
+                    <option value="7">Nível 7 (+90% HP)</option>
+                    <option value="8">Nível 8 (+105% HP)</option>
+                    <option value="9">Nível 9 (+120% HP)</option>
+                    <option value="10">Nível 10 (+135% HP - Chefe do Bioma)</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label>🗡️ Arma do Herói:</label>
+                <select id="selectWeapon" onchange="changeWeapon(this.value)">
+                    <option value="sword">⚔️ Espada de Ferro (Corpo a Corpo)</option>
+                    <option value="silver">🗡️ Lâmina de Prata (Corte Lunar)</option>
+                    <option value="gold">✨ Sabre Dourado (Corte de Luz)</option>
+                    <option value="bow">🏹 Arco Curto (Projétil Flecha)</option>
+                    <option value="staff">🔮 Cajado Mágico (Orbe Arcano)</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label>⚡ Velocidade da Corrida:</label>
+                <select id="selectSpeed" onchange="changeSpeed(this.value)">
+                    <option value="1">Velocidade Normal (1x)</option>
+                    <option value="2">Acelerado (2x)</option>
+                    <option value="5">Avanço Rápido Teste (5x)</option>
+                </select>
+            </div>
+
+            <div class="control-group" style="grid-column: 1 / -1; display:flex; flex-direction:row; gap:14px; margin-top: 4px;">
+                <button class="btn-pip" style="flex:1;" onclick="openPictureInPicture()">📌 Destacar Taskbar Hero (Janela Flutuante Always-on-Top!)</button>
+                <button class="btn-action" style="flex:1;" onclick="triggerSpecialSkill()">🔥 Giro Flamejante (Golpe Crítico)</button>
+                <button class="btn-boss-test" style="flex:1;" onclick="forceBossSpawn()">⚠️ Invocação de Chefe</button>
+            </div>
+        </div>
+
+        <!-- BESTIÁRIO DE MONSTROS INTEGRADO DO PROJETO -->
+        <div class="bestiary-panel">
+            <div class="bestiary-header">
+                <span>📜 Bestiário de Monstros (Com Multiplicadores de HP por Nível e Bioma)</span>
+                <span style="font-size:0.8em; color:#a0aec0;" id="bestiaryCount">0 monstros no bioma</span>
+            </div>
+            <div class="bestiary-tabs" id="bestiaryTabs"></div>
+            <div class="bestiary-grid" id="bestiaryGrid"></div>
+        </div>
+
+        <!-- METRICAS DA CORRIDA -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">🏃</div>
+                <div class="stat-info">
+                    <div class="value" id="valDistance">0m</div>
+                    <div class="label">Distância Percorrida</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">💀</div>
+                <div class="stat-info">
+                    <div class="value" id="valKills">0</div>
+                    <div class="label">Monstros Derrotados</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">💰</div>
+                <div class="stat-info">
+                    <div class="value" id="valGold">0</div>
+                    <div class="label">Ouro Coletado</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🎒</div>
+                <div class="stat-info">
+                    <div class="value" id="valLoots">0</div>
+                    <div class="label">Equipamentos Dropar</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAINEL DE INVENTÁRIO -->
+        <div class="loot-inventory-panel">
+            <div class="loot-header">
+                <span>🎒 Equipamentos Coletados na Corrida</span>
+                <span style="font-size:0.8em; color:#a0aec0;" id="lootCountText">0 itens</span>
+            </div>
+            <div class="loot-grid" id="lootGrid">
+                <div style="color:#666; font-size:0.85em; font-style:italic;" id="emptyLootMsg">Nenhum equipamento dropado ainda. Enfrente as ondas de monstros!</div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- WIDGET TASKBAR HERO (FAIXA DO RODAPÉ) -->
+    <!-- ============================================================ -->
+    <div class="tbh-wrapper" id="tbhWrapper">
+        <div class="tbh-bar" id="tbhBar">
+            
+            <!-- BADGE DE BIOMA E NÍVEL ATUAL -->
+            <div class="biome-level-badge" id="biomeLevelBadge">
+                <span>🌍 GELO:</span>
+                <span style="color:#ffd700;" id="biomeLevelVal">Nível 1 / 10</span>
+            </div>
+
+            <!-- BADGE DE FILA -->
+            <div class="queue-stack-badge" id="queueStackBadge" style="display:none;">
+                <span>⚔️ MONSTROS NA FILA:</span>
+                <span style="color:#ffd700;" id="queueCountVal">0</span>
+            </div>
+
+            <!-- BARRA DE VIDA DO BOSS -->
+            <div class="boss-top-hud" id="bossTopHud">
+                <div class="boss-title-row">
+                    <span id="bossName">👑 REI DRAGÃO ANCESTRAL</span>
+                    <span id="bossHpText">1800 / 1800 HP</span>
+                </div>
+                <div class="boss-hp-track">
+                    <div class="boss-hp-fill" id="bossHpFill" style="width: 100%;"></div>
+                </div>
+            </div>
+
+            <!-- CAMADAS DE FUNDO -->
+            <div class="tbh-sky biome-ice-sky" id="tbhSky"></div>
+            <div class="tbh-particles-layer" id="tbhParticles"></div>
+            <div class="tbh-parallax-bg biome-ice" id="tbhParallax"></div>
+            <div class="tbh-ground">
+                <div class="tbh-ground-pattern" id="tbhGround"></div>
+            </div>
+
+            <!-- HUD COM STATUS RÁPIDOS NA BARRA -->
+            <div class="tbh-hud">
+                <div class="tbh-bar-container">
+                    <div class="tbh-bar-label"><span>VIDA</span><span id="txtHp">100/100</span></div>
+                    <div class="tbh-progress-track"><div class="tbh-progress-fill fill-hp" id="barHp" style="width: 100%;"></div></div>
+                </div>
+                <div class="tbh-bar-container">
+                    <div class="tbh-bar-label"><span>XP</span><span id="txtXp">Lv. 12</span></div>
+                    <div class="tbh-progress-track"><div class="tbh-progress-fill fill-xp" id="barXp" style="width: 45%;"></div></div>
+                </div>
+            </div>
+
+            <!-- CONTROLES DA BARRA -->
+            <div class="tbh-controls-mini">
+                <button class="tbh-mini-btn" style="background:#0055ff; border-color:#4a9aff;" onclick="openPictureInPicture()">📌 Destacar Tela</button>
+                <button class="tbh-mini-btn" onclick="toggleConfigModal()">⚙️ Configs</button>
+                <button class="tbh-mini-btn" onclick="toggleExpandModal()">🔍 Relatório</button>
+            </div>
+
+            <!-- PALCO DO HERÓI E INIMIGOS -->
+            <div class="tbh-stage" id="tbhStage">
+                
+                <!-- HERÓI COM AURA E ARMA -->
+                <div class="tbh-hero-container" id="tbhHeroContainer">
+                    <div class="tbh-hero-aura"></div>
+                    <div class="tbh-pet" id="tbhPet">🐺</div>
+                    <div class="tbh-hero" id="tbhHero">
+                        🧙‍♂️
+                        <div class="tbh-weapon-overlay" id="tbhWeapon">⚔️</div>
+                    </div>
+                </div>
+
+                <!-- ENTIDADES SPAWNADAS SERÃO INJETADAS DINAMICAMENTE AQUI -->
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- MODAL DE CONFIGURAÇÃO AO VIVO -->
+    <div class="tbh-expanded-modal" id="tbhConfigModal" onclick="if(event.target===this) toggleConfigModal()">
+        <div class="tbh-expanded-content">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:14px;">
+                <h2 style="font-family:'Cinzel'; color:var(--gold);">⚙️ Ajustes da Fila e Spawn de Mobs ao Vivo</h2>
+                <button class="tbh-mini-btn" onclick="toggleConfigModal()">✕ Fechar</button>
+            </div>
+            
+            <p style="color:#aaa; font-size:0.95em;">Ajuste os parâmetros abaixo para encontrar o equilíbrio perfeito do jogo em tempo real!</p>
+
+            <div class="config-grid-settings">
+                <div class="config-field">
+                    <label>👾 Máximo de Mobs Simultâneos:</label>
+                    <input type="number" id="inputMaxMonsters" value="2" min="1" max="10" onchange="applyLiveConfigs()">
+                </div>
+
+                <div class="config-field">
+                    <label>📏 Distância Mínima de Spawn (px):</label>
+                    <input type="number" id="inputMinDistance" value="500" min="100" max="1000" step="50" onchange="applyLiveConfigs()">
+                </div>
+
+                <div class="config-field">
+                    <label>🎲 Chance de Spawn no Tick (%):</label>
+                    <input type="number" id="inputSpawnChance" value="4.0" min="0.5" max="20.0" step="0.5" onchange="applyLiveConfigs()">
+                </div>
+
+                <div class="config-field">
+                    <label>❤️ Multiplicador Geral de HP:</label>
+                    <input type="number" id="inputHpMult" value="1.0" min="0.2" max="5.0" step="0.2" onchange="applyLiveConfigs()">
+                </div>
+            </div>
+
+            <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:10px;">
+                <button class="tbh-mini-btn" style="background:var(--primary); color:#080f1a; font-weight:800;" onclick="applyLiveConfigs(); toggleConfigModal();">✅ Aplicar Configurações</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL EXPANDIDO DE RELATÓRIO -->
+    <div class="tbh-expanded-modal" id="tbhExpandedModal" onclick="if(event.target===this) toggleExpandModal()">
+        <div class="tbh-expanded-content">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:14px;">
+                <h2 style="font-family:'Cinzel'; color:var(--gold);">📜 Relatório de Viagem do Herói</h2>
+                <button class="tbh-mini-btn" onclick="toggleExpandModal()">✕ Fechar</button>
+            </div>
+            <p style="color:#aaa; font-size:0.95em;">Seu herói continua correndo e enfrentando monstros no rodapé enquanto você navega pelas telas do jogo!</p>
+            <div style="background:rgba(0,0,0,0.5); padding:20px; border-radius:12px; font-family:monospace; color:var(--green); border:1px solid rgba(255,255,255,0.08); font-size:0.9em; line-height:1.6;" id="expandedLog">
+                > [PROGRESSÃO DE BIOMAS] Cada um dos 8 Biomas possui 10 Níveis (+15% HP por nível).<br>
+                > [GAP DE CONTINUIDADE] O Nível 1 de um novo bioma começa exatamente onde o Nível 10 do bioma anterior parou (+50% multiplicador base)!<br>
+                > [STATUS ATUAL] Limite: <span id="logMaxMobs">2</span> mobs | Distância: <span id="logMinDist">500</span>px | Taxa: <span id="logChance">4.0</span>%
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- LÓGICA JAVASCRIPT: 10 NÍVEIS POR BIOMA E ESCALONAMENTO DE HP -->
+    <!-- ============================================================ -->
+    <script>
+        const liveConfigs = {
+            maxMonsters: 2,
+            minDistance: 500,
+            spawnChance: 0.04,
+            hpMult: 1.0
+        };
+
+        // ORDEM E MULTIPLICADOR BASE CONTÍNUO DE CADA BIOMA
+        const biomeOrder = ['ice', 'fire', 'water', 'wind', 'earth', 'dark', 'holy', 'lightning'];
+        const biomeBaseMultipliers = {
+            ice: 1.0,        // Bioma 1: Base 1.0x (HP inicial 400 - 850)
+            fire: 2.5,       // Bioma 2: Continua a partir do Nível 10 do Bioma 1 (+50% gap)
+            water: 4.0,      // Bioma 3: Continua a partir do Bioma 2
+            wind: 5.8,       // Bioma 4
+            earth: 7.8,      // Bioma 5
+            dark: 10.0,      // Bioma 6
+            holy: 12.5,      // Bioma 7
+            lightning: 15.5  // Bioma 8
+        };
+
+        let pipWindow = null;
+
+        const projectMonstersByElement = {
+            ice: [
+                { name: 'Golem de Gelo', icon: '🧊', element: 'ice', baseHp: 450 },
+                { name: 'Esqueleto Glacial', icon: '💀❄️', element: 'ice', baseHp: 480 },
+                { name: 'Lobo Invernal', icon: '🐺❄️', element: 'ice', baseHp: 450 },
+                { name: 'Aranha de Gelo', icon: '❄️🕷️', element: 'ice', baseHp: 420 },
+                { name: 'Aparição Congelada', icon: '❄️👻', element: 'ice', baseHp: 500 },
+                { name: 'Fada da Neve', icon: '🧚❄️', element: 'ice', baseHp: 400 },
+                { name: 'Yeti', icon: '🐻❄️', element: 'ice', baseHp: 650 },
+                { name: 'Cavaleiro de Gelo', icon: '❄️🛡️', element: 'ice', baseHp: 700 },
+                { name: 'Rei de Gelo', icon: '❄️👑', element: 'ice', baseHp: 750 },
+                { name: 'Dragão Branco', icon: '🐉❄️', element: 'ice', baseHp: 850 }
+            ],
+            fire: [
+                { name: 'Elemental de Fogo', icon: '🔥', element: 'fire', baseHp: 480 },
+                { name: 'Salamandra', icon: '🦎🔥', element: 'fire', baseHp: 450 },
+                { name: 'Cão do Inferno', icon: '🔥🐕', element: 'fire', baseHp: 520 },
+                { name: 'Caveira Flamejante', icon: '🔥💀', element: 'fire', baseHp: 440 },
+                { name: 'Minotauro de Fogo', icon: '🔥🐂', element: 'fire', baseHp: 680 },
+                { name: 'Águia de Cinzas', icon: '🔥🦅', element: 'fire', baseHp: 540 },
+                { name: 'Fênix Jovem', icon: '🦅🔥', element: 'fire', baseHp: 580 },
+                { name: 'Golem de Magma', icon: '🗿🔥', element: 'fire', baseHp: 750 },
+                { name: 'Lorde do Magma', icon: '🔥👑', element: 'fire', baseHp: 800 },
+                { name: 'Dragão Vermelho', icon: '🐉🔥', element: 'fire', baseHp: 900 }
+            ],
+            water: [
+                { name: 'Elemental de Água', icon: '💧', element: 'water', baseHp: 460 },
+                { name: 'Tritão Guerreiro', icon: '🧜‍♂️', element: 'water', baseHp: 530 },
+                { name: 'Crocodilo do Pântano', icon: '💧🦎', element: 'water', baseHp: 560 },
+                { name: 'Caranguejo Gigante', icon: '💧🦀', element: 'water', baseHp: 620 },
+                { name: 'Fantasma das Marés', icon: '💧👻', element: 'water', baseHp: 500 },
+                { name: 'Sereia', icon: '🧜‍♀️', element: 'water', baseHp: 450 },
+                { name: 'Mago da Água', icon: '💧🧙‍♂️', element: 'water', baseHp: 510 },
+                { name: 'Serpente Marinha', icon: '💧🐍', element: 'water', baseHp: 700 },
+                { name: 'Hidra', icon: '🐍💧', element: 'water', baseHp: 820 },
+                { name: 'Kraken', icon: '🐙', element: 'water', baseHp: 950 }
+            ],
+            wind: [
+                { name: 'Elemental de Ar', icon: '🌪️', element: 'wind', baseHp: 440 },
+                { name: 'Harpia', icon: '🦅', element: 'wind', baseHp: 460 },
+                { name: 'Falcão da Tempestade', icon: '🌪️🦅', element: 'wind', baseHp: 490 },
+                { name: 'Tigre da Nevasca', icon: '🌪️🐯', element: 'wind', baseHp: 550 },
+                { name: 'Arqueiro do Vento', icon: '🌪️🏹', element: 'wind', baseHp: 510 },
+                { name: 'Fada do Vento', icon: '🧚🌪️', element: 'wind', baseHp: 430 },
+                { name: 'Pégaso Sombrio', icon: '🌪️🐎', element: 'wind', baseHp: 640 },
+                { name: 'Espectro do Vento', icon: '🌪️👻', element: 'wind', baseHp: 600 },
+                { name: 'Grifo', icon: '🦁', element: 'wind', baseHp: 750 },
+                { name: 'Dragão Azul', icon: '🐉🌪️', element: 'wind', baseHp: 880 }
+            ],
+            earth: [
+                { name: 'Elemental de Terra', icon: '🪨', element: 'earth', baseHp: 550 },
+                { name: 'Mandrágora', icon: '🌱', element: 'earth', baseHp: 450 },
+                { name: 'Aranha de Terra', icon: '🪨🕷️', element: 'earth', baseHp: 500 },
+                { name: 'Escorpião de Pedra', icon: '🪨🦂', element: 'earth', baseHp: 580 },
+                { name: 'Touro de Bronze', icon: '🪨🐂', element: 'earth', baseHp: 660 },
+                { name: 'Basilisco', icon: '🦎', element: 'earth', baseHp: 700 },
+                { name: 'Guardião das Ruínas', icon: '🪨🛡️', element: 'earth', baseHp: 780 },
+                { name: 'Treant', icon: '🌳', element: 'earth', baseHp: 720 },
+                { name: 'Rei da Montanha', icon: '🪨👑', element: 'earth', baseHp: 840 },
+                { name: 'Golem de Pedra', icon: '🗿', element: 'earth', baseHp: 900 }
+            ],
+            dark: [
+                { name: 'Caveira Amaldiçoada', icon: '💀🌑', element: 'dark', baseHp: 500 },
+                { name: 'Sombra Espreitadora', icon: '🌑👻', element: 'dark', baseHp: 530 },
+                { name: 'Lobo das Sombras', icon: '🌑🐺', element: 'dark', baseHp: 560 },
+                { name: 'Aranha Viúva Negra', icon: '🌑🕷️', element: 'dark', baseHp: 580 },
+                { name: 'Espectro', icon: '👻', element: 'dark', baseHp: 600 },
+                { name: 'Cavaleiro Sem Cabeça', icon: '🌑🛡️', element: 'dark', baseHp: 740 },
+                { name: 'Demônio', icon: '😈', element: 'dark', baseHp: 800 },
+                { name: 'Vampiro', icon: '🧛', element: 'dark', baseHp: 760 },
+                { name: 'Ceifador de Almas', icon: '🌑👑', element: 'dark', baseHp: 890 },
+                { name: 'Lich', icon: '💀', element: 'dark', baseHp: 950 }
+            ],
+            holy: [
+                { name: 'Espírito de Luz', icon: '✨', element: 'holy', baseHp: 480 },
+                { name: 'Unicórnio de Luz', icon: '☀️🦄', element: 'holy', baseHp: 580 },
+                { name: 'Cervo Sagrado', icon: '☀️🦌', element: 'holy', baseHp: 560 },
+                { name: 'Juiz da Luz', icon: '☀️⚖️', element: 'holy', baseHp: 650 },
+                { name: 'Cavaleiro Sagrado', icon: '⚔️☀️', element: 'holy', baseHp: 730 },
+                { name: 'Arcanjo da Justiça', icon: '☀️👑', element: 'holy', baseHp: 850 },
+                { name: 'Valquíria Celestial', icon: '☀️🦅', element: 'holy', baseHp: 800 },
+                { name: 'Guardião Celestial', icon: '⭐', element: 'holy', baseHp: 890 },
+                { name: 'Serafim', icon: '🪽', element: 'holy', baseHp: 980 }
+            ],
+            lightning: [
+                { name: 'Elemental de Raio', icon: '⚡', element: 'lightning', baseHp: 500 },
+                { name: 'Leopardo de Relâmpago', icon: '⚡🐆', element: 'lightning', baseHp: 550 },
+                { name: 'Víbora Elétrica', icon: '⚡🐍', element: 'lightning', baseHp: 520 },
+                { name: 'Arqueiro do Trovão', icon: '⚡🏹', element: 'lightning', baseHp: 600 },
+                { name: 'Gladiador do Raio', icon: '⚡⚔️', element: 'lightning', baseHp: 720 },
+                { name: 'Espírito Trovejante', icon: '🌩️', element: 'lightning', baseHp: 640 },
+                { name: 'Golem Elétrico', icon: '🗿⚡', element: 'lightning', baseHp: 790 },
+                { name: 'Fênix de Raio', icon: '🦅⚡', element: 'lightning', baseHp: 860 },
+                { name: 'Lorde do Trovão', icon: '⚡👑', element: 'lightning', baseHp: 920 },
+                { name: 'Dragão do Trovão', icon: '🐉⚡', element: 'lightning', baseHp: 1000 }
+            ]
+        };
+
+        const bossByElement = {
+            ice:       { id: 'wb_ice_dragon', icon: '🐲❄️', name: 'DRAGÃO BRANCO ANCESTRAL', baseHp: 1800, guaranteedLoot: 'wb_dragon_crown' },
+            fire:      { id: 'wb_phoenix', icon: '🔥', name: 'FÊNIX DE MAGMA ANCESTRAL', baseHp: 2000, guaranteedLoot: 'wb_phoenix_staff' },
+            water:     { id: 'wb_kraken', icon: '🐙', name: 'KRAKEN DAS PROFUNDEZAS', baseHp: 1900, guaranteedLoot: 'wb_void_amulet' },
+            wind:      { id: 'wb_griffin', icon: '🦅⚡', name: 'GRIFO DA TEMPESTADE', baseHp: 1750, guaranteedLoot: 'wb_chimera_boots' },
+            earth:     { id: 'wb_golem', icon: '🗿🪨', name: 'GOLEM TITÂNICO DE MITRIL', baseHp: 2300, guaranteedLoot: 'wb_golem_shield' },
+            dark:      { id: 'wb_lich', icon: '💀🌑', name: 'LICH REI DAS SOMBRAS', baseHp: 2100, guaranteedLoot: 'wb_lich_ring' },
+            holy:      { id: 'wb_seraph', icon: '🪽☀️', name: 'SERAFIM SUPREMO CELESTIAL', baseHp: 2500, guaranteedLoot: 'wb_dragon_crown' },
+            lightning: { id: 'wb_thunderdragon', icon: '🐉⚡', name: 'DRAGÃO DO TROVÃO ANCESTRAL', baseHp: 2200, guaranteedLoot: 'wb_phoenix_staff' }
+        };
+
+        const realEquipmentDatabase = {
+            'weapon_copper': { id: 'weapon_copper', name: 'Espada de Cobre', icon: '🗡️', rarity: 'common' },
+            'weapon_iron':   { id: 'weapon_iron',   name: 'Espada de Ferro',  icon: '⚔️', rarity: 'uncommon' },
+            'weapon_silver': { id: 'weapon_silver', name: 'Lâmina de Prata',  icon: '🌙', rarity: 'rare' },
+            'weapon_gold':   { id: 'weapon_gold',   name: 'Sabre Dourado',    icon: '✨', rarity: 'epic' },
+            'weapon_mithril':{ id: 'weapon_mithril',name: 'Espada de Mitril', icon: '💫', rarity: 'legendary' },
+            'armor_iron':    { id: 'armor_iron',    name: 'Armadura de Ferro',icon: '⚙️', rarity: 'uncommon' },
+            'armor_mithril': { id: 'armor_mithril', name: 'Armadura de Mitril',icon: '💫', rarity: 'legendary' },
+            'boots_wood':    { id: 'boots_wood',    name: 'Botas de Madeira', icon: '👢', rarity: 'common' },
+            'boots_magic':   { id: 'boots_magic',   name: 'Botas Mágicas',    icon: '✨', rarity: 'legendary' },
+            'ring_ebony':    { id: 'ring_ebony',    name: 'Anel de Ébano',    icon: '🖤', rarity: 'rare' },
+            'ring_magic':    { id: 'ring_magic',    name: 'Anel Mágico',      icon: '🌟', rarity: 'legendary' },
+            'amulet_dragon': { id: 'amulet_dragon', name: 'Amuleto do Dragão',icon: '🐉', rarity: 'legendary' },
+            'wb_dragon_crown': { id: 'wb_dragon_crown', name: 'Coroa do Rei Dragão', icon: '👑', rarity: 'ancient' },
+            'wb_phoenix_staff': { id: 'wb_phoenix_staff', name: 'Cajado da Fênix', icon: '🔥', rarity: 'ancient' },
+            'wb_void_amulet': { id: 'wb_void_amulet', name: 'Amuleto do Vazio', icon: '👁️', rarity: 'ancient' },
+            'wb_golem_shield': { id: 'wb_golem_shield', name: 'Escudo de Mitril', icon: '🗿', rarity: 'ancient' },
+            'wb_lich_ring': { id: 'wb_lich_ring', name: 'Filactéria das Sombras', icon: '💍', rarity: 'ancient' },
+            'wb_chimera_boots': { id: 'wb_chimera_boots', name: 'Botas da Tempestade', icon: '⚡', rarity: 'ancient' }
+        };
+
+        const rarityColors = {
+            common: '#ffffff',
+            uncommon: '#4aff4a',
+            rare: '#4a9aff',
+            epic: '#c96ac9',
+            legendary: '#ffd700',
+            ancient: '#ff44aa'
+        };
+
+        const weaponConfigs = {
+            sword:  { icon: '⚔️', type: 'melee',  range: 50,  slashClass: 'slash-sword', cooldown: 500 },
+            silver: { icon: '🗡️', type: 'melee',  range: 55,  slashClass: 'slash-silver', cooldown: 400 },
+            gold:   { icon: '✨', type: 'melee',  range: 60,  slashClass: 'slash-gold',   cooldown: 350 },
+            bow:    { icon: '🏹', type: 'ranged', range: 320, projIcon: '🏹', projClass: 'arrow', cooldown: 600 },
+            staff:  { icon: '🔮', type: 'magic',  range: 380, projIcon: '🔮', projClass: 'magic', cooldown: 680 }
+        };
+
+        const heroState = {
+            distance: 0,
+            kills: 0,
+            gold: 0,
+            xp: 45,
+            hp: 100,
+            maxHp: 100,
+            speedMult: 1,
+            biome: 'ice',
+            biomeLevel: 1, // Nível do bioma atual (1 a 10)
+            weaponKey: 'sword',
+            pet: '🐺',
+            collectedLoots: [],
+            nextBossDistance: 1500,
+            currentBoss: null,
+            lastAttackTime: 0
+        };
+
+        const resourceTypes = [
+            { icon: '🌳', name: 'Árvore', type: 'wood' },
+            { icon: '🪨', name: 'Minério', type: 'ore' },
+            { icon: '🎁', name: 'Baú', type: 'chest' }
+        ];
+
+        let activeEntities = [];
+        let gameLoopInterval = null;
+
+        // INICIALIZAÇÃO
+        window.addEventListener('DOMContentLoaded', () => {
+            renderBestiaryUI('ice');
+            spawnAmbientParticles();
+            startLoop();
+        });
+
+        function startLoop() {
+            if (gameLoopInterval) clearInterval(gameLoopInterval);
+            gameLoopInterval = setInterval(() => {
+                updateGame();
+            }, 100 / heroState.speedMult);
+        }
+
+        // CÁLCULO DA PORCENTAGEM DE HP COM GAP CONTINUO ENTRE BIOMAS
+        function getCalculatedHp(baseHp) {
+            const baseMult = biomeBaseMultipliers[heroState.biome] || 1.0;
+            // Cada nível do bioma aumenta em +15% de HP
+            const levelMult = 1.0 + ((heroState.biomeLevel - 1) * 0.15);
+            return Math.round(baseHp * baseMult * levelMult * liveConfigs.hpMult);
+        }
+
+        // DESTAQUE DA BARRA PARA JANELA ALWAYS-ON-TOP
+        async function openPictureInPicture() {
+            const tbhBar = document.getElementById('tbhBar');
+
+            if ('documentPictureInPicture' in window) {
+                try {
+                    pipWindow = await window.documentPictureInPicture.requestWindow({
+                        width: 900,
+                        height: 160
+                    });
+
+                    [...document.styleSheets].forEach((styleSheet) => {
+                        try {
+                            const cssRules = [...styleSheet.cssRules].map((rule) => rule.cssText).join('');
+                            const style = document.createElement('style');
+                            style.textContent = cssRules;
+                            pipWindow.document.head.appendChild(style);
+                        } catch (e) {
+                            const link = document.createElement('link');
+                            link.rel = 'stylesheet';
+                            link.type = styleSheet.type;
+                            link.href = styleSheet.href;
+                            pipWindow.document.head.appendChild(link);
+                        }
+                    });
+
+                    pipWindow.document.body.appendChild(tbhBar);
+                    pipWindow.document.body.style.background = '#04060a';
+                    pipWindow.document.body.style.margin = '0';
+                    pipWindow.document.body.style.overflow = 'hidden';
+
+                    startLoop();
+
+                    pipWindow.addEventListener('pagehide', () => {
+                        document.getElementById('tbhWrapper').appendChild(tbhBar);
+                        pipWindow = null;
+                        startLoop();
+                    });
+
+                } catch (err) {
+                    openFallbackPopup();
+                }
+            } else {
+                openFallbackPopup();
+            }
+        }
+
+        function openFallbackPopup() {
+            const popup = window.open('', 'TaskbarHeroPiP', 'width=900,height=160,resizable=yes,scrollbars=no,status=no,location=no,toolbar=no,menubar=no');
+            if (popup) {
+                const tbhBar = document.getElementById('tbhBar');
+                popup.document.head.innerHTML = document.head.innerHTML;
+                popup.document.body.appendChild(tbhBar);
+                popup.document.body.style.margin = '0';
+                popup.document.body.style.background = '#04060a';
+
+                popup.onbeforeunload = () => {
+                    document.getElementById('tbhWrapper').appendChild(tbhBar);
+                    startLoop();
+                };
+                startLoop();
+            }
+        }
+
+        function applyLiveConfigs() {
+            liveConfigs.maxMonsters = parseInt(document.getElementById('inputMaxMonsters').value) || 2;
+            liveConfigs.minDistance = parseInt(document.getElementById('inputMinDistance').value) || 500;
+            liveConfigs.spawnChance = (parseFloat(document.getElementById('inputSpawnChance').value) || 4.0) / 100;
+            liveConfigs.hpMult = parseFloat(document.getElementById('inputHpMult').value) || 1.0;
+
+            document.getElementById('logMaxMobs').innerText = liveConfigs.maxMonsters;
+            document.getElementById('logMinDist').innerText = liveConfigs.minDistance;
+            document.getElementById('logChance').innerText = (liveConfigs.spawnChance * 100).toFixed(1);
+
+            renderBestiaryUI(heroState.biome);
+        }
+
+        function changeBiomeLevel(lvl) {
+            heroState.biomeLevel = parseInt(lvl);
+            updateBiomeBadgeUI();
+            renderBestiaryUI(heroState.biome);
+        }
+
+        function updateBiomeBadgeUI() {
+            const elVal = (pipWindow && pipWindow.document.getElementById('biomeLevelVal')) ? pipWindow.document.getElementById('biomeLevelVal') : document.getElementById('biomeLevelVal');
+            if (elVal) elVal.innerText = `Nível ${heroState.biomeLevel} / 10 (+${(heroState.biomeLevel - 1) * 15}% HP)`;
+        }
+
+        function renderBestiaryUI(activeElement) {
+            const tabsContainer = document.getElementById('bestiaryTabs');
+            const grid = document.getElementById('bestiaryGrid');
+            const countLabel = document.getElementById('bestiaryCount');
+
+            const elementNames = {
+                ice: '❄️ Bioma 1: Gelo',
+                fire: '🔥 Bioma 2: Fogo',
+                water: '💧 Bioma 3: Água',
+                wind: '🌪️ Bioma 4: Ar',
+                earth: '🪨 Bioma 5: Terra',
+                dark: '🌑 Bioma 6: Trevas',
+                holy: '✨ Bioma 7: Luz',
+                lightning: '⚡ Bioma 8: Raio'
+            };
+
+            tabsContainer.innerHTML = Object.keys(projectMonstersByElement).map(elKey => `
+                <button class="bestiary-tab-btn ${elKey === activeElement ? 'active' : ''}" onclick="switchBestiaryTab('${elKey}')">
+                    ${elementNames[elKey]}
+                </button>
+            `).join('');
+
+            const monsters = projectMonstersByElement[activeElement] || [];
+            countLabel.innerText = `${monsters.length} monstros no bioma (Nível ${heroState.biomeLevel})`;
+
+            grid.innerHTML = monsters.map(m => {
+                const finalHp = getCalculatedHp(m.baseHp);
+                return `
+                    <div class="bestiary-card">
+                        <span class="icon">${m.icon}</span>
+                        <div class="info">
+                            <span class="name">${m.name}</span>
+                            <span class="element">${finalHp} HP</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function switchBestiaryTab(elKey) {
+            changeBiome(elKey);
+            document.getElementById('selectBiome').value = elKey;
+            renderBestiaryUI(elKey);
+        }
+
+        function spawnAmbientParticles() {
+            const container = document.getElementById('tbhParticles');
+            container.innerHTML = '';
+            for (let i = 0; i < 15; i++) {
+                const p = document.createElement('div');
+                p.className = 'ambient-particle';
+                const size = Math.random() * 4 + 2;
+                p.style.width = size + 'px';
+                p.style.height = size + 'px';
+                p.style.left = Math.random() * 100 + '%';
+                p.style.animationDuration = (Math.random() * 4 + 3) + 's';
+                p.style.animationDelay = (Math.random() * 3) + 's';
+                container.appendChild(p);
+            }
+        }
+
+        // LOOP PRINCIPAL
+        function updateGame() {
+            const now = Date.now();
+            const heroPos = 180;
+            const currentWeapon = weaponConfigs[heroState.weaponKey];
+            const stageWidth = pipWindow ? pipWindow.innerWidth : window.innerWidth;
+
+            // 1. Atualizar distância
+            heroState.distance += Math.round(1 * heroState.speedMult);
+            const distEl = document.getElementById('valDistance');
+            if (distEl) distEl.innerText = heroState.distance + 'm';
+
+            // 2. Testar Chefe aos 1500m (Ou se atingir o Nível 10 do bioma)
+            if (heroState.distance >= heroState.nextBossDistance && !heroState.currentBoss) {
+                spawnBoss();
+            }
+
+            // 3. REGRA DE SPAWN DINÂMICA
+            const currentMonstersCount = activeEntities.filter(e => e.isMonster).length;
+            const lastEntity = activeEntities[activeEntities.length - 1];
+
+            const isFarEnough = !lastEntity || (stageWidth + 40 - lastEntity.x > liveConfigs.minDistance);
+
+            if (!heroState.currentBoss && currentMonstersCount < liveConfigs.maxMonsters && isFarEnough && Math.random() < liveConfigs.spawnChance) {
+                spawnRandomEntity();
+            }
+
+            // 4. Filtrar monstros na fila de combate
+            const queuedMonsters = activeEntities.filter(e => e.isMonster && e.x <= heroPos + currentWeapon.range + 80);
+            
+            const badge = (pipWindow && pipWindow.document.getElementById('queueStackBadge')) ? pipWindow.document.getElementById('queueStackBadge') : document.getElementById('queueStackBadge');
+            const countVal = (pipWindow && pipWindow.document.getElementById('queueCountVal')) ? pipWindow.document.getElementById('queueCountVal') : document.getElementById('queueCountVal');
+
+            if (badge && countVal) {
+                if (queuedMonsters.length > 1) {
+                    badge.style.display = 'flex';
+                    countVal.innerText = queuedMonsters.length;
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
+
+            // 5. Atacar o primeiro monstro da frente
+            if (queuedMonsters.length > 0) {
+                if (now - heroState.lastAttackTime >= (currentWeapon.cooldown / heroState.speedMult)) {
+                    heroState.lastAttackTime = now;
+                    executeWeaponAttack(queuedMonsters[0], currentWeapon, heroPos);
+                }
+            }
+
+            // 6. Mover entidades
+            for (let i = activeEntities.length - 1; i >= 0; i--) {
+                const ent = activeEntities[i];
+                let minXAllowed = heroPos + 40;
+
+                const entityAhead = activeEntities.find((other, idx) => idx < i && other.isMonster && other.x > heroPos);
+                if (entityAhead) {
+                    minXAllowed = entityAhead.x + 60;
+                }
+
+                if (ent.x > minXAllowed) {
+                    const speed = ent.isBoss ? (5 * heroState.speedMult) : (8 * heroState.speedMult);
+                    ent.x -= speed;
+                    if (ent.x < minXAllowed) ent.x = minXAllowed;
+                }
+
+                ent.el.style.left = ent.x + 'px';
+
+                if (!ent.isMonster && !ent.interacted && ent.x <= heroPos + 40) {
+                    ent.interacted = true;
+                    triggerEntityImpact(ent);
+                }
+
+                if (ent.x < -120) {
+                    if (ent.isBoss) {
+                        heroState.currentBoss = null;
+                        const bossHud = (pipWindow && pipWindow.document.getElementById('bossTopHud')) ? pipWindow.document.getElementById('bossTopHud') : document.getElementById('bossTopHud');
+                        const tbhBar = (pipWindow && pipWindow.document.getElementById('tbhBar')) ? pipWindow.document.getElementById('tbhBar') : document.getElementById('tbhBar');
+                        if (bossHud) bossHud.style.display = 'none';
+                        if (tbhBar) tbhBar.classList.remove('boss-active');
+                    }
+                    if (ent.el.parentNode) ent.el.parentNode.removeChild(ent.el);
+                    activeEntities.splice(i, 1);
+                }
+            }
+        }
+
+        // SPAWN DO CHEFE ANCESTRAL
+        function spawnBoss() {
+            const bossDef = bossByElement[heroState.biome] || bossByElement.ice;
+            const bossData = JSON.parse(JSON.stringify(bossDef));
+            
+            bossData.hp = getCalculatedHp(bossDef.baseHp);
+            bossData.maxHp = bossData.hp;
+            heroState.currentBoss = bossData;
+
+            const stage = (pipWindow && pipWindow.document.getElementById('tbhStage')) ? pipWindow.document.getElementById('tbhStage') : document.getElementById('tbhStage');
+            const bar = (pipWindow && pipWindow.document.getElementById('tbhBar')) ? pipWindow.document.getElementById('tbhBar') : document.getElementById('tbhBar');
+            if (bar) bar.classList.add('boss-active');
+
+            const hud = (pipWindow && pipWindow.document.getElementById('bossTopHud')) ? pipWindow.document.getElementById('bossTopHud') : document.getElementById('bossTopHud');
+            if (hud) {
+                hud.style.display = 'flex';
+                const bossName = (pipWindow && pipWindow.document.getElementById('bossName')) ? pipWindow.document.getElementById('bossName') : document.getElementById('bossName');
+                const bossHpText = (pipWindow && pipWindow.document.getElementById('bossHpText')) ? pipWindow.document.getElementById('bossHpText') : document.getElementById('bossHpText');
+                const bossHpFill = (pipWindow && pipWindow.document.getElementById('bossHpFill')) ? pipWindow.document.getElementById('bossHpFill') : document.getElementById('bossHpFill');
+                
+                if (bossName) bossName.innerText = '👑 ' + bossData.name;
+                if (bossHpText) bossHpText.innerText = `${bossData.hp} / ${bossData.maxHp} HP`;
+                if (bossHpFill) bossHpFill.style.width = '100%';
+            }
+
+            const el = document.createElement('div');
+            el.className = 'tbh-entity boss-monster';
+            el.innerHTML = `<span>${bossData.icon}</span>`;
+            
+            const stageWidth = pipWindow ? pipWindow.innerWidth : window.innerWidth;
+            const startX = stageWidth + 60;
+            el.style.left = startX + 'px';
+            if (stage) stage.appendChild(el);
+
+            activeEntities.push({
+                el: el,
+                x: startX,
+                isMonster: true,
+                isBoss: true,
+                data: bossData,
+                interacted: false
+            });
+
+            spawnPopup(stageWidth / 2, `⚠️ CHEFE DE ${heroState.biome.toUpperCase()} NÍVEL ${heroState.biomeLevel}!`, 'crit');
+        }
+
+        function forceBossSpawn() {
+            if (heroState.currentBoss) return;
+            spawnBoss();
+        }
+
+        function executeWeaponAttack(ent, weapon, heroPos) {
+            const heroEl = (pipWindow && pipWindow.document.getElementById('tbhHero')) ? pipWindow.document.getElementById('tbhHero') : document.getElementById('tbhHero');
+            if (heroEl) {
+                heroEl.classList.add('attacking');
+                setTimeout(() => heroEl.classList.remove('attacking'), 220);
+            }
+
+            if (weapon.type === 'melee') {
+                const heroContainer = (pipWindow && pipWindow.document.getElementById('tbhHeroContainer')) ? pipWindow.document.getElementById('tbhHeroContainer') : document.getElementById('tbhHeroContainer');
+                if (heroContainer) {
+                    const slash = document.createElement('div');
+                    slash.className = `slash-effect ${weapon.slashClass}`;
+                    heroContainer.appendChild(slash);
+                    setTimeout(() => { if (slash.parentNode) slash.parentNode.removeChild(slash); }, 250);
+                }
+
+                triggerEntityImpact(ent);
+            } else {
+                const stage = (pipWindow && pipWindow.document.getElementById('tbhStage')) ? pipWindow.document.getElementById('tbhStage') : document.getElementById('tbhStage');
+                if (stage) {
+                    const proj = document.createElement('div');
+                    proj.className = `projectile ${weapon.projClass}`;
+                    proj.innerText = weapon.projIcon;
+                    
+                    const startX = heroPos + 30;
+                    proj.style.left = startX + 'px';
+                    stage.appendChild(proj);
+
+                    const targetX = ent.x;
+                    const travelTime = Math.max(120, (targetX - startX) * 1.2 / heroState.speedMult);
+
+                    proj.style.transition = `left ${travelTime}ms linear`;
+                    setTimeout(() => { proj.style.left = targetX + 'px'; }, 10);
+
+                    setTimeout(() => {
+                        if (proj.parentNode) proj.parentNode.removeChild(proj);
+                        
+                        const burst = document.createElement('div');
+                        burst.className = 'impact-burst';
+                        burst.innerText = weapon.type === 'magic' ? '💥✨' : '🎯';
+                        burst.style.left = targetX + 'px';
+                        stage.appendChild(burst);
+                        setTimeout(() => { if (burst.parentNode) burst.parentNode.removeChild(burst); }, 300);
+
+                        triggerEntityImpact(ent);
+                    }, travelTime);
+                }
+            }
+        }
+
+        function triggerEntityImpact(ent) {
+            if (ent.isMonster) {
+                ent.el.classList.add('hit');
+                setTimeout(() => ent.el.classList.remove('hit'), 250);
+                
+                const bar = (pipWindow && pipWindow.document.getElementById('tbhBar')) ? pipWindow.document.getElementById('tbhBar') : document.getElementById('tbhBar');
+                if (bar) {
+                    bar.classList.add('shake');
+                    setTimeout(() => bar.classList.remove('shake'), 300);
+                }
+
+                const isCrit = Math.random() < 0.3;
+                const damage = isCrit ? Math.floor(Math.random() * 65) + 75 : Math.floor(Math.random() * 35) + 30;
+                
+                spawnPopup(ent.x, damage + (isCrit ? ' 💥 CRÍTICO!' : ''), isCrit ? 'crit' : 'damage');
+
+                ent.data.hp -= damage;
+
+                if (ent.isBoss) {
+                    const pct = Math.max(0, (ent.data.hp / ent.data.maxHp) * 100);
+                    const bossHpFill = (pipWindow && pipWindow.document.getElementById('bossHpFill')) ? pipWindow.document.getElementById('bossHpFill') : document.getElementById('bossHpFill');
+                    const bossHpText = (pipWindow && pipWindow.document.getElementById('bossHpText')) ? pipWindow.document.getElementById('bossHpText') : document.getElementById('bossHpText');
+                    
+                    if (bossHpFill) bossHpFill.style.width = pct + '%';
+                    if (bossHpText) bossHpText.innerText = `${Math.max(0, ent.data.hp)} / ${ent.data.maxHp} HP`;
+                } else {
+                    const hpFill = ent.el.querySelector('.monster-hp-fill');
+                    if (hpFill) {
+                        const pct = Math.max(0, (ent.data.hp / ent.data.maxHp) * 100);
+                        hpFill.style.width = pct + '%';
+                    }
+                }
+
+                if (ent.data.hp <= 0) {
+                    heroState.kills++;
+                    heroState.gold += Math.floor(ent.data.maxHp * 0.2);
+                    heroState.xp += Math.floor(ent.data.maxHp * 0.25);
+
+                    const valKills = document.getElementById('valKills');
+                    const valGold = document.getElementById('valGold');
+                    if (valKills) valKills.innerText = heroState.kills;
+                    if (valGold) valGold.innerText = heroState.gold;
+
+                    if (ent.isBoss) {
+                        heroState.nextBossDistance += 1500;
+                        triggerFlyingLootDrop(ent.x, ent.data.guaranteedLoot);
+
+                        // Avançar Nível do Bioma ao derrotar o Chefe
+                        if (heroState.biomeLevel < 10) {
+                            heroState.biomeLevel++;
+                            document.getElementById('selectBiomeLevel').value = heroState.biomeLevel;
+                            updateBiomeBadgeUI();
+                        }
+
+                        setTimeout(() => {
+                            const bossHud = (pipWindow && pipWindow.document.getElementById('bossTopHud')) ? pipWindow.document.getElementById('bossTopHud') : document.getElementById('bossTopHud');
+                            if (bossHud) bossHud.style.display = 'none';
+                            if (bar) bar.classList.remove('boss-active');
+                            heroState.currentBoss = null;
+                        }, 400);
+                    } else {
+                        if (Math.random() < 0.35) {
+                            const keys = Object.keys(realEquipmentDatabase);
+                            const randomEquipKey = keys[Math.floor(Math.random() * keys.length)];
+                            triggerFlyingLootDrop(ent.x, randomEquipKey);
+                        }
+                    }
+
+                    ent.el.classList.add('hit');
+                    setTimeout(() => {
+                        if (ent.el.parentNode) ent.el.parentNode.removeChild(ent.el);
+                        const idx = activeEntities.indexOf(ent);
+                        if (idx !== -1) activeEntities.splice(idx, 1);
+                    }, 220);
+                }
+
+            } else {
+                ent.el.classList.add('hit');
+                if (ent.data.type === 'chest') {
+                    const chestGold = Math.floor(Math.random() * 60) + 40;
+                    heroState.gold += chestGold;
+                    const valGold = document.getElementById('valGold');
+                    if (valGold) valGold.innerText = heroState.gold;
+                    spawnPopup(ent.x, '+' + chestGold + '💰 (Baú!)', 'gold');
+
+                    if (Math.random() < 0.5) {
+                        const keys = Object.keys(realEquipmentDatabase);
+                        const randomEquipKey = keys[Math.floor(Math.random() * keys.length)];
+                        triggerFlyingLootDrop(ent.x, randomEquipKey);
+                    }
+                } else {
+                    spawnPopup(ent.x, '+1 ' + ent.data.name, 'item');
+                }
+
+                setTimeout(() => {
+                    if (ent.el.parentNode) ent.el.parentNode.removeChild(ent.el);
+                    const idx = activeEntities.indexOf(ent);
+                    if (idx !== -1) activeEntities.splice(idx, 1);
+                }, 200);
+            }
+        }
+
+        function triggerFlyingLootDrop(xPos, equipKey) {
+            const equip = realEquipmentDatabase[equipKey];
+            if (!equip) return;
+
+            const stage = (pipWindow && pipWindow.document.getElementById('tbhStage')) ? pipWindow.document.getElementById('tbhStage') : document.getElementById('tbhStage');
+            if (stage) {
+                const flyingItem = document.createElement('div');
+                flyingItem.className = 'flying-loot-item';
+                flyingItem.innerText = equip.icon;
+                flyingItem.style.left = xPos + 'px';
+                flyingItem.style.bottom = '40px';
+                stage.appendChild(flyingItem);
+
+                spawnPopup(xPos, `🎁 ${equip.icon} ${equip.name}`, 'item');
+
+                setTimeout(() => {
+                    if (flyingItem.parentNode) flyingItem.parentNode.removeChild(flyingItem);
+                    heroState.collectedLoots.push(equip);
+                    updateLootInventoryUI();
+                }, 800);
+            }
+        }
+
+        function updateLootInventoryUI() {
+            const grid = document.getElementById('lootGrid');
+            const emptyMsg = document.getElementById('emptyLootMsg');
+            if (emptyMsg) emptyMsg.style.display = 'none';
+
+            const valLoots = document.getElementById('valLoots');
+            const lootCountText = document.getElementById('lootCountText');
+
+            if (valLoots) valLoots.innerText = heroState.collectedLoots.length;
+            if (lootCountText) lootCountText.innerText = heroState.collectedLoots.length + ' itens';
+
+            if (grid) {
+                const recent = heroState.collectedLoots.slice(-10).reverse();
+                grid.innerHTML = recent.map(eq => {
+                    const color = rarityColors[eq.rarity] || '#fff';
+                    return `
+                        <div class="loot-item-pill" style="border-color:${color}; color:${color};">
+                            <span>${eq.icon}</span>
+                            <span>${eq.name}</span>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        function spawnRandomEntity() {
+            const stage = (pipWindow && pipWindow.document.getElementById('tbhStage')) ? pipWindow.document.getElementById('tbhStage') : document.getElementById('tbhStage');
+            if (!stage) return;
+
+            const isMonster = Math.random() < 0.75;
+            const currentList = projectMonstersByElement[heroState.biome] || projectMonstersByElement.ice;
+            let data = isMonster ? JSON.parse(JSON.stringify(currentList[Math.floor(Math.random() * currentList.length)])) : resourceTypes[Math.floor(Math.random() * resourceTypes.length)];
+
+            if (isMonster) {
+                data.hp = getCalculatedHp(data.baseHp);
+                data.maxHp = data.hp;
+            }
+
+            const el = document.createElement('div');
+            el.className = `tbh-entity ${isMonster ? 'monster' : 'object'}`;
+            
+            if (isMonster) {
+                el.innerHTML = `
+                    <div class="monster-hp-bar"><div class="monster-hp-fill"></div></div>
+                    <span>${data.icon}</span>
+                `;
+            } else {
+                el.innerText = data.icon;
+            }
+            
+            const stageWidth = pipWindow ? pipWindow.innerWidth : window.innerWidth;
+            const startX = stageWidth + 40;
+            el.style.left = startX + 'px';
+            stage.appendChild(el);
+
+            activeEntities.push({
+                el: el,
+                x: startX,
+                isMonster: isMonster,
+                isBoss: false,
+                data: data,
+                interacted: false
+            });
+        }
+
+        function spawnPopup(x, text, type) {
+            const stage = (pipWindow && pipWindow.document.getElementById('tbhStage')) ? pipWindow.document.getElementById('tbhStage') : document.getElementById('tbhStage');
+            if (!stage) return;
+
+            const pop = document.createElement('div');
+            pop.className = `tbh-popup ${type}`;
+            pop.innerText = text;
+            pop.style.left = x + 'px';
+            pop.style.bottom = '70px';
+            stage.appendChild(pop);
+
+            setTimeout(() => {
+                if (pop.parentNode) pop.parentNode.removeChild(pop);
+            }, 850);
+        }
+
+        // CONTROLES DE INTERFACE
+        function changeBiome(biome) {
+            heroState.biome = biome;
+            const parallax = (pipWindow && pipWindow.document.getElementById('tbhParallax')) ? pipWindow.document.getElementById('tbhParallax') : document.getElementById('tbhParallax');
+            const sky = (pipWindow && pipWindow.document.getElementById('tbhSky')) ? pipWindow.document.getElementById('tbhSky') : document.getElementById('tbhSky');
+            
+            if (parallax) parallax.className = `tbh-parallax-bg biome-${biome}`;
+            if (sky) sky.className = `tbh-sky biome-${biome}-sky`;
+
+            updateBiomeBadgeUI();
+            renderBestiaryUI(biome);
+        }
+
+        function changeWeapon(weaponKey) {
+            heroState.weaponKey = weaponKey;
+            const w = weaponConfigs[weaponKey];
+            const tbhWeapon = (pipWindow && pipWindow.document.getElementById('tbhWeapon')) ? pipWindow.document.getElementById('tbhWeapon') : document.getElementById('tbhWeapon');
+            if (tbhWeapon) tbhWeapon.innerText = w.icon;
+        }
+
+        function changePet(petIcon) {
+            const petEl = (pipWindow && pipWindow.document.getElementById('tbhPet')) ? pipWindow.document.getElementById('tbhPet') : document.getElementById('tbhPet');
+            if (petEl) {
+                if (petIcon === 'none') {
+                    petEl.style.display = 'none';
+                } else {
+                    petEl.style.display = 'block';
+                    petEl.innerText = petIcon;
+                }
+            }
+        }
+
+        function changeSpeed(speed) {
+            heroState.speedMult = parseFloat(speed);
+            startLoop();
+            const ground = (pipWindow && pipWindow.document.getElementById('tbhGround')) ? pipWindow.document.getElementById('tbhGround') : document.getElementById('tbhGround');
+            if (ground) ground.style.animationDuration = (1 / heroState.speedMult) + 's';
+        }
+
+        function triggerSpecialSkill() {
+            const heroEl = (pipWindow && pipWindow.document.getElementById('tbhHero')) ? pipWindow.document.getElementById('tbhHero') : document.getElementById('tbhHero');
+            const bar = (pipWindow && pipWindow.document.getElementById('tbhBar')) ? pipWindow.document.getElementById('tbhBar') : document.getElementById('tbhBar');
+            
+            if (heroEl) {
+                heroEl.style.transform = 'scale(2) rotate(720deg)';
+                heroEl.style.transition = 'transform 0.6s cubic-bezier(0.17, 0.67, 0.83, 0.67)';
+            }
+
+            if (bar) {
+                const exp = document.createElement('div');
+                exp.className = 'skill-explosion';
+                bar.appendChild(exp);
+                setTimeout(() => { if (exp.parentNode) exp.parentNode.removeChild(exp); }, 600);
+            }
+
+            activeEntities.forEach(ent => {
+                if (ent.isMonster) {
+                    triggerEntityImpact(ent);
+                    spawnPopup(ent.x, '🔥 999 GIRO FLAMEJANTE!', 'crit');
+                }
+            });
+
+            setTimeout(() => {
+                if (heroEl) {
+                    heroEl.style.transform = '';
+                    heroEl.style.transition = '';
+                }
+            }, 600);
+        }
+
+        function spawnTreasureChest() {
+            const stage = (pipWindow && pipWindow.document.getElementById('tbhStage')) ? pipWindow.document.getElementById('tbhStage') : document.getElementById('tbhStage');
+            if (!stage) return;
+
+            const el = document.createElement('div');
+            el.className = 'tbh-entity object';
+            el.innerText = '🎁';
+            const stageWidth = pipWindow ? pipWindow.innerWidth : window.innerWidth;
+            const startX = stageWidth + 20;
+            el.style.left = startX + 'px';
+            stage.appendChild(el);
+
+            activeEntities.push({
+                el: el,
+                x: startX,
+                isMonster: false,
+                isBoss: false,
+                data: { icon: '🎁', name: 'Baú Raro', type: 'chest' },
+                interacted: false
+            });
+        }
+
+        function toggleConfigModal() {
+            const modal = document.getElementById('tbhConfigModal');
+            if (modal) modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
+        }
+
+        function toggleExpandModal() {
+            const modal = document.getElementById('tbhExpandedModal');
+            if (modal) modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
+        }
+    </script>
+</body>
+</html>
