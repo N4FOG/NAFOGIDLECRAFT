@@ -3348,7 +3348,7 @@
 
         function rollRuneDrop(ent) {
             const isBoss = ent ? ent.isBoss : false;
-            const runeDropChance = isBoss ? 0.15 : 0.015; // 15% em chefes, 1.5% em mobs normais
+            const runeDropChance = isBoss ? 0.10 : 0.008; // 10% em chefes, 0.8% em mobs normais (Ultra Raro!)
 
             if (Math.random() > runeDropChance) return;
 
@@ -3378,7 +3378,7 @@
 
         function rollMonsterDrop(ent) {
             const isBoss = ent.isBoss || false;
-            const dropChance = isBoss ? 0.50 : 0.06; // 6% em mobs normais, 50% em chefes
+            const dropChance = isBoss ? 0.25 : 0.018; // 1.8% em mobs normais (1 drop a cada ~55 mobs), 25% em chefes
             if (Math.random() > dropChance) return;
 
             let rarityWeights = { common: 80, uncommon: 17, rare: 3, epic: 0, legendary: 0, ancient: 0 };
