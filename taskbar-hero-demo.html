@@ -370,14 +370,23 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            padding: 6px 12px;
+            padding: 6px 14px;
             border-radius: 20px;
             font-size: 0.85em;
-            font-weight: 700;
+            font-weight: 800;
             background: rgba(255, 255, 255, 0.06);
-            border: 1px solid;
+            border: 1.5px solid;
             animation: popIn 0.3s ease-out;
             box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            user-select: none;
+        }
+
+        .loot-item-pill:hover {
+            transform: translateY(-3px) scale(1.05);
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.6), 0 0 15px rgba(255,215,0,0.3);
         }
 
         @keyframes popIn {
@@ -1009,6 +1018,354 @@
             50% { opacity: 0.9; }
             100% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
         }
+
+        /* --- BOTÃO E MODAL DO PERSONAGEM (TASKBAR HERO) --- */
+        .btn-char {
+            background: linear-gradient(135deg, #c96ac9, #8e44ad) !important;
+            color: #fff !important;
+            font-weight: 800 !important;
+            border: none !important;
+            box-shadow: 0 4px 15px rgba(201, 106, 201, 0.4) !important;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-char:hover {
+            transform: translateY(-2px) scale(1.01) !important;
+            box-shadow: 0 6px 20px rgba(201, 106, 201, 0.6) !important;
+        }
+
+        .char-modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(3, 7, 13, 0.85);
+            backdrop-filter: blur(12px);
+            z-index: 9999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .char-modal-backdrop.active {
+            display: flex;
+        }
+
+        .char-modal-box {
+            background: linear-gradient(145deg, rgba(16, 26, 44, 0.96), rgba(8, 14, 25, 0.98));
+            border: 1px solid var(--border-glow);
+            box-shadow: 0 15px 50px rgba(0,0,0,0.8), 0 0 25px rgba(255,153,68,0.2);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 980px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .char-modal-header {
+            padding: 20px 28px;
+            background: linear-gradient(90deg, rgba(255, 153, 68, 0.15), transparent);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .char-modal-header h2 {
+            font-family: 'Cinzel', serif;
+            color: var(--gold);
+            font-size: 1.6em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-shadow: 0 0 12px rgba(255,215,0,0.4);
+        }
+
+        .char-modal-body {
+            padding: 24px;
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: 360px 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 820px) {
+            .char-modal-body {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .char-equip-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            background: rgba(5, 10, 18, 0.6);
+            padding: 16px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .slot-box {
+            background: rgba(12, 20, 34, 0.8);
+            border: 1px dashed rgba(255, 255, 255, 0.18);
+            border-radius: 12px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            min-height: 90px;
+            position: relative;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .slot-box:hover {
+            border-color: var(--primary);
+            background: rgba(20, 32, 54, 0.9);
+            transform: translateY(-2px);
+        }
+
+        .slot-box.filled {
+            border-style: solid;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .slot-name {
+            font-size: 0.68em;
+            text-transform: uppercase;
+            color: #a0aec0;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+
+        .slot-icon {
+            font-size: 1.7em;
+        }
+
+        .slot-item-name {
+            font-size: 0.73em;
+            font-weight: 700;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+        }
+
+        .slot-action-btn {
+            font-size: 0.65em;
+            background: rgba(255, 68, 68, 0.2);
+            color: #ff6666;
+            border: 1px solid rgba(255, 68, 68, 0.4);
+            border-radius: 6px;
+            padding: 2px 6px;
+            cursor: pointer;
+            margin-top: 2px;
+            transition: all 0.15s ease;
+        }
+
+        .slot-action-btn:hover {
+            background: #ff4444;
+            color: #fff;
+        }
+
+        .char-stats-panel {
+            background: rgba(5, 10, 18, 0.6);
+            padding: 14px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .stats-sub-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 5px;
+        }
+
+        .stat-pill {
+            background: rgba(12, 20, 34, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-pill .val {
+            font-size: 1.15em;
+            font-weight: 900;
+            color: var(--gold);
+        }
+
+        .stat-pill .lbl {
+            font-size: 0.7em;
+            color: #a0aec0;
+            font-weight: 700;
+        }
+
+        .inventory-section {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 10px;
+            max-height: 240px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .inv-card {
+            background: rgba(10, 16, 28, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .inv-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+
+        .rarity-border-common { border-color: #ffffff !important; box-shadow: 0 0 8px rgba(255,255,255,0.2); }
+        .rarity-border-uncommon { border-color: #4aff4a !important; box-shadow: 0 0 10px rgba(74,255,74,0.3); }
+        .rarity-border-rare { border-color: #4a9aff !important; box-shadow: 0 0 12px rgba(74,154,255,0.35); }
+        .rarity-border-epic { border-color: #c96ac9 !important; box-shadow: 0 0 14px rgba(201,106,201,0.4); }
+        .rarity-border-legendary { border-color: #ffd700 !important; box-shadow: 0 0 18px rgba(255,215,0,0.5); }
+        .rarity-border-ancient { border-color: #ff44aa !important; box-shadow: 0 0 22px rgba(255,68,170,0.6); animation: ancientPulse 2s infinite alternate; }
+
+        @keyframes ancientPulse {
+            0% { box-shadow: 0 0 15px rgba(255,68,170,0.5); }
+            100% { box-shadow: 0 0 28px rgba(255,68,170,0.9); }
+        }
+
+        /* --- NAVEGAÇÃO DE FEATURES DE ALTO DESTAQUE --- */
+        .feature-nav-bar {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.85));
+            padding: 12px 18px;
+            border-radius: 18px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+        }
+
+        .feature-tab-btn {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95));
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            color: #e2e8f0;
+            padding: 12px 22px;
+            border-radius: 14px;
+            font-size: 0.98em;
+            font-weight: 800;
+            font-family: 'Outfit', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+
+        .feature-tab-btn::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,215,0,0.2), transparent 60%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .feature-tab-btn:hover {
+            color: #ffffff;
+            border-color: var(--gold);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 12px 30px rgba(255, 153, 68, 0.35), 0 0 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .feature-tab-btn:hover::before {
+            opacity: 1;
+        }
+
+        .feature-tab-btn.active {
+            background: linear-gradient(135deg, rgba(255, 153, 68, 0.4), rgba(201, 106, 201, 0.4), rgba(15, 23, 42, 0.9));
+            border-color: var(--gold);
+            color: #ffffff;
+            box-shadow: 0 0 25px rgba(255, 153, 68, 0.5), 0 0 15px rgba(201, 106, 201, 0.4), inset 0 0 15px rgba(255, 215, 0, 0.2);
+            text-shadow: 0 0 10px rgba(255,215,0,0.6);
+            animation: tabGlowPulse 2.5s infinite alternate;
+        }
+
+        @keyframes tabGlowPulse {
+            0% { border-color: rgba(255, 215, 0, 0.6); box-shadow: 0 0 18px rgba(255, 153, 68, 0.4), 0 0 10px rgba(201, 106, 201, 0.3); }
+            100% { border-color: rgba(255, 215, 0, 1); box-shadow: 0 0 30px rgba(255, 153, 68, 0.7), 0 0 22px rgba(201, 106, 201, 0.6); }
+        }
+
+        .tab-shortcut-badge {
+            background: linear-gradient(135deg, var(--primary), var(--gold));
+            color: #080f1a;
+            font-size: 0.75em;
+            font-weight: 900;
+            padding: 2px 8px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+            letter-spacing: 0.5px;
+        }
+
+        .rune-card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 12px;
+            max-height: 380px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .rune-item-box {
+            background: rgba(8, 14, 25, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .rune-item-box:hover {
+            transform: translateY(-2px);
+            border-color: var(--gold);
+        }
     </style>
 </head>
 <body>
@@ -1019,6 +1376,23 @@
         <div class="demo-header">
             <h1>⚔️ Taskbar Hero <span class="demo-badge">10 Níveis por Bioma & HP Escalável</span></h1>
             <div style="font-size: 0.9em; color: #a0aec0; font-weight: 600;">8 Biomas x 10 Níveis (+15% HP/nível) · Continuidade Perfeita de Bioma para Bioma!</div>
+        </div>
+
+        <!-- NAVEGAÇÃO DE FEATURES PRINCIPAIS DO JOGO COM ALTO DESTAQUE -->
+        <div class="feature-nav-bar">
+            <div style="font-size:0.85em; font-weight:800; color:var(--gold); display:flex; align-items:center; gap:6px; margin-right:6px; text-transform:uppercase; letter-spacing:1px; font-family:'Cinzel', serif;">
+                
+            </div>
+            <button class="feature-tab-btn active" id="topNavBtnPersonagem" onclick="openCharacterModal(); switchFeatureTab('personagem');">
+                <span class="tab-shortcut-badge">👤</span>
+                <span>Personagem & Equipamentos</span>
+                <span class="tab-shortcut-badge">👤</span>
+            </button>
+            <button class="feature-tab-btn" id="topNavBtnRunas" onclick="openCharacterModal(); switchFeatureTab('runas');">
+                <span class="tab-shortcut-badge">🔮</span>
+                <span>Runas & Encantamentos</span>
+                <span class="tab-shortcut-badge">🔮</span>
+            </button>
         </div>
 
         <!-- CONTROLES DA SIMULAÇÃO (BIOMAS E NÍVEIS) -->
@@ -1073,10 +1447,11 @@
                 </select>
             </div>
 
-            <div class="control-group" style="grid-column: 1 / -1; display:flex; flex-direction:row; gap:14px; margin-top: 4px;">
-                <button class="btn-pip" style="flex:1;" onclick="openPictureInPicture()">📌 Destacar Taskbar Hero (Janela Flutuante Always-on-Top!)</button>
-                <button class="btn-action" style="flex:1;" onclick="triggerSpecialSkill()">🔥 Giro Flamejante (Golpe Crítico)</button>
-                <button class="btn-boss-test" style="flex:1;" onclick="forceBossSpawn()">⚠️ Invocação de Chefe</button>
+            <div class="control-group" style="grid-column: 1 / -1; display:flex; flex-direction:row; gap:14px; margin-top: 4px; flex-wrap:wrap;">
+                <button class="btn-char" style="flex:1; min-width: 200px;" onclick="openCharacterModal()">👤 Personagem & Equipamentos</button>
+                <button class="btn-pip" style="flex:1; min-width: 200px;" onclick="openPictureInPicture()">📌 Destacar Taskbar Hero (PiP)</button>
+                <button class="btn-action" style="flex:1; min-width: 180px;" onclick="triggerSpecialSkill()">🔥 Giro Flamejante</button>
+                <button class="btn-boss-test" style="flex:1; min-width: 160px;" onclick="forceBossSpawn()">⚠️ Invocação de Chefe</button>
             </div>
         </div>
 
@@ -1147,6 +1522,13 @@
                 <span style="color:#ffd700;" id="biomeLevelVal">Nível 1 / 10</span>
             </div>
 
+            <!-- BADGE DE OURO E GEAR SCORE NA TASKBAR -->
+            <div class="taskbar-stats-badge" style="display:flex; align-items:center; gap:8px; background:rgba(0,0,0,0.65); padding:4px 10px; border-radius:12px; border:1px solid rgba(255,215,0,0.35); font-size:0.78em; font-weight:800; color:var(--gold); box-shadow: 0 4px 12px rgba(0,0,0,0.5);">
+                <span id="tbhGoldVal">💰 0</span>
+                <span style="color:rgba(255,255,255,0.25);">|</span>
+                <span id="tbhGsVal">⭐ GS: 10</span>
+            </div>
+
             <!-- BADGE DE FILA -->
             <div class="queue-stack-badge" id="queueStackBadge" style="display:none;">
                 <span>⚔️ MONSTROS NA FILA:</span>
@@ -1179,14 +1561,16 @@
                     <div class="tbh-progress-track"><div class="tbh-progress-fill fill-hp" id="barHp" style="width: 100%;"></div></div>
                 </div>
                 <div class="tbh-bar-container">
-                    <div class="tbh-bar-label"><span>XP</span><span id="txtXp">Lv. 12</span></div>
-                    <div class="tbh-progress-track"><div class="tbh-progress-fill fill-xp" id="barXp" style="width: 45%;"></div></div>
+                    <div class="tbh-bar-label"><span>XP</span><span id="txtXp">Lv. 1</span></div>
+                    <div class="tbh-progress-track"><div class="tbh-progress-fill fill-xp" id="barXp" style="width: 0%;"></div></div>
                 </div>
             </div>
 
             <!-- CONTROLES DA BARRA -->
             <div class="tbh-controls-mini">
-                <button class="tbh-mini-btn" style="background:#0055ff; border-color:#4a9aff;" onclick="openPictureInPicture()">📌 Destacar Tela</button>
+                <button class="tbh-mini-btn" style="background: linear-gradient(135deg, #0055ff, #00d4ff); border-color:#00ffff; color:#fff; font-weight:800;" onclick="openPictureInPicture()">📌 Destacar</button>
+                <button class="tbh-mini-btn" style="background: linear-gradient(135deg, #2b6cb0, #4299e1); border-color:#63b3ed; color:#fff; font-weight:800;" onclick="openCharacterModal()">👤 Equipamentos</button>
+                <button class="tbh-mini-btn" style="background: linear-gradient(135deg, #6b46c1, #9f7aea); border-color:#b794f4; color:#fff; font-weight:800;" onclick="openRunesModal()">🔮 Runas</button>
                 <button class="tbh-mini-btn" onclick="toggleConfigModal()">⚙️ Configs</button>
                 <button class="tbh-mini-btn" onclick="toggleExpandModal()">🔍 Relatório</button>
             </div>
@@ -1261,6 +1645,128 @@
                 > [PROGRESSÃO DE BIOMAS] Cada um dos 8 Biomas possui 10 Níveis (+15% HP por nível).<br>
                 > [GAP DE CONTINUIDADE] O Nível 1 de um novo bioma começa exatamente onde o Nível 10 do bioma anterior parou (+50% multiplicador base)!<br>
                 > [STATUS ATUAL] Limite: <span id="logMaxMobs">2</span> mobs | Distância: <span id="logMinDist">500</span>px | Taxa: <span id="logChance">4.0</span>%
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PRINCIPAL DE FEATURES DO JOGO (PERSONAGEM & RUNAS) -->
+    <div class="char-modal-backdrop" id="characterModal" onclick="if(event.target===this) closeCharacterModal()">
+        <div class="char-modal-box">
+            <div class="char-modal-header">
+                <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
+                    <h2 style="font-size:1.3em;">⚙️ Painel do Herói</h2>
+                    <div style="display:flex; gap:8px;">
+                        <button class="feature-tab-btn active" id="modalTabPersonagem" onclick="switchFeatureTab('personagem')">👤 Personagem & Equipamento [1]</button>
+                        <button class="feature-tab-btn" id="modalTabRunas" onclick="switchFeatureTab('runas')">🔮 Runas & Encantamentos [2]</button>
+                    </div>
+                </div>
+                <button class="tbh-mini-btn" onclick="closeCharacterModal()">✕ Fechar</button>
+            </div>
+            
+            <!-- CONTEÚDO DA ABA 1: PERSONAGEM & EQUIPAMENTOS -->
+            <div class="char-modal-body" id="tabContentPersonagem">
+                <!-- COLUNA DA ESQUERDA: SLOTS DE EQUIPAMENTO (8 SLOTS) -->
+                <div>
+                    <div style="font-size:0.9em; font-weight:800; color:var(--gold); margin-bottom:10px; display:flex; align-items:center; gap:6px;">
+                        <span>🛡️ Equipamentos Ativos</span>
+                        <span style="font-size:0.75em; color:#a0aec0; font-weight:600;">(8 Slots)</span>
+                    </div>
+                    <div class="char-equip-grid" id="charEquipGrid">
+                        <!-- Renderizado via JS -->
+                    </div>
+                </div>
+
+                <!-- COLUNA DA DIREITA: ATRIBUTOS TOTAIS & INVENTÁRIO DE DROPS -->
+                <div style="display:flex; flex-direction:column; gap:20px;">
+                    <!-- PAINEL DE ATRIBUTOS TOTAIS -->
+                    <div class="char-stats-panel">
+                        <div style="font-size:0.9em; font-weight:800; color:var(--gold); display:flex; justify-content:space-between; align-items:center;">
+                            <span>📊 Atributos Totais do Herói</span>
+                            <span id="charClassBadge" style="font-size:0.75em; background:rgba(255,153,68,0.2); color:var(--primary); padding:3px 8px; border-radius:10px; border:1px solid var(--primary);">Guerreiro Taskbar</span>
+                        </div>
+                        <div class="stats-sub-grid">
+                            <div class="stat-pill">
+                                <span class="val" id="statStrength">10</span>
+                                <span class="lbl">🗡️ Dano / Força</span>
+                            </div>
+                            <div class="stat-pill">
+                                <span class="val" id="statDefense">5</span>
+                                <span class="lbl">🛡️ Defesa</span>
+                            </div>
+                            <div class="stat-pill">
+                                <span class="val" id="statMaxHp">100</span>
+                                <span class="lbl">❤️ HP Máximo</span>
+                            </div>
+                            <div class="stat-pill">
+                                <span class="val" id="statCrit">10%</span>
+                                <span class="lbl">💥 Crit Chance</span>
+                            </div>
+                            <div class="stat-pill">
+                                <span class="val" id="statSpeed">+0%</span>
+                                <span class="lbl">⚡ Velocidade</span>
+                            </div>
+                            <div class="stat-pill">
+                                <span class="val" id="statXpGold">+0%</span>
+                                <span class="lbl">⭐ Bônus XP/Ouro</span>
+                            </div>
+                            <div class="stat-pill">
+                                <span class="val" id="statLifesteal">0%</span>
+                                <span class="lbl">🩸 Roubo de Vida</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- INVENTÁRIO DE ITENS OBTIDOS -->
+                    <div class="inventory-section">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <div style="font-size:0.9em; font-weight:800; color:var(--gold);">
+                                🎒 Inventário de Drops (<span id="invCountText">0 itens</span>)
+                            </div>
+                            <div style="font-size:0.75em; color:#a0aec0;">Clique no item para Equipar / Desequipar</div>
+                        </div>
+                        <div class="inventory-grid" id="charInventoryGrid">
+                            <!-- Renderizado via JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CONTEÚDO DA ABA 2: RUNAS & ENCANTAMENTOS -->
+            <div class="char-modal-body" id="tabContentRunas" style="display:none; grid-template-columns: 1fr 340px;">
+                <!-- ESQUERDA: LISTA DE EQUIPAMENTOS COM SOCKETS -->
+                <div style="display:flex; flex-direction:column; gap:14px;">
+                    <div style="font-size:0.95em; font-weight:800; color:var(--gold); display:flex; justify-content:space-between; align-items:center;">
+                        <span>🔮 Sockets & Encaixe de Runas</span>
+                        <span style="font-size:0.75em; color:#a0aec0;">Clique em um slot para Encaixar ou Remover Runas</span>
+                    </div>
+                    <div class="inventory-grid" id="runeEquipGrid" style="max-height: 480px;">
+                        <!-- Renderizado via JS -->
+                    </div>
+                </div>
+
+                <!-- DIREITA: INVENTÁRIO & FORJA DE RUNAS -->
+                <div style="display:flex; flex-direction:column; gap:16px; background:rgba(5, 10, 18, 0.6); padding:16px; border-radius:14px; border:1px solid rgba(255,255,255,0.08);">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-size:0.9em; font-weight:800; color:var(--gold);">🎒 Sacola de Runas</span>
+                        <button class="tbh-mini-btn" style="background:var(--primary); color:#080f1a; font-weight:800; font-size:0.75em;" onclick="forgeRune()">🔨 Forjar (60 💰)</button>
+                    </div>
+                    <div class="rune-card-grid" id="runeBagGrid" style="max-height: 400px;">
+                        <!-- Renderizado via JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE SELEÇÃO DE RUNAS -->
+    <div class="char-modal-backdrop" id="runeSelectModal" style="z-index: 10005;" onclick="if(event.target===this) closeRuneSelectModal()">
+        <div class="char-modal-box" style="max-width: 520px; max-height: 70vh;">
+            <div class="char-modal-header">
+                <h3>🔮 Escolha uma Runa para Encaixar</h3>
+                <button class="tbh-mini-btn" onclick="closeRuneSelectModal()">✕</button>
+            </div>
+            <div style="padding:20px; overflow-y:auto;" id="runeSelectList">
+                <!-- Opções de runas disponíveis -->
             </div>
         </div>
     </div>
@@ -1401,24 +1907,63 @@
         };
 
         const realEquipmentDatabase = {
-            'weapon_copper': { id: 'weapon_copper', name: 'Espada de Cobre', icon: '🗡️', rarity: 'common' },
-            'weapon_iron':   { id: 'weapon_iron',   name: 'Espada de Ferro',  icon: '⚔️', rarity: 'uncommon' },
-            'weapon_silver': { id: 'weapon_silver', name: 'Lâmina de Prata',  icon: '🌙', rarity: 'rare' },
-            'weapon_gold':   { id: 'weapon_gold',   name: 'Sabre Dourado',    icon: '✨', rarity: 'epic' },
-            'weapon_mithril':{ id: 'weapon_mithril',name: 'Espada de Mitril', icon: '💫', rarity: 'legendary' },
-            'armor_iron':    { id: 'armor_iron',    name: 'Armadura de Ferro',icon: '⚙️', rarity: 'uncommon' },
-            'armor_mithril': { id: 'armor_mithril', name: 'Armadura de Mitril',icon: '💫', rarity: 'legendary' },
-            'boots_wood':    { id: 'boots_wood',    name: 'Botas de Madeira', icon: '👢', rarity: 'common' },
-            'boots_magic':   { id: 'boots_magic',   name: 'Botas Mágicas',    icon: '✨', rarity: 'legendary' },
-            'ring_ebony':    { id: 'ring_ebony',    name: 'Anel de Ébano',    icon: '🖤', rarity: 'rare' },
-            'ring_magic':    { id: 'ring_magic',    name: 'Anel Mágico',      icon: '🌟', rarity: 'legendary' },
-            'amulet_dragon': { id: 'amulet_dragon', name: 'Amuleto do Dragão',icon: '🐉', rarity: 'legendary' },
-            'wb_dragon_crown': { id: 'wb_dragon_crown', name: 'Coroa do Rei Dragão', icon: '👑', rarity: 'ancient' },
-            'wb_phoenix_staff': { id: 'wb_phoenix_staff', name: 'Cajado da Fênix', icon: '🔥', rarity: 'ancient' },
-            'wb_void_amulet': { id: 'wb_void_amulet', name: 'Amuleto do Vazio', icon: '👁️', rarity: 'ancient' },
-            'wb_golem_shield': { id: 'wb_golem_shield', name: 'Escudo de Mitril', icon: '🗿', rarity: 'ancient' },
-            'wb_lich_ring': { id: 'wb_lich_ring', name: 'Filactéria das Sombras', icon: '💍', rarity: 'ancient' },
-            'wb_chimera_boots': { id: 'wb_chimera_boots', name: 'Botas da Tempestade', icon: '⚡', rarity: 'ancient' }
+            // ARMAS
+            'weapon_copper':  { id: 'weapon_copper',  name: 'Espada de Cobre',  icon: '🗡️', slot: 'weapon', rarity: 'common', stats: { strength: 5 }, desc: 'Lâmina inicial de cobre (+5 Dano)', price: 3 },
+            'weapon_iron':    { id: 'weapon_iron',    name: 'Espada de Ferro',   icon: '⚔️', slot: 'weapon', rarity: 'uncommon', stats: { strength: 12, critChance: 3 }, desc: 'Lâmina resistente de ferro (+12 Dano, +3% Crit)', price: 8 },
+            'weapon_silver':  { id: 'weapon_silver',  name: 'Lâmina de Prata',   icon: '🌙', slot: 'weapon', rarity: 'rare', stats: { strength: 22, critChance: 8 }, desc: 'Lâmina brilhante de prata (+22 Dano, +8% Crit)', price: 18 },
+            'weapon_gold':    { id: 'weapon_gold',    name: 'Sabre Dourado',     icon: '✨', slot: 'weapon', rarity: 'epic', stats: { strength: 38, critChance: 12, xpBonus: 10 }, desc: 'Sabre forjado em ouro (+38 Dano, +12% Crit, +10% XP)', price: 45 },
+            'weapon_mithril': { id: 'weapon_mithril', name: 'Espada de Mitril',  icon: '💫', slot: 'weapon', rarity: 'legendary', stats: { strength: 60, critChance: 18, xpBonus: 15 }, desc: 'Arma suprema de mitril (+60 Dano, +18% Crit, +15% XP)', price: 120 },
+            'weapon_obsidian':{ id: 'weapon_obsidian',name: 'Machado de Obsidiana', icon: '🌋', slot: 'weapon', rarity: 'ancient', stats: { strength: 95, critChance: 25, lifesteal: 8 }, desc: 'Machado vulcânico supremo (+95 Dano, +25% Crit, +8% Lifesteal)', price: 400 },
+            
+            // ARMADURAS
+            'armor_copper':   { id: 'armor_copper',   name: 'Armadura de Cobre', icon: '🥉', slot: 'armor', rarity: 'common', stats: { defense: 4, maxHealth: 15 }, desc: 'Proteção inicial de cobre (+4 Def, +15 HP)', price: 4 },
+            'armor_iron':     { id: 'armor_iron',     name: 'Armadura de Ferro', icon: '⚙️', slot: 'armor', rarity: 'uncommon', stats: { defense: 10, maxHealth: 35 }, desc: 'Cota de ferro tratada (+10 Def, +35 HP)', price: 9 },
+            'armor_silver':   { id: 'armor_silver',   name: 'Armadura de Prata', icon: '🥈', slot: 'armor', rarity: 'rare', stats: { defense: 20, maxHealth: 70 }, desc: 'Placa de prata encerada (+20 Def, +70 HP)', price: 22 },
+            'armor_gold':     { id: 'armor_gold',     name: 'Armadura Dourada',  icon: '🥇', slot: 'armor', rarity: 'epic', stats: { defense: 35, maxHealth: 120, goldBonus: 15 }, desc: 'Armadura majestosa de ouro (+35 Def, +120 HP, +15% Ouro)', price: 50 },
+            'armor_mithril':  { id: 'armor_mithril',  name: 'Armadura de Mitril',icon: '💫', slot: 'armor', rarity: 'legendary', stats: { defense: 55, maxHealth: 200, xpBonus: 10 }, desc: 'Armadura lendária (+55 Def, +200 HP, +10% XP)', price: 130 },
+            'wb_dracula_cloak':{ id: 'wb_dracula_cloak', name: 'Manto de Drácula', icon: '🧛', slot: 'armor', rarity: 'ancient', stats: { defense: 75, maxHealth: 300, lifesteal: 10 }, desc: 'Manto sombrio lendário (+75 Def, +300 HP, +10% Roubo de Vida)', price: 450 },
+
+            // CAPACETES
+            'helmet_copper':  { id: 'helmet_copper',  name: 'Elmo de Cobre',    icon: '🪖', slot: 'helmet', rarity: 'common', stats: { defense: 3, maxHealth: 10 }, desc: 'Elmo leve de cobre (+3 Def, +10 HP)', price: 3 },
+            'helmet_iron':    { id: 'helmet_iron',    name: 'Elmo de Ferro',    icon: '⛑️', slot: 'helmet', rarity: 'uncommon', stats: { defense: 7, maxHealth: 25 }, desc: 'Elmo reforçado de ferro (+7 Def, +25 HP)', price: 7 },
+            'helmet_mithril': { id: 'helmet_mithril', name: 'Elmo de Mitril',   icon: '👑', slot: 'helmet', rarity: 'legendary', stats: { defense: 25, maxHealth: 80, xpBonus: 15 }, desc: 'Elmo rúnico supremo (+25 Def, +80 HP, +15% XP)', price: 110 },
+            'wb_dragon_crown':{ id: 'wb_dragon_crown',name: 'Coroa do Rei Dragão', icon: '👑', slot: 'helmet', rarity: 'ancient', stats: { strength: 40, defense: 30, maxHealth: 150 }, desc: 'Coroa dos dragões ancestrais (+40 Dano, +30 Def, +150 HP)', price: 450 },
+
+            // ESCUDOS
+            'shield_copper':  { id: 'shield_copper',  name: 'Escudo de Cobre',  icon: '🔰', slot: 'shield', rarity: 'common', stats: { defense: 5 }, desc: 'Broquel simples de cobre (+5 Def)', price: 3 },
+            'shield_iron':    { id: 'shield_iron',    name: 'Escudo de Ferro',  icon: '🛡️', slot: 'shield', rarity: 'uncommon', stats: { defense: 14, maxHealth: 20 }, desc: 'Escudo pesado de ferro (+14 Def, +20 HP)', price: 8 },
+            'shield_mithril': { id: 'shield_mithril', name: 'Escudo de Mitril', icon: '⚜️', slot: 'shield', rarity: 'legendary', stats: { defense: 40, strength: 10, maxHealth: 90 }, desc: 'Escudo inquebrável (+40 Def, +10 Dano, +90 HP)', price: 115 },
+            'wb_golem_shield':{ id: 'wb_golem_shield',name: 'Escudo Titânico',  icon: '🗿', slot: 'shield', rarity: 'ancient', stats: { defense: 70, maxHealth: 250, strength: 15 }, desc: 'Escudo do Golem de Pedra (+70 Def, +250 HP, +15 Dano)', price: 450 },
+
+            // CALÇAS
+            'pants_iron':     { id: 'pants_iron',     name: 'Grevas de Ferro',  icon: '🦵', slot: 'pants', rarity: 'uncommon', stats: { defense: 8, maxHealth: 20 }, desc: 'Grevas de ferro (+8 Def, +20 HP)', price: 7 },
+            'pants_mithril':  { id: 'pants_mithril',  name: 'Grevas de Mitril', icon: '✨', slot: 'pants', rarity: 'legendary', stats: { defense: 28, speedBonus: 10 }, desc: 'Grevas mágicas (+28 Def, +10% Vel)', price: 105 },
+
+            // BOTAS
+            'boots_wood':     { id: 'boots_wood',     name: 'Botas de Madeira', icon: '👢', slot: 'boots', rarity: 'common', stats: { speedBonus: 5 }, desc: 'Calçado básico (+5% Velocidade)', price: 2 },
+            'boots_oak':      { id: 'boots_oak',      name: 'Botas de Carvalho',icon: '🥾', slot: 'boots', rarity: 'uncommon', stats: { speedBonus: 12, xpBonus: 5 }, desc: 'Botas duráveis (+12% Vel, +5% XP)', price: 6 },
+            'boots_magic':    { id: 'boots_magic',    name: 'Botas Mágicas',    icon: '✨', slot: 'boots', rarity: 'legendary', stats: { speedBonus: 30, xpBonus: 15 }, desc: 'Botas encantadas (+30% Vel, +15% XP)', price: 100 },
+            'wb_chimera_boots':{ id: 'wb_chimera_boots',name: 'Botas da Tempestade', icon: '⚡', slot: 'boots', rarity: 'ancient', stats: { speedBonus: 45, strength: 20, maxHealth: 80 }, desc: 'Botas relâmpago (+45% Vel, +20 Dano, +80 HP)', price: 450 },
+
+            // ANÉIS
+            'ring_wood':      { id: 'ring_wood',      name: 'Anel de Madeira',  icon: '💍', slot: 'ring', rarity: 'common', stats: { xpBonus: 5 }, desc: 'Anel artesanal (+5% XP)', price: 3 },
+            'ring_ebony':     { id: 'ring_ebony',     name: 'Anel de Ébano',    icon: '🖤', slot: 'ring', rarity: 'rare', stats: { xpBonus: 15, critChance: 5 }, desc: 'Anel escuro (+15% XP, +5% Crit)', price: 20 },
+            'ring_magic':     { id: 'ring_magic',     name: 'Anel Mágico',      icon: '🌟', slot: 'ring', rarity: 'legendary', stats: { xpBonus: 25, critChance: 10, speedBonus: 10 }, desc: 'Anel místico (+25% XP, +10% Crit, +10% Vel)', price: 110 },
+            'wb_lich_ring':   { id: 'wb_lich_ring',   name: 'Filactéria das Sombras', icon: '💍', slot: 'ring', rarity: 'ancient', stats: { strength: 30, critChance: 15, lifesteal: 8 }, desc: 'Relíquia necromântica (+30 Dano, +15% Crit, +8% Lifesteal)', price: 450 },
+
+            // AMULETOS
+            'wb_void_amulet': { id: 'wb_void_amulet',  name: 'Amuleto do Vazio', icon: '👁️', slot: 'amulet', rarity: 'ancient', stats: { maxHealth: 180, strength: 25, xpBonus: 25 }, desc: 'Amuleto cósmico (+180 HP, +25 Dano, +25% XP)', price: 2500 }
+        };
+
+        const runasData = {
+            runa_sabio:     { id: 'runa_sabio',     name: 'Runa do Sábio',     icon: '📚', rarity: 'common',    desc: '+10% XP Ganho', stats: { xpBonus: 10 }, price: 150 },
+            runa_guerreiro: { id: 'runa_guerreiro', name: 'Runa do Guerreiro', icon: '⚔️', rarity: 'common',    desc: '+8 Força / Dano', stats: { strength: 8 }, price: 150 },
+            runa_veloz:     { id: 'runa_veloz',     name: 'Runa do Veloz',     icon: '⚡', rarity: 'common',    desc: '+8% Velocidade de Ataque', stats: { speedBonus: 8 }, price: 150 },
+            runa_colosso:   { id: 'runa_colosso',   name: 'Runa do Colosso',   icon: '🧱', rarity: 'uncommon',  desc: '+35 Vida Máxima', stats: { maxHealth: 35 }, price: 250 },
+            runa_fortaleza: { id: 'runa_fortaleza', name: 'Runa da Fortaleza', icon: '🛡️', rarity: 'uncommon',  desc: '+15 Defesa', stats: { defense: 15 }, price: 250 },
+            runa_vampiro:   { id: 'runa_vampiro',   name: 'Runa do Vampiro',   icon: '🦇', rarity: 'rare',      desc: '+4% Roubo de Vida', stats: { lifesteal: 4 }, price: 400 },
+            runa_trovao:    { id: 'runa_trovao',    name: 'Runa do Trovão',    icon: '⚡', rarity: 'rare',      desc: '+12% Chance Crítica', stats: { critChance: 12 }, price: 450 },
+            runa_ancestral: { id: 'runa_ancestral', name: 'Runa Ancestral',   icon: '🌸', rarity: 'ancient',   desc: '+25 Força & +10% Crit', stats: { strength: 25, critChance: 10 }, price: 1000 }
         };
 
         const rarityColors = {
@@ -1429,6 +1974,9 @@
             legendary: '#ffd700',
             ancient: '#ff44aa'
         };
+
+        const rarityNames = { common: 'Comum', uncommon: 'Incomum', rare: 'Raro', epic: 'Épico', legendary: 'Lendário', ancient: 'Ancestral' };
+        const slotNames   = { helmet: 'Capacete', amulet: 'Amuleto', weapon: 'Arma', armor: 'Armadura', shield: 'Escudo', pants: 'Calças', boots: 'Botas', ring: 'Anel' };
 
         const weaponConfigs = {
             sword:  { icon: '⚔️', type: 'melee',  range: 50,  slashClass: 'slash-sword', cooldown: 500 },
@@ -1442,19 +1990,854 @@
             distance: 0,
             kills: 0,
             gold: 0,
-            xp: 45,
+            level: 1,
+            xp: 0,
+            maxXp: 500,
+            baseStrength: 10,
+            baseDefense: 5,
+            baseMaxHealth: 100,
             hp: 100,
             maxHp: 100,
             speedMult: 1,
             biome: 'ice',
-            biomeLevel: 1, // Nível do bioma atual (1 a 10)
+            biomeLevel: 1,
             weaponKey: 'sword',
             pet: '🐺',
+            equipment: {
+                helmet: null,
+                amulet: null,
+                weapon: null,
+                armor: null,
+                shield: null,
+                pants: null,
+                boots: null,
+                ring: null
+            },
+            inventory: [],
+            runes: {
+                runa_sabio: 2,
+                runa_guerreiro: 1,
+                runa_veloz: 2,
+                runa_colosso: 1,
+                runa_vampiro: 1
+            },
             collectedLoots: [],
-            nextBossDistance: 1500,
+            nextBossDistance: 3500,
             currentBoss: null,
             lastAttackTime: 0
         };
+
+        let currentSocketTarget = { item: null, slotIndex: 0 };
+
+        function switchFeatureTab(tabName) {
+            const btnPersonagem = document.getElementById('modalTabPersonagem');
+            const btnRunas = document.getElementById('modalTabRunas');
+            const topPersonagem = document.getElementById('topNavBtnPersonagem');
+            const topRunas = document.getElementById('topNavBtnRunas');
+
+            const contentPersonagem = document.getElementById('tabContentPersonagem');
+            const contentRunas = document.getElementById('tabContentRunas');
+
+            if (tabName === 'runas') {
+                if (btnPersonagem) btnPersonagem.classList.remove('active');
+                if (btnRunas) btnRunas.classList.add('active');
+                if (topPersonagem) topPersonagem.classList.remove('active');
+                if (topRunas) topRunas.classList.add('active');
+
+                if (contentPersonagem) contentPersonagem.style.display = 'none';
+                if (contentRunas) contentRunas.style.display = 'grid';
+                renderRunesUI();
+            } else {
+                if (btnPersonagem) btnPersonagem.classList.add('active');
+                if (btnRunas) btnRunas.classList.remove('active');
+                if (topPersonagem) topPersonagem.classList.add('active');
+                if (topRunas) topRunas.classList.remove('active');
+
+                if (contentPersonagem) contentPersonagem.style.display = 'grid';
+                if (contentRunas) contentRunas.style.display = 'none';
+                renderCharacterUI();
+            }
+        }
+
+        function calculateItemGearScore(item) {
+            if (!item) return 0;
+            const stats = item.stats || {};
+            let gs = 0;
+            if (stats.strength) gs += stats.strength * 3;
+            if (stats.defense) gs += stats.defense * 2;
+            if (stats.maxHealth) gs += stats.maxHealth * 0.5;
+            if (stats.speedBonus) gs += stats.speedBonus * 3;
+            if (stats.critChance) gs += stats.critChance * 4;
+            if (stats.xpBonus) gs += stats.xpBonus * 1;
+            if (stats.armorPenetration) gs += stats.armorPenetration * 4;
+            if (stats.trueDamage) gs += stats.trueDamage * 5;
+            if (stats.lootLuck) gs += stats.lootLuck * 2;
+            if (stats.tenacity) gs += stats.tenacity * 2;
+            if (stats.lifesteal) gs += stats.lifesteal * 5;
+
+            // Bônus por runas encaixadas (+25 GS por runa)
+            if (item.runas) {
+                item.runas.forEach(rId => {
+                    if (rId && runasData[rId]) gs += 25;
+                });
+            }
+
+            return Math.round(gs);
+        }
+
+        function calculateHeroTotalGearScore() {
+            let totalGS = 0;
+            if (heroState.equipment) {
+                Object.values(heroState.equipment).forEach(item => {
+                    if (item) totalGS += (item.gearScore || calculateItemGearScore(item));
+                });
+            }
+            return totalGS;
+        }
+
+        function createFullItemInstance(baseItemId, forcedRarity) {
+            const baseItem = realEquipmentDatabase[baseItemId] || realEquipmentDatabase['weapon_iron'];
+            const rarity = forcedRarity || baseItem.rarity || 'common';
+
+            const qualityRanges = {
+                common:    { min: 0.90, max: 1.15 },
+                uncommon:  { min: 1.00, max: 1.25 },
+                rare:      { min: 1.05, max: 1.35 },
+                epic:      { min: 1.10, max: 1.45 },
+                legendary: { min: 1.15, max: 1.55 },
+                ancient:   { min: 1.20, max: 1.65 }
+            };
+
+            const range = qualityRanges[rarity] || qualityRanges.common;
+            const statRolls = {};
+            const effectiveStats = {};
+
+            if (baseItem.stats) {
+                for (let statKey in baseItem.stats) {
+                    const baseVal = baseItem.stats[statKey];
+                    const roll = parseFloat((range.min + Math.random() * (range.max - range.min)).toFixed(2));
+                    statRolls[statKey] = roll;
+                    effectiveStats[statKey] = Math.max(1, Math.round(baseVal * roll));
+                }
+            }
+
+            let numBonuses = 0;
+            if (rarity === 'uncommon') numBonuses = Math.random() < 0.4 ? 1 : 0;
+            else if (rarity === 'rare') numBonuses = Math.random() < 0.5 ? 2 : 1;
+            else if (rarity === 'epic') numBonuses = Math.random() < 0.6 ? 2 : 1;
+            else if (rarity === 'legendary') numBonuses = Math.random() < 0.7 ? 3 : 2;
+            else if (rarity === 'ancient') numBonuses = Math.random() < 0.8 ? 4 : 3;
+
+            if (numBonuses > 0) {
+                const pool = ['strength', 'defense', 'maxHealth', 'critChance', 'speedBonus', 'xpBonus', 'tenacity', 'lifesteal'];
+                const existing = Object.keys(effectiveStats);
+                let available = pool.filter(s => !existing.includes(s));
+                if (available.length === 0) available = [...pool];
+
+                for (let i = 0; i < numBonuses; i++) {
+                    if (available.length === 0) break;
+                    const idx = Math.floor(Math.random() * available.length);
+                    const bonusStat = available.splice(idx, 1)[0];
+
+                    let baseVal = 2;
+                    if (bonusStat === 'strength' || bonusStat === 'defense') baseVal = Math.floor(2 + Math.random() * 4);
+                    else if (bonusStat === 'maxHealth') baseVal = Math.floor(10 + Math.random() * 25);
+                    else if (bonusStat === 'critChance' || bonusStat === 'speedBonus') baseVal = Math.floor(2 + Math.random() * 5);
+                    else if (bonusStat === 'xpBonus') baseVal = Math.floor(3 + Math.random() * 7);
+                    else if (bonusStat === 'tenacity' || bonusStat === 'lifesteal') baseVal = Math.floor(2 + Math.random() * 6);
+
+                    const roll = parseFloat((range.min + Math.random() * (range.max - range.min)).toFixed(2));
+                    statRolls[bonusStat] = roll;
+                    effectiveStats[bonusStat] = Math.max(1, Math.round(baseVal * roll));
+                }
+            }
+
+            const itemInstance = {
+                instanceId: 'inst_' + Date.now() + '_' + Math.floor(Math.random() * 10000),
+                id: baseItem.id,
+                name: baseItem.name,
+                icon: baseItem.icon,
+                slot: baseItem.slot,
+                rarity: rarity,
+                desc: baseItem.desc,
+                price: baseItem.price || 50,
+                stats: effectiveStats,
+                statRolls: statRolls,
+                sockets: 2,
+                runas: [null, null],
+                gearScore: 0
+            };
+
+            itemInstance.gearScore = calculateItemGearScore(itemInstance);
+            return itemInstance;
+        }
+
+        // Inicializar inventário inicial com rolagens completas
+        heroState.inventory = [
+            createFullItemInstance('weapon_copper', 'common'),
+            createFullItemInstance('armor_copper', 'common'),
+            createFullItemInstance('ring_ebony', 'rare')
+        ];
+
+        function formatItemStatsHtml(item) {
+            if (!item || !item.stats) return '';
+            const stats = item.stats;
+            const rolls = item.statRolls || {};
+            const parts = [];
+
+            const statIcons = {
+                strength: '⚔️ Força',
+                defense: '🛡️ Defesa',
+                maxHealth: '❤️ Vida',
+                speedBonus: '⚡ Velocidade',
+                critChance: '🍀 Crítico',
+                xpBonus: '📚 XP',
+                goldBonus: '💰 Ouro',
+                tenacity: '🛡️ Tenacidade',
+                lifesteal: '🩸 Roubo de Vida'
+            };
+
+            for (const [key, val] of Object.entries(stats)) {
+                const label = statIcons[key] || key;
+                const rollPct = rolls[key] ? ` (${Math.round(rolls[key] * 100)}%)` : '';
+                const unit = (key === 'speedBonus' || key === 'critChance' || key === 'xpBonus' || key === 'goldBonus' || key === 'tenacity' || key === 'lifesteal') ? '%' : '';
+                parts.push(`${label}: +${val}${unit}${rollPct}`);
+            }
+
+            return parts.join(' | ');
+        }
+
+        function getHeroComputedStats() {
+            const lvl = heroState.level || 1;
+            let stats = {
+                strength: (heroState.baseStrength || 10) + (lvl - 1) * 3,
+                defense: (heroState.baseDefense || 5) + (lvl - 1) * 2,
+                maxHealth: (heroState.baseMaxHealth || 100) + (lvl - 1) * 25,
+                critChance: 10,
+                speedBonus: 0,
+                xpBonus: 0,
+                goldBonus: 0,
+                lifesteal: 0
+            };
+
+            if (heroState.equipment) {
+                Object.values(heroState.equipment).forEach(item => {
+                    if (!item) return;
+                    if (item.stats) {
+                        if (item.stats.strength) stats.strength += item.stats.strength;
+                        if (item.stats.defense) stats.defense += item.stats.defense;
+                        if (item.stats.maxHealth) stats.maxHealth += item.stats.maxHealth;
+                        if (item.stats.critChance) stats.critChance += item.stats.critChance;
+                        if (item.stats.speedBonus) stats.speedBonus += item.stats.speedBonus;
+                        if (item.stats.xpBonus) stats.xpBonus += item.stats.xpBonus;
+                        if (item.stats.goldBonus) stats.goldBonus += item.stats.goldBonus;
+                        if (item.stats.lifesteal) stats.lifesteal += item.stats.lifesteal;
+                    }
+
+                    // Acumular bônus das runas encaixadas
+                    if (item.runas) {
+                        item.runas.forEach(rId => {
+                            if (rId && runasData[rId]) {
+                                const rStats = runasData[rId].stats;
+                                if (rStats.strength) stats.strength += rStats.strength;
+                                if (rStats.defense) stats.defense += rStats.defense;
+                                if (rStats.maxHealth) stats.maxHealth += rStats.maxHealth;
+                                if (rStats.critChance) stats.critChance += rStats.critChance;
+                                if (rStats.speedBonus) stats.speedBonus += rStats.speedBonus;
+                                if (rStats.xpBonus) stats.xpBonus += rStats.xpBonus;
+                                if (rStats.lifesteal) stats.lifesteal += rStats.lifesteal;
+                            }
+                        });
+                    }
+                });
+            }
+
+            return stats;
+        }
+
+        function updateHpUI() {
+            const comp = getHeroComputedStats();
+            const pct = Math.min(100, Math.max(0, (heroState.hp / comp.maxHealth) * 100));
+
+            const txtHpEl = (pipWindow && pipWindow.document.getElementById('txtHp')) ? pipWindow.document.getElementById('txtHp') : document.getElementById('txtHp');
+            const barHpEl = (pipWindow && pipWindow.document.getElementById('barHp')) ? pipWindow.document.getElementById('barHp') : document.getElementById('barHp');
+            const goldEl = (pipWindow && pipWindow.document.getElementById('tbhGoldVal')) ? pipWindow.document.getElementById('tbhGoldVal') : document.getElementById('tbhGoldVal');
+            const gsEl = (pipWindow && pipWindow.document.getElementById('tbhGsVal')) ? pipWindow.document.getElementById('tbhGsVal') : document.getElementById('tbhGsVal');
+
+            if (txtHpEl) txtHpEl.innerText = `${Math.max(0, heroState.hp)}/${comp.maxHealth}`;
+            if (barHpEl) barHpEl.style.width = pct + '%';
+            if (goldEl) goldEl.innerText = `💰 ${heroState.gold}`;
+            if (gsEl) gsEl.innerText = `⭐ GS: ${calculateHeroTotalGearScore()}`;
+        }
+
+        function updateXpAndLevelUI() {
+            // Level UP check (Curva Hardcore 1.55x por Nível)
+            while (heroState.xp >= heroState.maxXp) {
+                heroState.xp -= heroState.maxXp;
+                heroState.level++;
+                heroState.maxXp = Math.floor(500 * Math.pow(1.55, heroState.level - 1));
+                const comp = getHeroComputedStats();
+                heroState.hp = comp.maxHealth; // Curar o herói ao subir de nível!
+
+                spawnPopup(220, `🌟 LEVEL UP! Lv. ${heroState.level}!`, 'special');
+                renderCharacterUI();
+            }
+
+            const pct = Math.min(100, Math.max(0, (heroState.xp / heroState.maxXp) * 100));
+
+            const txtXpEl = (pipWindow && pipWindow.document.getElementById('txtXp')) ? pipWindow.document.getElementById('txtXp') : document.getElementById('txtXp');
+            const barXpEl = (pipWindow && pipWindow.document.getElementById('barXp')) ? pipWindow.document.getElementById('barXp') : document.getElementById('barXp');
+
+            if (txtXpEl) txtXpEl.innerText = `Lv. ${heroState.level} (${heroState.xp}/${heroState.maxXp})`;
+            if (barXpEl) barXpEl.style.width = pct + '%';
+        }
+
+        function openCharacterModal() {
+            if (window.opener && !window.opener.closed) {
+                try {
+                    window.opener.focus();
+                    window.opener.openCharacterModal();
+                    return;
+                } catch(e) {}
+            }
+            switchFeatureTab('personagem');
+            const modal = document.getElementById('characterModal');
+            if (modal) modal.classList.add('active');
+            renderCharacterUI();
+        }
+
+        function openRunesModal() {
+            if (window.opener && !window.opener.closed) {
+                try {
+                    window.opener.focus();
+                    window.opener.openRunesModal();
+                    return;
+                } catch(e) {}
+            }
+            switchFeatureTab('runas');
+            const modal = document.getElementById('characterModal');
+            if (modal) modal.classList.add('active');
+            renderRunesUI();
+        }
+
+        function closeCharacterModal() {
+            const modal = document.getElementById('characterModal');
+            if (modal) modal.classList.remove('active');
+        }
+
+        function renderCharacterUI() {
+            // Render Class & Total GS
+            const totalGS = calculateHeroTotalGearScore();
+            const badge = document.getElementById('charClassBadge');
+            if (badge) badge.innerHTML = `⭐ GS Total: <strong>${totalGS}</strong>`;
+
+            // Render Slots
+            const equipGrid = document.getElementById('charEquipGrid');
+            if (equipGrid) {
+                const slots = ['helmet', 'amulet', 'weapon', 'armor', 'shield', 'ring', 'pants', 'boots'];
+                equipGrid.innerHTML = slots.map(slotKey => {
+                    const item = heroState.equipment[slotKey];
+                    const slotLabel = slotNames[slotKey] || slotKey;
+                    if (item) {
+                        const rClass = `rarity-border-${item.rarity || 'common'}`;
+                        const r1Html = item.runas && item.runas[0] ? `🔮 ${runasData[item.runas[0]].name}` : '🟢 Slot Vazio';
+                        const r2Html = item.runas && item.runas[1] ? `🔮 ${runasData[item.runas[1]].name}` : '🟢 Slot Vazio';
+                        return `
+                            <div class="slot-box filled ${rClass}" onclick="unequipItem('${slotKey}')">
+                                <div class="slot-name">${slotLabel}</div>
+                                <div class="slot-icon">${item.icon}</div>
+                                <div class="slot-item-name" style="color:${rarityColors[item.rarity] || '#fff'}; font-weight:800;">${item.name}</div>
+                                <div style="font-size:0.65em; color:var(--gold); font-weight:800;">⭐ GS: ${item.gearScore || calculateItemGearScore(item)}</div>
+                                <div style="font-size:0.6em; color:#cbd5e0; display:flex; flex-direction:column; align-items:center; margin-top:2px;">
+                                    <span>${r1Html}</span>
+                                    <span>${r2Html}</span>
+                                </div>
+                                <div class="slot-action-btn">Desequipar</div>
+                            </div>
+                        `;
+                    } else {
+                        return `
+                            <div class="slot-box">
+                                <div class="slot-name">${slotLabel}</div>
+                                <div class="slot-icon" style="opacity:0.3;">🛡️</div>
+                                <div class="slot-item-name" style="color:#718096;">Vazio</div>
+                            </div>
+                        `;
+                    }
+                }).join('');
+            }
+
+            // Render Stats
+            const comp = getHeroComputedStats();
+            document.getElementById('statStrength').innerText = comp.strength;
+            document.getElementById('statDefense').innerText = comp.defense;
+            document.getElementById('statMaxHp').innerText = comp.maxHealth;
+            document.getElementById('statCrit').innerText = comp.critChance + '%';
+            document.getElementById('statSpeed').innerText = '+' + comp.speedBonus + '%';
+            document.getElementById('statXpGold').innerText = '+' + comp.xpBonus + '% / +' + comp.goldBonus + '%';
+            document.getElementById('statLifesteal').innerText = comp.lifesteal + '%';
+
+            // Render Inventory
+            const invGrid = document.getElementById('charInventoryGrid');
+            const invText = document.getElementById('invCountText');
+            if (invText) invText.innerText = (heroState.inventory ? heroState.inventory.length : 0) + ' itens';
+
+            if (invGrid) {
+                if (!heroState.inventory || heroState.inventory.length === 0) {
+                    invGrid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; color:#718096; padding:20px; font-size:0.85em;">Nenhum equipamento no inventário. Derrote monstros para obter drops!</div>`;
+                } else {
+                    invGrid.innerHTML = heroState.inventory.map((item, idx) => {
+                        const color = rarityColors[item.rarity] || '#fff';
+                        const rClass = `rarity-border-${item.rarity || 'common'}`;
+                        const formattedStats = formatItemStatsHtml(item);
+                        const r1Html = item.runas && item.runas[0] ? `<span style="color:#c96ac9; font-weight:800;">🔮 ${runasData[item.runas[0]].name}</span>` : '<span>🟢 Slot Vazio</span>';
+                        const r2Html = item.runas && item.runas[1] ? `<span style="color:#c96ac9; font-weight:800;">🔮 ${runasData[item.runas[1]].name}</span>` : '<span>🟢 Slot Vazio</span>';
+                        return `
+                            <div class="inv-card ${rClass}" style="width:100%; border-radius:12px; padding:12px; display:flex; flex-direction:column; gap:6px;" onmouseenter="showEquipmentComparison(${idx}, event)" onmousemove="moveEquipmentComparison(event)" onmouseleave="hideEquipmentComparison()">
+                                <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+                                    <span style="font-size:1.5em;">${item.icon}</span>
+                                    <span style="font-size:0.85em; font-weight:800; color:${color};">${item.name} <span style="font-size:0.75em; color:#a0aec0;">[${rarityNames[item.rarity]}]</span></span>
+                                    <span style="font-size:0.8em; color:var(--gold); font-weight:800; background:rgba(255,215,0,0.1); padding:2px 8px; border-radius:10px;">⭐ GS: ${item.gearScore || calculateItemGearScore(item)}</span>
+                                </div>
+                                <div style="font-size:0.75em; color:#e2e8f0; line-height:1.4; background:rgba(0,0,0,0.4); padding:6px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.05);">
+                                    ${formattedStats}
+                                </div>
+                                <div style="font-size:0.7em; color:var(--green); display:flex; gap:10px; font-weight:700;">
+                                    ${r1Html}
+                                    ${r2Html}
+                                </div>
+                                <div style="display:flex; gap:6px; margin-top:4px; width:100%;">
+                                    <button class="tbh-mini-btn" style="flex:2; background:var(--primary); color:#080f1a; font-weight:800; font-size:0.75em; padding:6px;" onclick="equipItem(${idx})">Equipar</button>
+                                    <button class="tbh-mini-btn" style="flex:1; background:rgba(255,68,68,0.2); color:#ff6666; font-size:0.75em; padding:6px; border:1px solid rgba(255,68,68,0.4);" onclick="sellItem(${idx})">💰 ${item.price || 50}</button>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+            }
+        }
+
+        function renderRunesUI() {
+            // Render Equipments with Rune Sockets
+            const runeEquipGrid = document.getElementById('runeEquipGrid');
+            if (runeEquipGrid) {
+                const allItems = [];
+                if (heroState.equipment) {
+                    Object.values(heroState.equipment).forEach(item => {
+                        if (item) allItems.push({ item: item, isEquipped: true });
+                    });
+                }
+                if (heroState.inventory) {
+                    heroState.inventory.forEach(item => {
+                        allItems.push({ item: item, isEquipped: false });
+                    });
+                }
+
+                if (allItems.length === 0) {
+                    runeEquipGrid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; color:#718096; padding:20px; font-size:0.85em;">Nenhum equipamento disponível para encaixar runas.</div>`;
+                } else {
+                    runeEquipGrid.innerHTML = allItems.map(({ item, isEquipped }, idx) => {
+                        const color = rarityColors[item.rarity] || '#fff';
+                        const rClass = `rarity-border-${item.rarity || 'common'}`;
+                        const runas = item.runas || [null, null];
+
+                        const socket1Html = runas[0] ?
+                            `<button class="tbh-mini-btn" style="background:rgba(201,106,201,0.25); color:#e2e8f0; font-size:0.7em; border:1px solid #c96ac9; padding:5px 8px; width:100%;" onclick="prepareRuneSocket(${idx}, 0)">${runasData[runas[0]].icon} ${runasData[runas[0]].name} (✕ Remover)</button>` :
+                            `<button class="tbh-mini-btn" style="background:rgba(74,255,74,0.15); color:var(--green); font-size:0.7em; border:1px dashed var(--green); padding:5px 8px; width:100%;" onclick="prepareRuneSocket(${idx}, 0)">🟢 Slot 1 Vazio (+ Encaixar)</button>`;
+
+                        const socket2Html = runas[1] ?
+                            `<button class="tbh-mini-btn" style="background:rgba(201,106,201,0.25); color:#e2e8f0; font-size:0.7em; border:1px solid #c96ac9; padding:5px 8px; width:100%;" onclick="prepareRuneSocket(${idx}, 1)">${runasData[runas[1]].icon} ${runasData[runas[1]].name} (✕ Remover)</button>` :
+                            `<button class="tbh-mini-btn" style="background:rgba(74,255,74,0.15); color:var(--green); font-size:0.7em; border:1px dashed var(--green); padding:5px 8px; width:100%;" onclick="prepareRuneSocket(${idx}, 1)">🟢 Slot 2 Vazio (+ Encaixar)</button>`;
+
+                        return `
+                            <div class="inv-card ${rClass}" style="width:100%; border-radius:12px; padding:12px; display:flex; flex-direction:column; gap:8px;">
+                                <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+                                    <span style="font-size:1.5em;">${item.icon}</span>
+                                    <span style="font-size:0.85em; font-weight:800; color:${color};">${item.name} ${isEquipped ? '<span style="color:var(--gold); font-size:0.75em;">[Equipado]</span>' : ''}</span>
+                                    <span style="font-size:0.8em; color:var(--gold); font-weight:800; background:rgba(255,215,0,0.1); padding:2px 8px; border-radius:10px;">⭐ GS: ${item.gearScore || calculateItemGearScore(item)}</span>
+                                </div>
+                                <div style="display:flex; gap:8px; width:100%;">
+                                    <div style="flex:1;">${socket1Html}</div>
+                                    <div style="flex:1;">${socket2Html}</div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+
+                    window._allSocketItems = allItems.map(a => a.item);
+                }
+            }
+
+            // Render Rune Inventory (Sacola de Runas)
+            const runeBagGrid = document.getElementById('runeBagGrid');
+            if (runeBagGrid) {
+                const runeEntries = Object.entries(heroState.runes || {}).filter(([rId, qty]) => runasData[rId]);
+                if (runeEntries.length === 0) {
+                    runeBagGrid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; color:#718096; padding:20px; font-size:0.8em;">Você não possui runas. Clique em "🔨 Forjar Runa" para forjar!</div>`;
+                } else {
+                    runeBagGrid.innerHTML = runeEntries.map(([rId, qty]) => {
+                        const r = runasData[rId];
+                        const rColor = rarityColors[r.rarity] || '#fff';
+                        return `
+                            <div class="rune-item-box rarity-border-${r.rarity}">
+                                <div style="font-size:1.6em;">${r.icon}</div>
+                                <div style="font-size:0.8em; font-weight:800; color:${rColor}; text-align:center;">${r.name}</div>
+                                <div style="font-size:0.7em; color:var(--gold); font-weight:800;">Quantidade: ${qty}x</div>
+                                <div style="font-size:0.68em; color:#a0aec0; text-align:center;">${r.desc}</div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+            }
+        }
+
+        function prepareRuneSocket(itemIdx, slotIdx) {
+            if (!window._allSocketItems || !window._allSocketItems[itemIdx]) return;
+            const item = window._allSocketItems[itemIdx];
+            const runeId = item.runas ? item.runas[slotIdx] : null;
+            if (runeId) {
+                removeRuneFromItem(item, slotIdx);
+            } else {
+                openRuneSelectModal(item, slotIdx);
+            }
+        }
+
+        function openRuneSelectModal(item, socketIndex) {
+            currentSocketTarget = { item: item, slotIndex: socketIndex };
+            const modal = document.getElementById('runeSelectModal');
+            const list = document.getElementById('runeSelectList');
+            if (modal) modal.classList.add('active');
+
+            if (list) {
+                const availableRunes = Object.entries(heroState.runes || {}).filter(([rId, qty]) => qty > 0 && runasData[rId]);
+                if (availableRunes.length === 0) {
+                    list.innerHTML = `<div style="text-align:center; color:#a0aec0; padding:20px;">Você não possui runas no inventário.<br>Clique em "🔨 Forjar Runa" no painel para criar uma!</div>`;
+                } else {
+                    list.innerHTML = availableRunes.map(([rId, qty]) => {
+                        const r = runasData[rId];
+                        const rColor = rarityColors[r.rarity] || '#fff';
+                        return `
+                            <div class="inv-card rarity-border-${r.rarity}" style="width:100%; flex-direction:row; justify-content:space-between; align-items:center; cursor:pointer; padding:12px; margin-bottom:8px;" onclick="applyRuneToItem('${rId}')">
+                                <div style="display:flex; align-items:center; gap:12px;">
+                                    <span style="font-size:1.6em;">${r.icon}</span>
+                                    <div>
+                                        <div style="font-size:0.85em; font-weight:800; color:${rColor};">${r.name} (${qty}x)</div>
+                                        <div style="font-size:0.75em; color:#cbd5e0;">${r.desc}</div>
+                                    </div>
+                                </div>
+                                <button class="tbh-mini-btn" style="background:var(--primary); color:#080f1a; font-weight:800; font-size:0.75em; padding:6px 12px;">Encaixar</button>
+                            </div>
+                        `;
+                    }).join('');
+                }
+            }
+        }
+
+        function closeRuneSelectModal() {
+            const modal = document.getElementById('runeSelectModal');
+            if (modal) modal.classList.remove('active');
+        }
+
+        function applyRuneToItem(runeId) {
+            if (!currentSocketTarget.item) return;
+            const item = currentSocketTarget.item;
+            const slotIdx = currentSocketTarget.slotIndex;
+
+            if ((heroState.runes[runeId] || 0) <= 0) return;
+
+            heroState.runes[runeId]--;
+            if (!item.runas) item.runas = [null, null];
+            item.runas[slotIdx] = runeId;
+            item.gearScore = calculateItemGearScore(item);
+
+            spawnPopup(180, `🟣 Runa Encaixada: ${runasData[runeId].name}!`, 'special');
+            closeRuneSelectModal();
+            renderRunesUI();
+            renderCharacterUI();
+        }
+
+        function removeRuneFromItem(item, slotIdx) {
+            if (!item || !item.runas || !item.runas[slotIdx]) return;
+            const runeId = item.runas[slotIdx];
+            item.runas[slotIdx] = null;
+            heroState.runes[runeId] = (heroState.runes[runeId] || 0) + 1;
+            item.gearScore = calculateItemGearScore(item);
+
+            spawnPopup(180, `🟢 Runa Removida: ${runasData[runeId].name}!`, 'gold');
+            renderRunesUI();
+            renderCharacterUI();
+        }
+
+        function forgeRune() {
+            if (heroState.gold < 60) {
+                spawnPopup(180, `❌ Ouro insuficiente (60 💰)!`, 'crit');
+                return;
+            }
+
+            heroState.gold -= 60;
+            const valGold = document.getElementById('valGold');
+            if (valGold) valGold.innerText = heroState.gold;
+
+            const runeKeys = Object.keys(runasData);
+            const randomRuneId = runeKeys[Math.floor(Math.random() * runeKeys.length)];
+            heroState.runes[randomRuneId] = (heroState.runes[randomRuneId] || 0) + 1;
+
+            const r = runasData[randomRuneId];
+            spawnPopup(180, `🌀 Forjou: ${r.icon} ${r.name}!`, 'special');
+            renderRunesUI();
+        }
+
+        function showLootItemComparison(lootIndex, event) {
+            if (!heroState.collectedLoots || !heroState.collectedLoots[lootIndex]) return;
+            showEquipmentComparison(heroState.collectedLoots[lootIndex], event);
+        }
+
+        function showEquipmentComparison(target, event) {
+            let newEq = null;
+            if (typeof target === 'number') {
+                if (!heroState.inventory || !heroState.inventory[target]) return;
+                newEq = heroState.inventory[target];
+            } else if (typeof target === 'object' && target !== null) {
+                newEq = target;
+            }
+            if (!newEq) return;
+
+            const slot = newEq.slot;
+            const curEq = heroState.equipment ? heroState.equipment[slot] : null;
+
+            let tooltip = document.getElementById('equipmentComparisonTooltip');
+            if (!tooltip) {
+                tooltip = document.createElement('div');
+                tooltip.id = 'equipmentComparisonTooltip';
+                tooltip.style.cssText = `
+                    position: fixed;
+                    z-index: 100000;
+                    pointer-events: none;
+                    background: linear-gradient(135deg, rgba(12,20,35,0.98), rgba(5,10,20,0.98));
+                    border: 2px solid rgba(255,215,0,0.4);
+                    border-radius: 14px;
+                    padding: 14px;
+                    width: 340px;
+                    font-family: 'Outfit', sans-serif;
+                    box-shadow: 0 15px 40px rgba(0,0,0,0.8), 0 0 20px rgba(255,153,68,0.25);
+                    backdrop-filter: blur(10px);
+                    display: flex;
+                    flex-direction: column;
+                    gap: 8px;
+                    line-height: 1.4;
+                    opacity: 0;
+                    transition: opacity 0.15s ease;
+                `;
+                document.body.appendChild(tooltip);
+            }
+
+            const borderColors = {
+                common: 'rgba(255,255,255,0.4)',
+                uncommon: 'rgba(74,255,74,0.6)',
+                rare: 'rgba(74,154,255,0.7)',
+                epic: 'rgba(201,106,201,0.8)',
+                legendary: 'rgba(255,215,0,0.9)',
+                ancient: 'rgba(255,68,170,1.0)'
+            };
+            tooltip.style.borderColor = borderColors[newEq.rarity] || borderColors.common;
+
+            let equippedHtml = '';
+            if (curEq) {
+                const curGs = curEq.gearScore || calculateItemGearScore(curEq);
+                equippedHtml = `
+                    <div style="flex:1; border-right:1px solid rgba(255,255,255,0.1); padding-right:10px;">
+                        <div style="font-size:0.7em; color:#a0aec0; font-weight:800;">👉 EQUIPADO</div>
+                        <div style="font-size:0.85em; font-weight:bold; color:${rarityColors[curEq.rarity]}; margin:4px 0;">${curEq.icon} ${curEq.name}</div>
+                        <div style="font-size:0.7em; color:var(--gold); font-weight:800;">⭐ GS: ${curGs}</div>
+                        <div style="font-size:0.72em; color:#cbd5e0; margin-top:4px;">${formatItemStatsHtml(curEq)}</div>
+                    </div>
+                `;
+            } else {
+                equippedHtml = `
+                    <div style="flex:1; border-right:1px solid rgba(255,255,255,0.1); padding-right:10px; display:flex; flex-direction:column; justify-content:center; align-items:center; min-height:60px;">
+                        <div style="font-size:0.7em; color:#a0aec0; font-weight:800;">👉 EQUIPADO</div>
+                        <div style="font-size:0.8em; color:#718096; font-style:italic; margin-top:6px;">Nenhum item</div>
+                    </div>
+                `;
+            }
+
+            const newGs = newEq.gearScore || calculateItemGearScore(newEq);
+            const newHtml = `
+                <div style="flex:1; padding-left:10px;">
+                    <div style="font-size:0.7em; color:var(--gold); font-weight:800;">✨ COMPARANDO</div>
+                    <div style="font-size:0.85em; font-weight:bold; color:${rarityColors[newEq.rarity]}; margin:4px 0;">${newEq.icon} ${newEq.name}</div>
+                    <div style="font-size:0.7em; color:var(--gold); font-weight:800;">⭐ GS: ${newGs}</div>
+                    <div style="font-size:0.72em; color:#cbd5e0; margin-top:4px;">${formatItemStatsHtml(newEq)}</div>
+                </div>
+            `;
+
+            const allStats = ['strength', 'defense', 'maxHealth', 'speedBonus', 'critChance', 'xpBonus', 'goldBonus', 'lifesteal'];
+            const statLabels = {
+                strength: 'Força ⚔️',
+                defense: 'Defesa 🛡️',
+                maxHealth: 'Vida ❤️',
+                speedBonus: 'Velocidade ⚡',
+                critChance: 'Crítico 💥',
+                xpBonus: 'XP 📚',
+                goldBonus: 'Ouro 💰',
+                lifesteal: 'Roubo de Vida 🩸'
+            };
+
+            let diffsHtml = '';
+            let hasAnyDiff = false;
+
+            const curGs = curEq ? (curEq.gearScore || calculateItemGearScore(curEq)) : 0;
+            const gsDiff = newGs - curGs;
+            if (gsDiff !== 0) {
+                const gsBadge = gsDiff > 0 ?
+                    `<span style="color:#00ff88; background:rgba(0,255,136,0.15); padding:2px 8px; border-radius:6px; font-weight:800;">▲ +${gsDiff}</span>` :
+                    `<span style="color:#ff4444; background:rgba(255,68,68,0.15); padding:2px 8px; border-radius:6px; font-weight:800;">▼ ${gsDiff}</span>`;
+                diffsHtml += `
+                    <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8em; padding:3px 0; border-bottom:1px solid rgba(255,255,255,0.06); font-weight:800;">
+                        <span style="color:var(--gold);">Gear Score ⭐</span>
+                        <span>${gsBadge}</span>
+                    </div>
+                `;
+                hasAnyDiff = true;
+            }
+
+            allStats.forEach(stat => {
+                const newVal = newEq.stats?.[stat] || 0;
+                const curVal = curEq ? (curEq.stats?.[stat] || 0) : 0;
+
+                if (newVal > 0 || curVal > 0) {
+                    const diff = newVal - curVal;
+                    let diffBadge = '';
+                    const isPct = (stat === 'speedBonus' || stat === 'critChance' || stat === 'xpBonus' || stat === 'goldBonus' || stat === 'lifesteal');
+                    const unit = isPct ? '%' : '';
+
+                    if (diff > 0) {
+                        diffBadge = `<span style="color:#00ff88; background:rgba(0,255,136,0.12); padding:2px 6px; border-radius:4px; font-weight:800;">▲ +${diff}${unit}</span>`;
+                        hasAnyDiff = true;
+                    } else if (diff < 0) {
+                        diffBadge = `<span style="color:#ff4444; background:rgba(255,68,68,0.12); padding:2px 6px; border-radius:4px; font-weight:800;">▼ ${diff}${unit}</span>`;
+                        hasAnyDiff = true;
+                    } else {
+                        diffBadge = `<span style="color:#718096; font-size:0.85em;">= (Sem alteração)</span>`;
+                    }
+                    diffsHtml += `
+                        <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.78em; padding:3px 0; border-bottom:1px solid rgba(255,255,255,0.04);">
+                            <span style="color:#cbd5e0;">${statLabels[stat]}</span>
+                            <span>${diffBadge}</span>
+                        </div>
+                    `;
+                }
+            });
+
+            if (!hasAnyDiff && diffsHtml === '') {
+                diffsHtml = `<div style="text-align:center; font-size:0.78em; color:#718096; font-style:italic; padding:6px 0;">Atributos idênticos aos do item equipado</div>`;
+            }
+
+            tooltip.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:6px; margin-bottom:4px;">
+                    <span style="font-size:0.85em; font-weight:bold; font-family:'Cinzel'; color:var(--gold);">⚔️ Comparador · Slot ${slotNames[slot] || slot}</span>
+                    <span style="font-size:0.7em; color:#a0aec0; background:rgba(255,255,255,0.06); padding:2px 8px; border-radius:6px;">Comparação em Tempo Real</span>
+                </div>
+                <div style="display:flex; margin-bottom:8px;">
+                    ${equippedHtml}
+                    ${newHtml}
+                </div>
+                <div style="background:rgba(0,0,0,0.35); border-radius:8px; padding:8px 12px; border:1px solid rgba(255,255,255,0.05);">
+                    <div style="font-size:0.7em; color:var(--gold); font-weight:800; text-transform:uppercase; margin-bottom:4px; letter-spacing:0.5px;">📊 Variação de Atributos</div>
+                    ${diffsHtml}
+                </div>
+            `;
+
+            tooltip.style.display = 'flex';
+            tooltip.style.opacity = '1';
+            moveEquipmentComparison(event);
+        }
+
+        function moveEquipmentComparison(event) {
+            const tooltip = document.getElementById('equipmentComparisonTooltip');
+            if (!tooltip) return;
+
+            let x = event.clientX + 18;
+            let y = event.clientY + 18;
+
+            if (x + tooltip.offsetWidth > window.innerWidth) {
+                x = event.clientX - tooltip.offsetWidth - 18;
+            }
+            if (y + tooltip.offsetHeight > window.innerHeight) {
+                y = window.innerHeight - tooltip.offsetHeight - 18;
+            }
+
+            tooltip.style.left = x + 'px';
+            tooltip.style.top = y + 'px';
+        }
+
+        function hideEquipmentComparison() {
+            const tooltip = document.getElementById('equipmentComparisonTooltip');
+            if (tooltip) {
+                tooltip.style.opacity = '0';
+                tooltip.style.display = 'none';
+            }
+        }
+
+        function sellItem(invIndex) {
+            hideEquipmentComparison();
+            if (!heroState.inventory || !heroState.inventory[invIndex]) return;
+            const item = heroState.inventory[invIndex];
+            const sellPrice = item.price || 50;
+            heroState.gold += sellPrice;
+            heroState.inventory.splice(invIndex, 1);
+
+            const valGold = document.getElementById('valGold');
+            if (valGold) valGold.innerText = heroState.gold;
+
+            spawnPopup(180, `+${sellPrice}💰 (Vendeu ${item.name})`, 'gold');
+            renderCharacterUI();
+        }
+
+        function equipItem(invIndex) {
+            hideEquipmentComparison();
+            if (!heroState.inventory || !heroState.inventory[invIndex]) return;
+            const item = heroState.inventory[invIndex];
+            const targetSlot = item.slot;
+
+            heroState.inventory.splice(invIndex, 1);
+
+            if (heroState.equipment[targetSlot]) {
+                heroState.inventory.push(heroState.equipment[targetSlot]);
+            }
+
+            heroState.equipment[targetSlot] = item;
+
+            // Se for uma arma, atualizar tipo visual do ataque
+            if (targetSlot === 'weapon') {
+                if (item.id.includes('silver')) heroState.weaponKey = 'silver';
+                else if (item.id.includes('gold')) heroState.weaponKey = 'gold';
+                else if (item.id.includes('bow') || item.id === 'craftedItem2') heroState.weaponKey = 'bow';
+                else if (item.id.includes('staff') || item.id.includes('cajado') || item.id === 'craftedItem3' || item.id === 'craftedItem5' || item.id === 'wb_phoenix_staff') heroState.weaponKey = 'staff';
+                else heroState.weaponKey = 'sword';
+
+                const selectWeapon = document.getElementById('selectWeapon');
+                if (selectWeapon) selectWeapon.value = heroState.weaponKey;
+            }
+
+            spawnPopup(180, `🛡️ Equipou: ${item.name}!`, 'special');
+            renderCharacterUI();
+        }
+
+        function unequipItem(slotKey) {
+            if (!heroState.equipment || !heroState.equipment[slotKey]) return;
+            const item = heroState.equipment[slotKey];
+            heroState.equipment[slotKey] = null;
+            heroState.inventory.push(item);
+
+            if (slotKey === 'weapon') {
+                heroState.weaponKey = 'sword';
+                const selectWeapon = document.getElementById('selectWeapon');
+                if (selectWeapon) selectWeapon.value = 'sword';
+            }
+
+            renderCharacterUI();
+        }
 
         const resourceTypes = [
             { icon: '🌳', name: 'Árvore', type: 'wood' },
@@ -1640,13 +3023,19 @@
         function updateGame() {
             const now = Date.now();
             const heroPos = 180;
+            const comp = getHeroComputedStats();
+            const effectiveSpeed = heroState.speedMult * (1.0 + ((comp.speedBonus || 0) / 100));
             const currentWeapon = weaponConfigs[heroState.weaponKey];
             const stageWidth = pipWindow ? pipWindow.innerWidth : window.innerWidth;
 
             // 1. Atualizar distância
-            heroState.distance += Math.round(1 * heroState.speedMult);
+            heroState.distance += Math.round(1 * effectiveSpeed);
             const distEl = document.getElementById('valDistance');
             if (distEl) distEl.innerText = heroState.distance + 'm';
+
+            // Atualizar barras de Vida e XP em tempo real
+            updateHpUI();
+            updateXpAndLevelUI();
 
             // 2. Testar Chefe aos 1500m (Ou se atingir o Nível 10 do bioma)
             if (heroState.distance >= heroState.nextBossDistance && !heroState.currentBoss) {
@@ -1678,9 +3067,9 @@
                 }
             }
 
-            // 5. Atacar o primeiro monstro da frente
+            // 5. Atacar o primeiro monstro da frente (usando velocidade acumulada)
             if (queuedMonsters.length > 0) {
-                if (now - heroState.lastAttackTime >= (currentWeapon.cooldown / heroState.speedMult)) {
+                if (now - heroState.lastAttackTime >= (currentWeapon.cooldown / effectiveSpeed)) {
                     heroState.lastAttackTime = now;
                     executeWeaponAttack(queuedMonsters[0], currentWeapon, heroPos);
                 }
@@ -1697,7 +3086,7 @@
                 }
 
                 if (ent.x > minXAllowed) {
-                    const speed = ent.isBoss ? (5 * heroState.speedMult) : (8 * heroState.speedMult);
+                    const speed = ent.isBoss ? (5 * effectiveSpeed) : (8 * effectiveSpeed);
                     ent.x -= speed;
                     if (ent.x < minXAllowed) ent.x = minXAllowed;
                 }
@@ -1835,10 +3224,20 @@
                     setTimeout(() => bar.classList.remove('shake'), 300);
                 }
 
-                const isCrit = Math.random() < 0.3;
-                const damage = isCrit ? Math.floor(Math.random() * 65) + 75 : Math.floor(Math.random() * 35) + 30;
+                // Cálculo de dano dinâmico com base nos Equipamentos
+                const comp = getHeroComputedStats();
+                const isCrit = Math.random() < (comp.critChance / 100);
+                const baseDmg = Math.floor(Math.random() * 20) + 15 + comp.strength;
+                const damage = isCrit ? Math.floor(baseDmg * 1.85) : baseDmg;
                 
                 spawnPopup(ent.x, damage + (isCrit ? ' 💥 CRÍTICO!' : ''), isCrit ? 'crit' : 'damage');
+
+                // Efeito de Lifesteal (Roubo de Vida)
+                if (comp.lifesteal > 0) {
+                    const heal = Math.max(1, Math.floor(damage * (comp.lifesteal / 100)));
+                    heroState.hp = Math.min(comp.maxHealth, heroState.hp + heal);
+                    spawnPopup(ent.x - 20, '+' + heal + '❤️', 'heal');
+                }
 
                 ent.data.hp -= damage;
 
@@ -1859,17 +3258,41 @@
 
                 if (ent.data.hp <= 0) {
                     heroState.kills++;
-                    heroState.gold += Math.floor(ent.data.maxHp * 0.2);
-                    heroState.xp += Math.floor(ent.data.maxHp * 0.25);
+
+                    const goldMult = 1.0 + (comp.goldBonus / 100);
+                    const xpMult = 1.0 + (comp.xpBonus / 100);
+
+                    // XP do mob (Curva Hardcore Equilibrada)
+                    const xpFactor = ent.isBoss ? 0.10 : 0.035;
+                    const xpGained = Math.max(3, Math.floor(ent.data.maxHp * xpFactor * xpMult));
+                    heroState.xp += xpGained;
+                    spawnPopup(ent.x + 30, `+${xpGained} XP`, 'xp');
+                    updateXpAndLevelUI();
+
+                    // DROPS ESCASSOS E DINÂMICOS DE OURO (40% chance em normais, 100% em chefes)
+                    const goldChance = ent.isBoss ? 1.0 : 0.40;
+                    if (Math.random() <= goldChance) {
+                        const levelBonus = 1.0 + (heroState.biomeLevel - 1) * 0.15;
+                        const minGold = ent.isBoss ? Math.max(12, Math.floor(ent.data.maxHp * 0.012 * levelBonus)) : Math.max(1, Math.floor(ent.data.maxHp * 0.002 * levelBonus));
+                        const maxGold = ent.isBoss ? Math.max(25, Math.floor(ent.data.maxHp * 0.025 * levelBonus)) : Math.max(3, Math.floor(ent.data.maxHp * 0.005 * levelBonus));
+                        const rawGold = Math.floor(minGold + Math.random() * (maxGold - minGold + 1));
+                        const finalGold = Math.max(1, Math.floor(rawGold * goldMult));
+
+                        heroState.gold += finalGold;
+                        spawnPopup(ent.x, `+${finalGold}💰`, 'gold');
+                    }
 
                     const valKills = document.getElementById('valKills');
                     const valGold = document.getElementById('valGold');
                     if (valKills) valKills.innerText = heroState.kills;
                     if (valGold) valGold.innerText = heroState.gold;
 
+                    // Chance de Drop de Runas ao derrotar monstros
+                    rollRuneDrop(ent);
+
                     if (ent.isBoss) {
-                        heroState.nextBossDistance += 1500;
-                        triggerFlyingLootDrop(ent.x, ent.data.guaranteedLoot);
+                        heroState.nextBossDistance += 3500;
+                        rollMonsterDrop(ent);
 
                         // Avançar Nível do Bioma ao derrotar o Chefe
                         if (heroState.biomeLevel < 10) {
@@ -1885,11 +3308,7 @@
                             heroState.currentBoss = null;
                         }, 400);
                     } else {
-                        if (Math.random() < 0.35) {
-                            const keys = Object.keys(realEquipmentDatabase);
-                            const randomEquipKey = keys[Math.floor(Math.random() * keys.length)];
-                            triggerFlyingLootDrop(ent.x, randomEquipKey);
-                        }
+                        rollMonsterDrop(ent);
                     }
 
                     ent.el.classList.add('hit');
@@ -1903,16 +3322,17 @@
             } else {
                 ent.el.classList.add('hit');
                 if (ent.data.type === 'chest') {
-                    const chestGold = Math.floor(Math.random() * 60) + 40;
+                    const chestGold = Math.floor((Math.random() * 8 + 5) * (1.0 + ((getHeroComputedStats().goldBonus || 0) / 100)));
                     heroState.gold += chestGold;
                     const valGold = document.getElementById('valGold');
                     if (valGold) valGold.innerText = heroState.gold;
                     spawnPopup(ent.x, '+' + chestGold + '💰 (Baú!)', 'gold');
 
-                    if (Math.random() < 0.5) {
-                        const keys = Object.keys(realEquipmentDatabase);
-                        const randomEquipKey = keys[Math.floor(Math.random() * keys.length)];
-                        triggerFlyingLootDrop(ent.x, randomEquipKey);
+                    // Baú também possui chance de drop de runas!
+                    rollRuneDrop({ x: ent.x, isBoss: false });
+
+                    if (Math.random() < 0.6) {
+                        rollMonsterDrop({ x: ent.x, isBoss: false });
                     }
                 } else {
                     spawnPopup(ent.x, '+1 ' + ent.data.name, 'item');
@@ -1926,25 +3346,105 @@
             }
         }
 
-        function triggerFlyingLootDrop(xPos, equipKey) {
-            const equip = realEquipmentDatabase[equipKey];
-            if (!equip) return;
+        function rollRuneDrop(ent) {
+            const isBoss = ent ? ent.isBoss : false;
+            const runeDropChance = isBoss ? 0.15 : 0.015; // 15% em chefes, 1.5% em mobs normais
+
+            if (Math.random() > runeDropChance) return;
+
+            const lvl = heroState.biomeLevel || 1;
+            let availableRunes = ['runa_sabio', 'runa_guerreiro', 'runa_veloz'];
+
+            if (lvl >= 4) {
+                availableRunes.push('runa_colosso', 'runa_fortaleza');
+            }
+            if (lvl >= 7 || isBoss) {
+                availableRunes.push('runa_vampiro', 'runa_trovao', 'runa_ancestral');
+            }
+
+            const chosenRuneId = availableRunes[Math.floor(Math.random() * availableRunes.length)];
+            heroState.runes[chosenRuneId] = (heroState.runes[chosenRuneId] || 0) + 1;
+
+            const r = runasData[chosenRuneId];
+            if (r && ent) {
+                spawnPopup(ent.x || 200, `🌀 RUNA DROPPADA: ${r.icon} ${r.name}!`, 'special');
+            }
+
+            // Atualizar UI de Runas se aberta
+            if (document.getElementById('tabContentRunas') && document.getElementById('tabContentRunas').style.display !== 'none') {
+                renderRunesUI();
+            }
+        }
+
+        function rollMonsterDrop(ent) {
+            const isBoss = ent.isBoss || false;
+            const dropChance = isBoss ? 0.50 : 0.06; // 6% em mobs normais, 50% em chefes
+            if (Math.random() > dropChance) return;
+
+            let rarityWeights = { common: 80, uncommon: 17, rare: 3, epic: 0, legendary: 0, ancient: 0 };
+            const bLvl = heroState.biomeLevel || 1;
+
+            if (isBoss) {
+                if (bLvl <= 3) {
+                    rarityWeights = { common: 60, uncommon: 35, rare: 5, epic: 0, legendary: 0, ancient: 0 };
+                } else if (bLvl <= 6) {
+                    rarityWeights = { common: 30, uncommon: 45, rare: 20, epic: 5, legendary: 0, ancient: 0 };
+                } else if (bLvl <= 9) {
+                    rarityWeights = { common: 10, uncommon: 30, rare: 40, epic: 16, legendary: 4, ancient: 0 };
+                } else {
+                    rarityWeights = { common: 0, uncommon: 10, rare: 35, epic: 35, legendary: 18, ancient: 2 };
+                }
+            } else {
+                if (bLvl <= 3) {
+                    rarityWeights = { common: 80, uncommon: 17, rare: 3, epic: 0, legendary: 0, ancient: 0 };
+                } else if (bLvl <= 6) {
+                    rarityWeights = { common: 62, uncommon: 28, rare: 9, epic: 1, legendary: 0, ancient: 0 };
+                } else {
+                    rarityWeights = { common: 45, uncommon: 35, rare: 15, epic: 4.5, legendary: 0.49, ancient: 0.01 };
+                }
+            }
+
+            const totalWeight = Object.values(rarityWeights).reduce((a, b) => a + b, 0);
+            let rand = Math.random() * totalWeight;
+            let selectedRarity = 'common';
+            for (const [r, w] of Object.entries(rarityWeights)) {
+                if (rand < w) {
+                    selectedRarity = r;
+                    break;
+                }
+                rand -= w;
+            }
+
+            const candidates = Object.values(realEquipmentDatabase).filter(eq => eq.rarity === selectedRarity);
+            const chosen = candidates.length > 0 ? candidates[Math.floor(Math.random() * candidates.length)] : realEquipmentDatabase['weapon_iron'];
+
+            triggerFlyingLootDrop(ent.x, chosen.id, selectedRarity);
+        }
+
+        function triggerFlyingLootDrop(xPos, equipKey, forcedRarity) {
+            const baseItem = realEquipmentDatabase[equipKey];
+            if (!baseItem) return;
+
+            const fullItemInstance = createFullItemInstance(equipKey, forcedRarity || baseItem.rarity);
 
             const stage = (pipWindow && pipWindow.document.getElementById('tbhStage')) ? pipWindow.document.getElementById('tbhStage') : document.getElementById('tbhStage');
             if (stage) {
                 const flyingItem = document.createElement('div');
                 flyingItem.className = 'flying-loot-item';
-                flyingItem.innerText = equip.icon;
+                flyingItem.innerText = fullItemInstance.icon;
                 flyingItem.style.left = xPos + 'px';
                 flyingItem.style.bottom = '40px';
                 stage.appendChild(flyingItem);
 
-                spawnPopup(xPos, `🎁 ${equip.icon} ${equip.name}`, 'item');
+                const rName = rarityNames[fullItemInstance.rarity] || fullItemInstance.rarity;
+                spawnPopup(xPos, `🎁 ${fullItemInstance.icon} ${fullItemInstance.name} [${rName}] (⭐ GS ${fullItemInstance.gearScore})`, 'item');
 
                 setTimeout(() => {
                     if (flyingItem.parentNode) flyingItem.parentNode.removeChild(flyingItem);
-                    heroState.collectedLoots.push(equip);
+                    heroState.collectedLoots.push(fullItemInstance);
+                    heroState.inventory.push(fullItemInstance);
                     updateLootInventoryUI();
+                    renderCharacterUI();
                 }, 800);
             }
         }
@@ -1961,13 +3461,16 @@
             if (lootCountText) lootCountText.innerText = heroState.collectedLoots.length + ' itens';
 
             if (grid) {
-                const recent = heroState.collectedLoots.slice(-10).reverse();
+                const recent = heroState.collectedLoots.slice(-12).reverse();
                 grid.innerHTML = recent.map(eq => {
                     const color = rarityColors[eq.rarity] || '#fff';
+                    const lootIndex = heroState.collectedLoots.indexOf(eq);
+                    const gs = eq.gearScore || calculateItemGearScore(eq);
                     return `
-                        <div class="loot-item-pill" style="border-color:${color}; color:${color};">
+                        <div class="loot-item-pill" style="border-color:${color}; color:${color};" onmouseenter="showLootItemComparison(${lootIndex}, event)" onmousemove="moveEquipmentComparison(event)" onmouseleave="hideEquipmentComparison()" onclick="openCharacterModal()">
                             <span>${eq.icon}</span>
                             <span>${eq.name}</span>
+                            <span style="font-size:0.75em; color:var(--gold); font-weight:800; background:rgba(255,215,0,0.12); padding:2px 6px; border-radius:8px; margin-left:4px;">⭐ ${gs}</span>
                         </div>
                     `;
                 }).join('');
