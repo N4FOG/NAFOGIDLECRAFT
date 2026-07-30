@@ -1,0 +1,34 @@
+- Efeito de Varredura de Luz (Shine Sweep): Reflexo dourado animado em botões premium
+- Molduras de Filigrana Dourada : Painéis e vitrines ornamentadas com cantos metálicos 3D e contorno brilhante.
+- Barra de Nível Total (Fogo Vivo / Arco-Íris): Redesign completo da barra de progresso global com brilho e gradiente incandescente.
+- Notificações Toast Refinadas: Animação de entrada suave estilo glassmorphism com sombras de profundidade.
+
+⛏️ 2. Expansão de Mineração, Fundição & Ferraria (End-Game)
+- 4 Novos Níveis de Minérios & Lingotes Avançados
+- Novos Equipamentos Craftáveis Supremos:
+
+👑 3. Sistema de Chefe Global (World Boss Multiplayer) & Recompensas Únicas
+Buffs & Saques Exclusivos por Titã: Cada Chefe Global derrotado agora garante bônus específicos (equipamentos ancestrais temáticos, ouro abundante e buffs ativos por 4 horas como a Bênção do Titã, Bênção de Fogo, etc.).
+Modal de Recompensa Reformulado: Tela de celebração com saques de ouro, equipamentos lendários e buffs explicativos.
+
+👷 4. Automação & Sistema de Trabalhadores
+- Resumo de Trabalhadores na Barra Superior (Top Bar): Painel compacto exibindo a quantidade de trabalhadores alocados e status dos abastecedores.
+- Controle Direto nas Receitas (Smithing & Crafting): Botões - / + de alocação rápida e alternador de notificações (🔔/🔕) em cada card de receita.
+- Correções no Consumo & XP: Lógica ajustada para receitas com múltiplos ingredientes, garantindo cálculo correto de XP e consumo de insumos pelos trabalhadores.
+
+5. Interface, Navegação & Buffs
+Buffs Clicáveis com Tooltip: Clique em qualquer buff ativo na barra lateral para ver detalhes, descrição e tempo restante em um tooltip.
+Navegação Rápida: Adicionado o botão Personagem nos links rápidos do menu.
+Redesign dos Botões da Sidebar & Academia: Atualizações visuais nos botões de Inventário, Propriedades e cards da Academia.
+
+🔨 1. Sistema de Forja & Ferraria (Smithing Overhaul)
+Categorização e Filtros Avançados de Receitas:
+Filtros por tipo de produção: Barras/Lingotes, Lâminas/Componentes e Equipamentos.
+Filtro rápido por Slots de Equipamentos (Armas, Armaduras, Elmos, Escudos, Botas, Anéis e Amuletos).
+Integração com Persecuções e Perks da Propriedade (Fornalha):
+Especialização Fundidor: Aumenta a chance de Escória Brilhante para 10% durante a fundição.
+Especialização Centelha Poderosa: 10% de chance de forjar +1 barra extra automaticamente.
+Alerta de Fornalha Fria: Interrupção segura de produção e notificação quando o combustível esgota.
+Automação por Trabalhadores na Forja:
+Alocação individual de trabalhadores em cada receita de forja (- / +), exibição do ícone 👷 e filtro de notificações por item (🔔/🔕).
+Cálculo dinâmico de XP de Ferraria e suporte a receitas complexas com múltiplos ingredientes.
