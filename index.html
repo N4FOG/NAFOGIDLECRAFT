@@ -1023,49 +1023,349 @@
         }
 
     </script>
+    <!-- ===== PATCH NOTES HUD CSS ===== -->
+    <style>
+        @keyframes mpnGlow {
+            0%,100% { box-shadow: 0 0 18px rgba(100,180,255,0.18), 0 4px 40px rgba(0,0,0,0.55); }
+            50%      { box-shadow: 0 0 32px rgba(120,200,255,0.30), 0 4px 40px rgba(0,0,0,0.55); }
+        }
+        @keyframes mpnShimmer {
+            0%   { background-position: -200% center; }
+            100% { background-position:  200% center; }
+        }
+        @keyframes mpnPulse {
+            0%,100% { opacity:1; transform:scale(1); }
+            50%      { opacity:0.7; transform:scale(0.92); }
+        }
+        @keyframes mpnSlideIn {
+            from { opacity:0; transform:translateY(8px); }
+            to   { opacity:1; transform:translateY(0); }
+        }
+        .menu-patchnotes {
+            margin-top: 18px;
+            background: linear-gradient(160deg, rgba(8,18,35,0.92) 0%, rgba(14,25,50,0.88) 100%);
+            border: 1px solid rgba(80,140,255,0.22);
+            border-radius: 16px;
+            padding: 0;
+            max-width: 390px;
+            width: 100%;
+            text-align: left;
+            overflow: hidden;
+            animation: mpnGlow 4s ease-in-out infinite;
+            position: relative;
+        }
+        .menu-patchnotes::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #4af, #a8f, #4af, transparent);
+            background-size: 200% auto;
+            animation: mpnShimmer 3s linear infinite;
+        }
+        .mpn-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            background: rgba(255,255,255,0.03);
+        }
+        .mpn-header-left { display: flex; align-items: center; gap: 10px; }
+        .mpn-icon {
+            font-size: 1.4em;
+            animation: mpnPulse 2.5s ease-in-out infinite;
+            display: inline-block;
+        }
+        .mpn-title {
+            font-size: 0.72em;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            color: #7ab8ff;
+            line-height: 1;
+        }
+        .mpn-subtitle {
+            font-size: 0.65em;
+            color: rgba(180,200,255,0.5);
+            margin-top: 2px;
+            letter-spacing: 0.5px;
+        }
+        .mpn-counter {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: linear-gradient(135deg, rgba(80,160,255,0.18), rgba(140,80,255,0.18));
+            border: 1px solid rgba(100,160,255,0.3);
+            border-radius: 10px;
+            padding: 5px 10px;
+            cursor: default;
+        }
+        .mpn-counter-num {
+            font-size: 1.3em;
+            font-weight: 900;
+            line-height: 1;
+            background: linear-gradient(135deg, #7af, #c8f);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .mpn-counter-label {
+            font-size: 0.52em;
+            font-weight: 700;
+            color: rgba(160,200,255,0.6);
+            letter-spacing: 1px;
+            margin-top: 1px;
+        }
+        .mpn-highlight {
+            margin: 10px 14px 0;
+            background: linear-gradient(135deg, rgba(255,200,50,0.10), rgba(255,140,20,0.08));
+            border: 1px solid rgba(255,200,50,0.25);
+            border-radius: 10px;
+            padding: 8px 12px;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            animation: mpnSlideIn 0.5s ease both;
+        }
+        .mpn-highlight-badge {
+            font-size: 0.58em;
+            font-weight: 800;
+            color: #ffd060;
+            background: rgba(255,200,50,0.15);
+            border: 1px solid rgba(255,200,50,0.35);
+            border-radius: 5px;
+            padding: 2px 6px;
+            white-space: nowrap;
+            flex-shrink: 0;
+            margin-top: 1px;
+            letter-spacing: 0.5px;
+        }
+        .mpn-highlight-text {
+            font-size: 0.78em;
+            color: #ffe8a0;
+            line-height: 1.4;
+        }
+        .mpn-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            padding: 8px 14px 10px;
+            max-height: 210px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(100,160,255,0.3) transparent;
+        }
+        .mpn-list::-webkit-scrollbar { width: 4px; }
+        .mpn-list::-webkit-scrollbar-track { background: transparent; }
+        .mpn-list::-webkit-scrollbar-thumb { background: rgba(100,160,255,0.3); border-radius: 4px; }
+        .mpn-entry {
+            display: flex;
+            align-items: baseline;
+            gap: 7px;
+            padding: 7px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 0.76em;
+            color: #c8d8f0;
+            line-height: 1.4;
+            transition: background 0.2s;
+            animation: mpnSlideIn 0.4s ease both;
+        }
+        .mpn-entry:last-child { border-bottom: none; }
+        .mpn-entry:hover { background: rgba(100,160,255,0.06); border-radius: 6px; }
+        .mpn-badge {
+            font-size: 0.58em;
+            font-weight: 800;
+            letter-spacing: 0.8px;
+            border-radius: 4px;
+            padding: 2px 6px;
+            white-space: nowrap;
+            flex-shrink: 0;
+            border: 1px solid transparent;
+        }
+        .mpn-badge-system  { background: rgba(80,140,255,0.15); color: #88bbff; border-color: rgba(80,140,255,0.35); }
+        .mpn-badge-visual  { background: rgba(180,80,255,0.15); color: #cc88ff; border-color: rgba(180,80,255,0.35); }
+        .mpn-badge-content { background: rgba(50,200,120,0.12); color: #66ddaa; border-color: rgba(50,200,120,0.30); }
+        .mpn-date {
+            color: rgba(160,190,255,0.5);
+            font-weight: 700;
+            white-space: nowrap;
+            flex-shrink: 0;
+            font-size: 0.9em;
+        }
+        .mpn-text b { color: #e8f0ff; }
+        .mpn-footer {
+            border-top: 1px solid rgba(255,255,255,0.06);
+            padding: 7px 16px;
+            font-size: 0.62em;
+            color: rgba(160,185,220,0.45);
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            background: rgba(255,255,255,0.02);
+            letter-spacing: 0.3px;
+        }
+        .mpn-footer-dot {
+            display: inline-block;
+            width: 7px; height: 7px;
+            border-radius: 50%;
+        }
+        .mpn-footer-dot.new { background: #ffd060; }
+        .mpn-footer-dot.sys { background: #88bbff; }
+        .mpn-footer-dot.vis { background: #cc88ff; }
+        .mpn-footer-dot.con { background: #66ddaa; }
+
+        /* ===== MENUS BUTTONS HORIZONTAL ROW ===== */
+        .menu-subtitle {
+            margin-bottom: 25px !important;
+        }
+        .menu-buttons-row {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            width: 100%;
+            max-width: 480px;
+            margin-bottom: 8px;
+        }
+        .menu-buttons-row .menu-btn-main {
+            flex: 1;
+            width: auto !important;
+            max-width: none !important;
+            padding: 14px 8px;
+            margin-bottom: 0;
+            font-size: 0.95em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+        }
+        .menu-btn-main.wiki {
+            background: linear-gradient(135deg, #1a2a4a, #0f1a30);
+            border-color: #4a6aaa;
+            color: #aaccff;
+        }
+        .menu-btn-main.wiki:hover {
+            background: linear-gradient(135deg, #2a3a6a, #1a2a4a);
+            box-shadow: 0 0 25px rgba(100,160,255,0.4);
+            transform: scale(1.03);
+        }
+        .menu-save-info {
+            margin-top: 4px !important;
+            margin-bottom: 14px !important;
+        }
+        @media (max-width: 520px) {
+            .menu-buttons-row {
+                flex-direction: column;
+                max-width: 320px;
+            }
+            .menu-buttons-row .menu-btn-main {
+                width: 100% !important;
+            }
+        }
+    </style>
+
     <!-- ===== TELA DE MENU INICIAL ===== -->
     <div id="mainMenuScreen">
         <div class="menu-logo">⚔️</div>
         <div class="menu-title">IDLE CRAFT</div>
         <div class="menu-subtitle">MASCOTES · TECNOLOGIA · ALQUIMIA</div>
 
-        <button class="menu-btn-main continue" id="menuContinueBtn" onclick="menuContinue()">
-            ▶ CONTINUAR
-        </button>
+        <div class="menu-buttons-row">
+            <button class="menu-btn-main continue" id="menuContinueBtn" onclick="menuContinue()">
+                ▶ CONTINUAR
+            </button>
+            <button class="menu-btn-main newgame" onclick="menuNewGame()">
+                ✦ NOVO JOGO
+            </button>
+            <button class="menu-btn-main wiki" onclick="openMiniWiki()">
+                📖 MINIWIKI
+            </button>
+        </div>
         <div class="menu-save-info" id="menuSaveInfo">Verificando save...</div>
 
-        <button class="menu-btn-main newgame" onclick="menuNewGame()">
-            ✦ NOVO JOGO
-        </button>
+        <!-- Changelog HUD Premium -->
+        <div class="menu-patchnotes" id="menuPatchnotes">
+            <!-- Header -->
+            <div class="mpn-header">
+                <div class="mpn-header-left">
+                    <span class="mpn-icon">🔔</span>
+                    <div>
+                        <div class="mpn-title">O QUE HÁ DE NOVO</div>
+                        <div class="mpn-subtitle">Patch 0.8 · Agosto 2026</div>
+                    </div>
+                </div>
+                <div class="mpn-counter" title="Novidades nesta versão">
+                    <span class="mpn-counter-num" id="mpnCounter">12</span>
+                    <span class="mpn-counter-label">NOVIDADES</span>
+                </div>
+            </div>
 
-        <button class="menu-btn-main" onclick="openMiniWiki()" style="background: linear-gradient(135deg, #1a2a4a, #2a3a6a); border: 1px solid #4a6aaa; color: #aaccff; margin-top: 6px; font-size: 0.95em;">
-            📖 MINIWIKI
-        </button>
+            <!-- Destaque principal -->
+            <div class="mpn-highlight">
+                <div class="mpn-highlight-badge">✨ DESTAQUE</div>
+                <div class="mpn-highlight-text">⚗️ Sistema de Alquimia — crie Poções, Elixires e Catalisadores em um laboratório totalmente novo!</div>
+            </div>
 
-        <!-- Changelog -->
-        <div class="menu-changelog">
-            <div class="menu-changelog-title">📣 Últimas Atualizações</div>
-            <div class="menu-changelog-list">
-                <div class="menu-changelog-entry">
-                    <span class="menu-changelog-date">[06/07]</span>
-                    <span>⚡ Sistema de Aprimoramento (+1 a +10) adicionado à Ferraria com chance de quebra e Elixir do Ferreiro</span>
+            <!-- Lista de entradas -->
+            <div class="mpn-list">
+
+                <div class="mpn-entry">
+                    <span class="mpn-badge mpn-badge-system">SISTEMA</span>
+                    <span class="mpn-date">01/08</span>
+                    <span class="mpn-text">🏗️ Profissão <b>Construtor</b>: erga estruturas no Mapa-Mundo que geram bônus passivos permanentes</span>
                 </div>
-                <div class="menu-changelog-entry">
-                    <span class="menu-changelog-date">[06/07]</span>
-                    <span>🎲 Atributos de equipamentos agora são variáveis por raridade — cada item é único!</span>
+
+                <div class="mpn-entry">
+                    <span class="mpn-badge mpn-badge-system">SISTEMA</span>
+                    <span class="mpn-date">01/08</span>
+                    <span class="mpn-text">🌍 Mapa-Mundo expansível — novas regiões desbloqueadas conforme nível de exploração</span>
                 </div>
-                <div class="menu-changelog-entry">
-                    <span class="menu-changelog-date">[06/07]</span>
-                    <span>🔥 Elementos Nativos: armas e armaduras podem vir de fábrica com Fogo, Gelo, Relâmpago e mais</span>
+
+                <div class="mpn-entry">
+                    <span class="mpn-badge mpn-badge-content">CONTEÚDO</span>
+                    <span class="mpn-date">30/07</span>
+                    <span class="mpn-text">⚔️ 3 novos Chefes de Região com loot exclusivo: Wyrm de Gelo, Golem de Lava e Arauto Sombrio</span>
                 </div>
-                <div class="menu-changelog-entry">
-                    <span class="menu-changelog-date">[06/07]</span>
-                    <span>🏆 Sistema de raridades rebalanceado — Lendário e Ancestral agora são muito mais raros</span>
+
+                <div class="mpn-entry">
+                    <span class="mpn-badge mpn-badge-content">CONTEÚDO</span>
+                    <span class="mpn-date">30/07</span>
+                    <span class="mpn-text">💎 18 novos recursos end-game: Cristais Elementais, Chamas Eternas, Essências Abissais e mais</span>
                 </div>
-                <div class="menu-changelog-entry">
-                    <span class="menu-changelog-date">[05/07]</span>
-                    <span>🗺️ Arena: seleção livre de waves para farm de recursos específicos</span>
+
+                <div class="mpn-entry">
+                    <span class="mpn-badge mpn-badge-system">SISTEMA</span>
+                    <span class="mpn-date">28/07</span>
+                    <span class="mpn-text">👷 Automação de Trabalhadores: alocação individual por receita com controles diretos nos cards de forja</span>
                 </div>
+
+                <div class="mpn-entry">
+                    <span class="mpn-badge mpn-badge-visual">VISUAL</span>
+                    <span class="mpn-date">27/07</span>
+                    <span class="mpn-text">✨ Barra de Nível Total reformulada com gradiente de fogo vivo e animação arco-íris</span>
+                </div>
+
+                <div class="mpn-entry">
+                    <span class="mpn-badge mpn-badge-system">SISTEMA</span>
+                    <span class="mpn-date">26/07</span>
+                    <span class="mpn-text">👑 Chefe Global Multiplayer: saque exclusivo por Titã, buffs de 4h (Bênção do Titã, Bênção de Fogo)</span>
+                </div>
+
+                <div class="mpn-entry">
+                    <span class="mpn-badge mpn-badge-visual">VISUAL</span>
+                    <span class="mpn-date">25/07</span>
+                    <span class="mpn-text">💫 Efeitos de Filigrana Dourada nos painéis premium e novo Shine Sweep em botões especiais</span>
+                </div>
+
+            </div>
+
+            <!-- Rodapé -->
+            <div class="mpn-footer">
+                <span class="mpn-footer-dot new"></span> Novo &nbsp;|&nbsp;
+                <span class="mpn-footer-dot sys"></span> Sistema &nbsp;|&nbsp;
+                <span class="mpn-footer-dot vis"></span> Visual &nbsp;|&nbsp;
+                <span class="mpn-footer-dot con"></span> Conteúdo
             </div>
         </div>
 
@@ -1255,7 +1555,32 @@
             <div class="mobile-gold" id="mobileGoldDisplay">💰 0</div>
         </div>
 
+        <!-- Barra de Navegação Inferior Mobile -->
+        <nav class="mobile-bottom-nav" id="mobileBottomNav">
+            <button class="mobile-nav-btn" data-page="dungeon" onclick="showPage('dungeon')">
+                <span class="mobile-nav-icon">⚔️</span>
+                <span class="mobile-nav-label">Masmorra</span>
+            </button>
+            <button class="mobile-nav-btn" data-page="inventory" onclick="showPage('inventory')">
+                <span class="mobile-nav-icon">📦</span>
+                <span class="mobile-nav-label">Inventário</span>
+            </button>
+            <button class="mobile-nav-btn" data-page="character" onclick="showPage('character')">
+                <span class="mobile-nav-icon">🧙</span>
+                <span class="mobile-nav-label">Herói</span>
+            </button>
+            <button class="mobile-nav-btn" data-page="property" onclick="showPage('property')">
+                <span class="mobile-nav-icon">🏡</span>
+                <span class="mobile-nav-label">Acampamento</span>
+            </button>
+            <button class="mobile-nav-btn" onclick="toggleMobileSidebar()">
+                <span class="mobile-nav-icon">☰</span>
+                <span class="mobile-nav-label">Menu</span>
+            </button>
+        </nav>
+
         <div class="sidebar layout-editable" id="gameSidebar" data-layout-label="📋 Sidebar">
+            <button class="mobile-sidebar-close" onclick="toggleMobileSidebar()" aria-label="Fechar Menu">✕</button>
             <div class="player-info-bar layout-editable" id="playerInfoBar" data-layout-label="🧙 Perfil do Jogador" style="display:none; flex-direction: column; align-items: stretch; gap: 8px;">
                 <!-- Linha superior: Avatar, Nome, Botões -->
                 <div style="display: flex; align-items: center; gap: 12px; width: 100%;">
@@ -6830,27 +7155,6 @@
                 </div>
             </div>
         </div>
-        /* ===== CHANGELOG NO MENU INICIAL ===== */
-        .menu-changelog {
-            margin-top: 20px;
-            background: rgba(0,0,0,0.35);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 12px;
-            padding: 14px 16px;
-            max-width: 380px;
-            width: 100%;
-            text-align: left;
-        }
-        .menu-changelog-title {
-            font-size: 0.85em;
-            font-weight: 700;
-            color: #aaccff;
-            margin-bottom: 10px;
-            letter-spacing: 0.5px;
-        }
-        .menu-changelog-list { display: flex; flex-direction: column; gap: 8px; }
-        .menu-changelog-entry { display: flex; gap: 10px; font-size: 0.78em; color: #bbb; line-height: 1.4; }
-        .menu-changelog-date { color: #6a9aff; font-weight: 700; white-space: nowrap; flex-shrink: 0; }
 
         /* ===== MINIWIKI SHELL ===== */
         @keyframes mwIn { from { opacity:0; transform:scale(0.94) translateY(12px); } to { opacity:1; transform:scale(1) translateY(0); } }

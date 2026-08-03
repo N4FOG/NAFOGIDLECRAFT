@@ -4360,14 +4360,24 @@
 .sidebar-overlay {
     display: none;
 }
+.mobile-bottom-nav {
+    display: none;
+}
+.mobile-sidebar-close {
+    display: none;
+}
 
 @media (max-width: 992px) {
     body {
-        padding: 5px;
+        padding-top: 56px !important;
+        padding-bottom: calc(65px + env(safe-area-inset-bottom, 0px)) !important;
+        padding-left: 8px !important;
+        padding-right: 8px !important;
         min-height: 100vh;
         align-items: flex-start;
         justify-content: flex-start;
         overflow-x: hidden;
+        -webkit-tap-highlight-color: transparent;
     }
 
     #mainMenuScreen, #newGameScreen {
@@ -4377,8 +4387,8 @@
 
     .game-container {
         grid-template-columns: 1fr !important;
-        padding: 12px !important;
-        gap: 15px !important;
+        padding: 10px !important;
+        gap: 12px !important;
         border-radius: 16px !important;
         margin: 0 auto !important;
         max-width: 100% !important;
@@ -4388,17 +4398,17 @@
     }
 
     .content-area {
-        padding: 14px !important;
+        padding: 12px !important;
     }
 
     .property-grid {
         grid-template-columns: repeat(2, 1fr) !important;
-        gap: 15px !important;
+        gap: 12px !important;
     }
 
     .tools-grid {
         grid-template-columns: repeat(2, 1fr) !important;
-        gap: 15px !important;
+        gap: 12px !important;
     }
 
     /* Barra Superior Mobile */
@@ -4406,13 +4416,13 @@
         display: flex !important;
         align-items: center;
         justify-content: space-between;
-        padding: 10px 15px;
+        padding: 8px 12px;
         background: rgba(16, 26, 36, 0.95);
         border-bottom: 1.5px solid rgba(170, 204, 255, 0.15);
         position: sticky;
-        top: -12px;
-        margin: -12px -12px 15px -12px;
-        border-radius: 16px 16px 0 0;
+        top: 0;
+        margin: -10px -10px 12px -10px;
+        border-radius: 14px 14px 0 0;
         z-index: 998;
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
@@ -4424,7 +4434,9 @@
         color: #fff;
         font-size: 1.8em;
         cursor: pointer;
-        padding: 5px;
+        padding: 6px 10px;
+        min-width: 44px;
+        min-height: 44px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -4439,19 +4451,76 @@
         font-family: 'Cinzel', serif;
         font-weight: 700;
         color: var(--primary-color, #ffd700);
-        font-size: 1.2em;
-        letter-spacing: 2px;
+        font-size: 1.15em;
+        letter-spacing: 1.5px;
         text-shadow: 0 0 10px var(--glow-color);
     }
 
     .mobile-gold {
         font-weight: bold;
-        font-size: 0.9em;
-        background: rgba(255, 215, 0, 0.1);
-        padding: 4px 10px;
+        font-size: 0.88em;
+        background: rgba(255, 215, 0, 0.12);
+        padding: 4px 12px;
         border-radius: 20px;
         border: 1px solid var(--primary-color, #ffd700);
         color: var(--primary-color, #ffd700);
+    }
+
+    /* Barra de Navegação Inferior Mobile (Bottom Nav) */
+    .mobile-bottom-nav {
+        display: flex !important;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: calc(56px + env(safe-area-inset-bottom, 0px));
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+        background: rgba(10, 18, 28, 0.96);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-top: 1px solid rgba(255, 215, 0, 0.2);
+        box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.7);
+        z-index: 9998;
+        align-items: center;
+        justify-content: space-around;
+    }
+
+    .mobile-nav-btn {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: none;
+        border: none;
+        color: #8a9aaa;
+        padding: 4px 0;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        min-height: 48px;
+        user-select: none;
+    }
+
+    .mobile-nav-btn:active {
+        transform: scale(0.92);
+    }
+
+    .mobile-nav-btn.active {
+        color: #ffd700;
+        text-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+    }
+
+    .mobile-nav-icon {
+        font-size: 1.25em;
+        line-height: 1;
+        margin-bottom: 2px;
+    }
+
+    .mobile-nav-label {
+        font-size: 0.68em;
+        font-weight: 600;
+        font-family: 'Outfit', sans-serif;
+        letter-spacing: 0.2px;
     }
 
     /* Gaveta Lateral da Sidebar */
@@ -4459,22 +4528,47 @@
         position: fixed !important;
         top: 0;
         left: 0;
-        width: 290px;
+        width: min(85vw, 320px) !important;
         height: 100vh !important;
+        height: 100dvh !important;
         z-index: 10000 !important;
         transform: translateX(-100%);
         transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
         overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
         border-radius: 0 !important;
         border: none !important;
-        border-right: 1.5px solid rgba(170, 204, 255, 0.15) !important;
-        box-shadow: 10px 0 30px rgba(0, 0, 0, 0.6) !important;
-        background: var(--sidebar-bg) !important;
-        padding: 20px !important;
+        border-right: 1.5px solid rgba(170, 204, 255, 0.2) !important;
+        box-shadow: 10px 0 35px rgba(0, 0, 0, 0.8) !important;
+        background: var(--sidebar-bg, #0b1420) !important;
+        padding: 16px 14px 80px 14px !important;
     }
 
     .sidebar.mobile-open {
         transform: translateX(0) !important;
+    }
+
+    .mobile-sidebar-close {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: #fff;
+        font-size: 1.1em;
+        cursor: pointer;
+        z-index: 10001;
+        transition: background 0.2s;
+    }
+
+    .mobile-sidebar-close:active {
+        background: rgba(255, 100, 100, 0.3);
     }
 
     /* Sombra de Fundo (Overlay) */
@@ -4494,62 +4588,77 @@
         pointer-events: auto;
     }
 
-    /* Ajustes Gerais de Conteﾃｺdo e Grid */
+    /* Ajustes Gerais de Conteúdo e Grid */
     .resources-grid,
     .recipes-grid {
         grid-template-columns: repeat(2, 1fr) !important;
-        gap: 12px !important;
-        margin: 20px 0 !important;
+        gap: 10px !important;
+        margin: 15px 0 !important;
     }
 
     .academy-grid {
         grid-template-columns: repeat(2, 1fr) !important;
-        gap: 12px !important;
-    }
-
-    .inventory-grid {
-        grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)) !important;
         gap: 10px !important;
     }
 
+    .inventory-grid {
+        grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)) !important;
+        gap: 8px !important;
+    }
+
     .inventory-slot {
-        min-height: 95px !important;
-        padding: 10px !important;
-        font-size: 0.85em !important;
+        min-height: 80px !important;
+        padding: 8px 4px !important;
+        font-size: 0.8em !important;
+        touch-action: manipulation;
     }
 
     .ng-classes-grid {
         grid-template-columns: repeat(2, 1fr) !important;
-        gap: 10px !important;
+        gap: 8px !important;
     }
 
     .ng-avatars-grid {
-        grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)) !important;
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)) !important;
         gap: 8px !important;
     }
 
     .character-page {
         grid-template-columns: 1fr !important;
-        gap: 20px !important;
+        gap: 16px !important;
     }
 
     .character-doll-area {
-        max-width: 320px;
+        max-width: 300px;
         margin: 0 auto;
     }
 
     .dungeon-layout {
         grid-template-columns: 1fr !important;
-        gap: 20px !important;
+        gap: 16px !important;
     }
 
     .inventory-page {
-        padding: 15px !important;
+        padding: 10px !important;
     }
 
     /* Ajustes em Modais */
     .modal-content {
-        max-height: 92vh !important;
+        max-height: 88vh !important;
+        max-height: 88dvh !important;
+        width: 94vw !important;
+        padding: 16px !important;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Evitar Zoom Automático em Inputs no iOS Safari */
+    input, select, textarea {
+        font-size: 16px !important;
+    }
+
+    button {
+        touch-action: manipulation;
     }
 }
 
@@ -4574,12 +4683,12 @@
     .camp-visual-map {
         padding: 10px !important;
         gap: 8px !important;
-        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)) !important;
+        grid-template-columns: repeat(auto-fit, minmax(95px, 1fr)) !important;
     }
 
     .camp-tile {
-        padding: 10px 6px !important;
-        min-height: 90px !important;
+        padding: 8px 4px !important;
+        min-height: 85px !important;
     }
 
     .building-ui-box > div {
@@ -4591,6 +4700,7 @@
     .building-ui-box button {
         width: 100% !important;
         text-align: center;
+        min-height: 44px;
     }
 
     .ng-gender-row {
@@ -4607,6 +4717,7 @@
         text-align: center;
         padding: 8px 6px !important;
         font-size: 0.8em !important;
+        min-height: 44px;
     }
 }
 
@@ -5051,15 +5162,24 @@ body.menu-open .top-stats-bar {
         display: none !important;
     }
     .top-stats-bar {
+        height: 48px !important;
         justify-content: space-between;
-        padding: 0 10px;
-        font-size: 0.8em;
+        padding: 0 10px !important;
+        font-size: 0.78em !important;
+        background: rgba(10, 18, 28, 0.94) !important;
+        border-bottom: 1px solid rgba(255, 215, 0, 0.2) !important;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6) !important;
     }
     .top-bar-resources {
-        gap: 6px;
+        gap: 5px !important;
     }
     .top-res-item {
-        padding: 2px 4px;
+        padding: 2px 6px !important;
+        border-radius: 8px !important;
+    }
+    .top-bar-divider {
+        height: 14px !important;
+        margin: 0 2px !important;
     }
 }
 

@@ -572,6 +572,12 @@
             document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.remove('active'));
             const activeBtn = Array.from(document.querySelectorAll('.menu-btn')).find(btn => btn.classList.contains(page));
             if (activeBtn) activeBtn.classList.add('active');
+
+            // Atualizar botões ativos da barra de navegação inferior mobile
+            document.querySelectorAll('.mobile-nav-btn').forEach(btn => {
+                if (btn.getAttribute('data-page') === page) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
             document.querySelectorAll('.content-page').forEach(p => p.classList.remove('active'));
             targetPage.classList.add('active');
             if (page === 'pets') updatePetsPage();
