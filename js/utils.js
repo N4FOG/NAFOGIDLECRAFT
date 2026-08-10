@@ -596,6 +596,7 @@
         // BUFFS ATIVOS NA SIDEBAR
         // ============================================
         function updateSidebarBuffs() {
+            if (window.isGamePausedForEditor || (window.LayoutEditor && window.LayoutEditor.isActive && window.LayoutEditor.isActive())) return;
             // 1. Buffs Temporários (Poções, Mascote, Chefe) no rodapé global
             const globalContainer = document.getElementById('globalActiveBuffs');
             if (globalContainer) {

@@ -168,6 +168,7 @@
         }
 
         function updateAllProgressBars() {
+            if (window.isGamePausedForEditor || (window.LayoutEditor && window.LayoutEditor.isActive && window.LayoutEditor.isActive())) return;
             // Modo debug / telemetria
             if (typeof devTickCount !== 'undefined') {
                 devTickCount++;

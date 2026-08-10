@@ -181,6 +181,10 @@
             if (!loaded.weaponSkills) loaded.weaponSkills = { melee: { level: 1, attacks: 0 }, distance: { level: 1, attacks: 0 }, magic: { level: 1, attacks: 0 }, shielding: { level: 1, attacks: 0 } };
             if (!loaded.bestiary) loaded.bestiary = {};
             if (!loaded.workers) loaded.workers = { allocated: {} };
+            if (!loaded.mastery) loaded.mastery = {};
+            // Garante que todos os slots de mastery existem
+            const _mSkills = ['woodcutting','mining','fishing','herbalism','cooking','crafting','smithing','enchanting'];
+            _mSkills.forEach(function(sk) { if (!loaded.mastery[sk]) loaded.mastery[sk] = {}; });
             loaded.craftingTimers = {};
             gameState = loaded;
             hideMenuScreens();
@@ -1546,7 +1550,7 @@
     </div>
 
     <!-- ===== JOGO PRINCIPAL ===== -->
-    <div class="game-container" data-layout-label="📦 Container Principal">
+    <div class="game-container layout-editable" data-layout-label="📦 Container Principal">
         <!-- Overlay e Barra Superior Mobile -->
         <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMobileSidebar()"></div>
         <div class="mobile-top-bar">
@@ -1555,32 +1559,7 @@
             <div class="mobile-gold" id="mobileGoldDisplay">💰 0</div>
         </div>
 
-        <!-- Barra de Navegação Inferior Mobile -->
-        <nav class="mobile-bottom-nav" id="mobileBottomNav">
-            <button class="mobile-nav-btn" data-page="dungeon" onclick="showPage('dungeon')">
-                <span class="mobile-nav-icon">⚔️</span>
-                <span class="mobile-nav-label">Masmorra</span>
-            </button>
-            <button class="mobile-nav-btn" data-page="inventory" onclick="showPage('inventory')">
-                <span class="mobile-nav-icon">📦</span>
-                <span class="mobile-nav-label">Inventário</span>
-            </button>
-            <button class="mobile-nav-btn" data-page="character" onclick="showPage('character')">
-                <span class="mobile-nav-icon">🧙</span>
-                <span class="mobile-nav-label">Herói</span>
-            </button>
-            <button class="mobile-nav-btn" data-page="property" onclick="showPage('property')">
-                <span class="mobile-nav-icon">🏡</span>
-                <span class="mobile-nav-label">Acampamento</span>
-            </button>
-            <button class="mobile-nav-btn" onclick="toggleMobileSidebar()">
-                <span class="mobile-nav-icon">☰</span>
-                <span class="mobile-nav-label">Menu</span>
-            </button>
-        </nav>
-
         <div class="sidebar layout-editable" id="gameSidebar" data-layout-label="📋 Sidebar">
-            <button class="mobile-sidebar-close" onclick="toggleMobileSidebar()" aria-label="Fechar Menu">✕</button>
             <div class="player-info-bar layout-editable" id="playerInfoBar" data-layout-label="🧙 Perfil do Jogador" style="display:none; flex-direction: column; align-items: stretch; gap: 8px;">
                 <!-- Linha superior: Avatar, Nome, Botões -->
                 <div style="display: flex; align-items: center; gap: 12px; width: 100%;">
@@ -1613,25 +1592,25 @@
 
             <!-- QUICK LINKS: botoes de atalho rapido -->
             <div class="sidebar-quick-links layout-editable" id="sidebarQuickLinks" data-layout-label="⚡ Atalhos Rápidos" style="display: none; grid-template-columns: repeat(4, 1fr); gap: 4px; margin: 6px 8px; margin-top: 4px;">
-                <button class="menu-btn inventory" id="qlBtnInventory" data-layout-label="📦 Botão Inventário" onclick="showPage('inventory')" style="padding: 6px 2px; justify-content: center; text-align: center; gap: 3px; font-size: 1.00em; transition: all 0.2s ease;">
+                <button class="menu-btn inventory layout-editable" id="qlBtnInventory" data-layout-label="📦 Botão Inventário" onclick="showPage('inventory')" style="padding: 6px 2px; justify-content: center; text-align: center; gap: 3px; font-size: 1.00em; transition: all 0.2s ease;">
                     <img src="img/07_chest.png" class="game-icon" alt="Inventário"><span>Inventário</span>
                 </button>
-                <button class="menu-btn property" id="qlBtnProperty" data-layout-label="🏡 Botão Propriedade" onclick="showPage('property')" style="padding: 6px 2px; justify-content: center; text-align: center; gap: 3px; font-size: 1.00em; transition: all 0.2s ease;">
+                <button class="menu-btn property layout-editable" id="qlBtnProperty" data-layout-label="🏡 Botão Propriedade" onclick="showPage('property')" style="padding: 6px 2px; justify-content: center; text-align: center; gap: 3px; font-size: 1.00em; transition: all 0.2s ease;">
                     <img src="img/20_house.png" class="game-icon" alt="Propriedade"><span>Propriedade</span>
                 </button>
-                <button class="menu-btn" id="qlBtnCharacter" data-layout-label="🧙 Botão Personagem" onclick="showPage('character')" style="padding: 6px 2px; justify-content: center; text-align: center; gap: 3px; font-size: 1.00em; transition: all 0.2s ease;">
+                <button class="menu-btn layout-editable" id="qlBtnCharacter" data-layout-label="🧙 Botão Personagem" onclick="showPage('character')" style="padding: 6px 2px; justify-content: center; text-align: center; gap: 3px; font-size: 1.00em; transition: all 0.2s ease;">
                     <img src="img/24_mage.png" class="game-icon" alt="Personagem"><span>Personagem</span>
                 </button>
-                <button class="menu-btn pets" id="qlBtnPets" data-layout-label="🐉 Botão Mascotes" onclick="showPage('pets')" style="padding: 6px 2px; justify-content: center; text-align: center; gap: 3px; font-size: 1.00em; transition: all 0.2s ease;">
+                <button class="menu-btn pets layout-editable" id="qlBtnPets" data-layout-label="🐉 Botão Mascotes" onclick="showPage('pets')" style="padding: 6px 2px; justify-content: center; text-align: center; gap: 3px; font-size: 1.00em; transition: all 0.2s ease;">
                     <img src="img/25_dragon.png" class="game-icon" alt="Mascotes"><span>Mascotes</span>
                 </button>
             </div>
 
             <!-- STATS: logo abaixo da barra do jogador -->
             <div class="sidebar-stats layout-editable" id="sidebarStats" data-layout-label="📊 Estatísticas">
-                <div class="stat-row" data-layout-label="📦 Espaços"><span class="stat-label"><img src="img/07_chest.png" class="game-icon-sm" alt="" style="vertical-align:middle;"> Espaços:</span><span class="stat-value" id="sidebarBank">0/4</span></div>
-                <div class="stat-row" data-layout-label="🏆 Nível Total"><span class="stat-label"><img src="img/04_trophy.png" class="game-icon-sm" alt="" style="vertical-align:middle;"> Nível Total:</span><span class="stat-value" id="sidebarLevel">6/300</span></div>
-                <div class="stat-row" data-layout-label="👷 Trabalhadores"><span class="stat-label"><img src="img/26_worker.png" class="game-icon-sm" alt="" style="vertical-align:middle;"> Trabalhadores:</span><span class="stat-value" id="sidebarWorkers">0/0</span></div>
+                <div class="stat-row layout-editable" data-layout-label="📦 Espaços"><span class="stat-label"><img src="img/07_chest.png" class="game-icon-sm" alt="" style="vertical-align:middle;"> Espaços:</span><span class="stat-value" id="sidebarBank">0/4</span></div>
+                <div class="stat-row layout-editable" data-layout-label="🏆 Nível Total"><span class="stat-label"><img src="img/04_trophy.png" class="game-icon-sm" alt="" style="vertical-align:middle;"> Nível Total:</span><span class="stat-value" id="sidebarLevel">6/300</span></div>
+                <div class="stat-row layout-editable" data-layout-label="👷 Trabalhadores"><span class="stat-label"><img src="img/26_worker.png" class="game-icon-sm" alt="" style="vertical-align:middle;"> Trabalhadores:</span><span class="stat-value" id="sidebarWorkers">0/0</span></div>
                 <!-- Perícias de Combate (Minimizar / Expandir) -->
                 <div class="sidebar-section-title" onclick="toggleSidebarCombatSkills()" style="margin-top:0px; margin-bottom:0px; font-size:0.75em; color:#ff9944; text-transform:uppercase; letter-spacing:1px; border-bottom:1px solid rgba(255,153,68,0.15); padding-bottom:3px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; user-select:none;" title="Clique para minimizar/expandir">
                     <span>🗡️ Perícias de Combate</span>
@@ -1693,22 +1672,22 @@
                 </div>
             </div>
 
-            <div class="sidebar-title" data-layout-label="⚡ Título Menu">⚡ MENU PRINCIPAL</div>
+            <div class="sidebar-title layout-editable" data-layout-label="⚡ Título Menu">⚡ MENU PRINCIPAL</div>
 
-            <div class="sidebar-category" data-layout-label="🏪 Categoria Comércio">🏪 COMÉRCIO</div>
-            <div class="sidebar-menu" data-layout-label="🏪 Menu Comércio">
+            <div class="sidebar-category layout-editable" data-layout-label="🏪 Categoria Comércio">🏪 COMÉRCIO</div>
+            <div class="sidebar-menu layout-editable" data-layout-label="🏪 Menu Comércio">
                 <button class="menu-btn mercado" onclick="showPage('mercado')"><img src="img/21_shop.png" class="game-icon" alt="Mercado"> Mercado & Academia</button>
             </div>
 
-            <div class="sidebar-category" data-layout-label="🌍 Cidade Multiplayer">🌍 CIDADE MULTIPLAYER</div>
-            <div class="sidebar-menu" data-layout-label="🌍 Menu Multiplayer">
+            <div class="sidebar-category layout-editable" data-layout-label="🌍 Cidade Multiplayer">🌍 CIDADE MULTIPLAYER</div>
+            <div class="sidebar-menu layout-editable" data-layout-label="🌍 Menu Multiplayer">
                 <button class="menu-btn worldboss" onclick="showPage('worldboss')"><img src="img/22_world.png" class="game-icon" alt="Chefes Globais"> Chefes Globais</button>
                 <button class="menu-btn wishingwell" onclick="showPage('wishingwell')"><img src="img/23_wishingwell.png" class="game-icon" alt="Poço dos Desejos"> Poço dos Desejos</button>
                 <button class="menu-btn observatory" onclick="showPage('observatory')"><img src="img/04_trophy.png" class="game-icon" alt="Observatório"> Grande Observatório</button>
             </div>
 
-            <div class="sidebar-category" data-layout-label="🐉 Categoria Especial">🐉 ESPECIAL</div>
-            <div class="sidebar-menu" data-layout-label="🐉 Menu Especial">
+            <div class="sidebar-category layout-editable" data-layout-label="🐉 Categoria Especial">🐉 ESPECIAL</div>
+            <div class="sidebar-menu layout-editable" data-layout-label="🐉 Menu Especial">
                 <button class="menu-btn character" onclick="showPage('character')"><img src="img/24_mage.png" class="game-icon" alt="Personagem"> Personagem</button>
                 <button class="menu-btn pets" onclick="showPage('pets')"><img src="img/25_dragon.png" class="game-icon" alt="Mascotes"> Mascotes</button>
                 <button class="menu-btn tech" onclick="showPage('tech')"><img src="img/29_tecnologias.png" class="game-icon" alt="Tecnologias"> Tecnologias</button>
@@ -1716,8 +1695,8 @@
                 <button class="menu-btn runar" onclick="showPage('runar')"><img src="img/10_portal.png" class="game-icon" alt="Runar"> Runar Equipamento</button>
             </div>
 
-            <div class="sidebar-category" data-layout-label="📦 Categoria Coleta">📦 COLETA</div>
-            <div class="sidebar-menu" data-layout-label="📦 Menu Coleta">
+            <div class="sidebar-category layout-editable" data-layout-label="📦 Categoria Coleta">📦 COLETA</div>
+            <div class="sidebar-menu layout-editable" data-layout-label="📦 Menu Coleta">
                 <button class="menu-btn woodcutting" onclick="showPage('woodcutting')">
                     <div class="menu-btn-skill-container">
                         <div class="menu-btn-skill-header">
@@ -1764,8 +1743,8 @@
                 </button>
             </div>
 
-            <div class="sidebar-category" data-layout-label="🔨 Categoria Craft">🔨 CRAFT</div>
-            <div class="sidebar-menu" data-layout-label="🔨 Menu Craft">
+            <div class="sidebar-category layout-editable" data-layout-label="🔨 Categoria Craft">🔨 CRAFT</div>
+            <div class="sidebar-menu layout-editable" data-layout-label="🔨 Menu Craft">
                 <button class="menu-btn crafting" onclick="showPage('crafting')">
                     <div class="menu-btn-skill-container">
                         <div class="menu-btn-skill-header">
@@ -1813,8 +1792,8 @@
                 <button class="menu-btn runeforge" onclick="showPage('runeforge')"><img src="img/10_portal.png" class="game-icon" alt="Forja"> Forja de Runas</button>
             </div>
 
-            <div class="sidebar-category" data-layout-label="⚔️ Categoria Combate">⚔️ COMBATE</div>
-            <div class="sidebar-menu" data-layout-label="⚔️ Menu Combate">
+            <div class="sidebar-category layout-editable" data-layout-label="⚔️ Categoria Combate">⚔️ COMBATE</div>
+            <div class="sidebar-menu layout-editable" data-layout-label="⚔️ Menu Combate">
                 <button class="menu-btn combat" onclick="showPage('combat')"><img src="img/17_crossedswords.png" class="game-icon" alt="Arena"> Arena de Combate</button>
                 <button class="menu-btn dungeon" onclick="showPage('dungeon')"><img src="img/19_castle.png" class="game-icon" alt="Masmorras"> Masmorras</button>
             </div>
@@ -1852,6 +1831,7 @@
                     <button class="adm-tab-btn" onclick="switchAdminTab('tiers', this)">📈 Proficiências</button>
                     <button class="adm-tab-btn" onclick="switchAdminTab('pets', this)">🐾 Mascotes</button>
                     <button class="adm-tab-btn" onclick="switchAdminTab('worldboss', this)">🐉 World Boss</button>
+                    <button class="adm-tab-btn" onclick="switchAdminTab('maestria', this)">⭐ Maestria</button>
                 </div>
 
                 <div class="admin-panel-container" style="display: grid; grid-template-columns: 1fr; gap: 20px; padding: 10px; font-family: 'Outfit';">
@@ -2983,6 +2963,126 @@
                         </div>
                     </div>
 
+                    <!-- TAB: MAESTRIA -->
+                    <div id="admTab_maestria" class="adm-section-tab" style="display: none;">
+                        <div class="card" style="background: rgba(20,15,40,0.7); border: 1px solid rgba(180,130,255,0.25); border-radius: 12px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+                            <h3 style="margin-top:0; color: #c084fc; font-size: 1.15em; display:flex; align-items:center; gap:8px;">⭐ Balanceamento do Sistema de Maestria</h3>
+                            <p style="font-size:0.8em; color:#888; margin-top:-5px; margin-bottom:20px;">Controle todos os parâmetros do sistema de Maestria por Recurso. Nível máximo: 50. Sem Pool compartilhada.</p>
+
+                            <!-- Bloco 1: Parâmetros Globais -->
+                            <div style="background:rgba(0,0,0,0.3); border:1px solid rgba(180,130,255,0.15); border-radius:10px; padding:16px; margin-bottom:16px;">
+                                <h4 style="color:#c084fc; margin:0 0 12px 0; font-size:0.95em;">🔧 Parâmetros Globais</h4>
+                                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px;">
+                                    <div>
+                                        <label style="font-size:0.78em; color:#aaa; display:block; margin-bottom:4px;">📊 Mult. XP de Maestria (coleta)</label>
+                                        <input type="number" id="admMstGatherXpMult" value="0.20" step="0.01" min="0.01" max="5" style="width:100%; padding:7px 10px; background:rgba(0,0,0,0.4); border:1px solid rgba(180,130,255,0.3); border-radius:6px; color:#fff; font-family:'Outfit'; font-size:0.85em;">
+                                        <span style="font-size:0.7em; color:#666;">Ex: 0.20 = 20% do XP base vai para Maestria</span>
+                                    </div>
+                                    <div>
+                                        <label style="font-size:0.78em; color:#aaa; display:block; margin-bottom:4px;">⚒️ Mult. XP de Maestria (craft)</label>
+                                        <input type="number" id="admMstCraftXpMult" value="0.15" step="0.01" min="0.01" max="5" style="width:100%; padding:7px 10px; background:rgba(0,0,0,0.4); border:1px solid rgba(180,130,255,0.3); border-radius:6px; color:#fff; font-family:'Outfit'; font-size:0.85em;">
+                                        <span style="font-size:0.7em; color:#666;">Ex: 0.15 = 15% do XP da receita vai para Maestria</span>
+                                    </div>
+                                    <div>
+                                        <label style="font-size:0.78em; color:#aaa; display:block; margin-bottom:4px;">⚡ Mult. global de XP de Maestria</label>
+                                        <input type="number" id="admMstGlobalMult" value="1.0" step="0.05" min="0.1" max="10" style="width:100%; padding:7px 10px; background:rgba(0,0,0,0.4); border:1px solid rgba(180,130,255,0.3); border-radius:6px; color:#fff; font-family:'Outfit'; font-size:0.85em;">
+                                        <span style="font-size:0.7em; color:#666;">Multiplicador adicional (eventos, buffs globais)</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Bloco 2: Bônus por Nível -->
+                            <div style="background:rgba(0,0,0,0.3); border:1px solid rgba(180,130,255,0.15); border-radius:10px; padding:16px; margin-bottom:16px;">
+                                <h4 style="color:#c084fc; margin:0 0 12px 0; font-size:0.95em;">🏆 Bônus por Marco de Nível</h4>
+                                <p style="font-size:0.75em; color:#888; margin:0 0 12px;">Cada nível de Maestria ativa bônus cumulativos. Configure os valores % de cada bônus:</p>
+                                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                                    <div>
+                                        <label style="font-size:0.78em; color:#aaa; display:block; margin-bottom:4px;">📈 Bônus XP (Nível 1, por grupo de 5)</label>
+                                        <input type="number" id="admMstXpBonus" value="5" step="1" min="0" max="100" style="width:100%; padding:7px 10px; background:rgba(0,0,0,0.4); border:1px solid rgba(180,130,255,0.3); border-radius:6px; color:#fff; font-family:'Outfit'; font-size:0.85em;">
+                                        <span style="font-size:0.7em; color:#666;">% de XP extra por recurso a cada 5 níveis de Maestria</span>
+                                    </div>
+                                    <div>
+                                        <label style="font-size:0.78em; color:#aaa; display:block; margin-bottom:4px;">🎲 Bônus Drop Duplo (Nível 5)</label>
+                                        <input type="number" id="admMstDoubleBase" value="5" step="1" min="0" max="100" style="width:100%; padding:7px 10px; background:rgba(0,0,0,0.4); border:1px solid rgba(180,130,255,0.3); border-radius:6px; color:#fff; font-family:'Outfit'; font-size:0.85em;">
+                                        <span style="font-size:0.7em; color:#666;">% de chance de drop duplo no nível 5</span>
+                                    </div>
+                                    <div>
+                                        <label style="font-size:0.78em; color:#aaa; display:block; margin-bottom:4px;">⚡ Redução de Tempo Autofarm (Nível 10)</label>
+                                        <input type="number" id="admMstSpeedReduc" value="10" step="1" min="0" max="80" style="width:100%; padding:7px 10px; background:rgba(0,0,0,0.4); border:1px solid rgba(180,130,255,0.3); border-radius:6px; color:#fff; font-family:'Outfit'; font-size:0.85em;">
+                                        <span style="font-size:0.7em; color:#666;">% de redução no intervalo de autofarm no nível 10</span>
+                                    </div>
+                                    <div>
+                                        <label style="font-size:0.78em; color:#aaa; display:block; margin-bottom:4px;">💎 Chance Drop Triplo (Nível 25)</label>
+                                        <input type="number" id="admMstTripleChance" value="3" step="1" min="0" max="50" style="width:100%; padding:7px 10px; background:rgba(0,0,0,0.4); border:1px solid rgba(180,130,255,0.3); border-radius:6px; color:#fff; font-family:'Outfit'; font-size:0.85em;">
+                                        <span style="font-size:0.7em; color:#666;">% de chance de tripla coleta no nível 25</span>
+                                    </div>
+                                    <div>
+                                        <label style="font-size:0.78em; color:#aaa; display:block; margin-bottom:4px;">🔩 Redução de Custo de Craft (Nível 35)</label>
+                                        <input type="number" id="admMstCostReduc" value="5" step="1" min="0" max="50" style="width:100%; padding:7px 10px; background:rgba(0,0,0,0.4); border:1px solid rgba(180,130,255,0.3); border-radius:6px; color:#fff; font-family:'Outfit'; font-size:0.85em;">
+                                        <span style="font-size:0.7em; color:#666;">% de chance de não consumir material no craft no nível 35</span>
+                                    </div>
+                                    <div>
+                                        <label style="font-size:0.78em; color:#aaa; display:block; margin-bottom:4px;">🌟 Bônus Extra Drop Duplo (Nível 50 — Máximo)</label>
+                                        <input type="number" id="admMstMaxDouble" value="15" step="1" min="0" max="100" style="width:100%; padding:7px 10px; background:rgba(0,0,0,0.4); border:1px solid rgba(180,130,255,0.3); border-radius:6px; color:#fff; font-family:'Outfit'; font-size:0.85em;">
+                                        <span style="font-size:0.7em; color:#666;">% adicional de drop duplo ao atingir nível 50 (Maestria Máxima)</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Bloco 3: Tabela de XP por nível -->
+                            <div style="background:rgba(0,0,0,0.3); border:1px solid rgba(180,130,255,0.15); border-radius:10px; padding:16px; margin-bottom:16px;">
+                                <h4 style="color:#c084fc; margin:0 0 12px 0; font-size:0.95em;">📊 Multiplicador da Curva de XP de Maestria</h4>
+                                <p style="font-size:0.75em; color:#888; margin:0 0 12px;">A curva usa: <code style="background:rgba(180,130,255,0.15); padding:2px 6px; border-radius:3px;">xpNivel = xpBase × xpCurvaMult^(nivel-1)</code></p>
+                                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                                    <div>
+                                        <label style="font-size:0.78em; color:#aaa; display:block; margin-bottom:4px;">🔢 XP Base (Nível 1)</label>
+                                        <input type="number" id="admMstXpBase" value="50" step="5" min="1" max="10000" style="width:100%; padding:7px 10px; background:rgba(0,0,0,0.4); border:1px solid rgba(180,130,255,0.3); border-radius:6px; color:#fff; font-family:'Outfit'; font-size:0.85em;">
+                                    </div>
+                                    <div>
+                                        <label style="font-size:0.78em; color:#aaa; display:block; margin-bottom:4px;">📈 Multiplicador de Curva</label>
+                                        <input type="number" id="admMstXpCurveMult" value="1.18" step="0.01" min="1.0" max="3.0" style="width:100%; padding:7px 10px; background:rgba(0,0,0,0.4); border:1px solid rgba(180,130,255,0.3); border-radius:6px; color:#fff; font-family:'Outfit'; font-size:0.85em;">
+                                    </div>
+                                </div>
+                                <div id="admMstXpPreview" style="margin-top:12px; font-size:0.75em; color:#888;"></div>
+                                <button onclick="admPreviewMasteryXpCurve()" style="margin-top:8px; padding:6px 14px; background:rgba(180,130,255,0.15); border:1px solid rgba(180,130,255,0.3); border-radius:6px; color:#c084fc; font-family:'Outfit'; font-size:0.8em; cursor:pointer;">👁️ Pré-visualizar Curva</button>
+                            </div>
+
+                            <!-- Bloco 4: Dev Tools -->
+                            <div style="background:rgba(0,0,0,0.3); border:1px solid rgba(180,130,255,0.15); border-radius:10px; padding:16px;">
+                                <h4 style="color:#c084fc; margin:0 0 12px 0; font-size:0.95em;">🧰 Ferramentas de Teste</h4>
+                                <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:flex-end;">
+                                    <div style="flex:1; min-width:150px;">
+                                        <label style="font-size:0.78em; color:#aaa; display:block; margin-bottom:4px;">Skill</label>
+                                        <select id="admMstSkillSelect" style="width:100%; padding:7px 10px; background:rgba(0,0,0,0.4); border:1px solid rgba(180,130,255,0.3); border-radius:6px; color:#fff; font-family:'Outfit'; font-size:0.85em;">
+                                            <option value="woodcutting">🪵 Corte de Madeira</option>
+                                            <option value="mining">⛏️ Mineração</option>
+                                            <option value="fishing">🎣 Pesca</option>
+                                            <option value="herbalism">🌿 Herbalismo</option>
+                                            <option value="cooking">🍳 Culinária</option>
+                                            <option value="crafting">🔨 Artesanato</option>
+                                            <option value="smithing">⚒️ Ferraria</option>
+                                            <option value="enchanting">✨ Encantamento</option>
+                                        </select>
+                                    </div>
+                                    <div style="flex:1; min-width:150px;">
+                                        <label style="font-size:0.78em; color:#aaa; display:block; margin-bottom:4px;">ID do Recurso</label>
+                                        <input type="text" id="admMstResourceId" placeholder="Ex: wood1, ore3..." style="width:100%; padding:7px 10px; background:rgba(0,0,0,0.4); border:1px solid rgba(180,130,255,0.3); border-radius:6px; color:#fff; font-family:'Outfit'; font-size:0.85em;">
+                                    </div>
+                                    <div style="flex:1; min-width:120px;">
+                                        <label style="font-size:0.78em; color:#aaa; display:block; margin-bottom:4px;">Nível Alvo</label>
+                                        <input type="number" id="admMstTargetLevel" placeholder="1-50" min="1" max="50" value="10" style="width:100%; padding:7px 10px; background:rgba(0,0,0,0.4); border:1px solid rgba(180,130,255,0.3); border-radius:6px; color:#fff; font-family:'Outfit'; font-size:0.85em;">
+                                    </div>
+                                    <div style="display:flex; gap:8px;">
+                                        <button onclick="admSetMasteryLevel()" style="padding:8px 14px; background:linear-gradient(135deg,#7c3aed,#5b21b6); border:none; border-radius:6px; color:#fff; font-family:'Outfit'; font-size:0.8em; font-weight:bold; cursor:pointer;">⭐ Definir Nível</button>
+                                        <button onclick="admResetAllMastery()" style="padding:8px 14px; background:rgba(220,38,38,0.3); border:1px solid rgba(220,38,38,0.4); border-radius:6px; color:#fca5a5; font-family:'Outfit'; font-size:0.8em; cursor:pointer;">🗑️ Resetar Tudo</button>
+                                        <button onclick="admShowMasteryState()" style="padding:8px 14px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#ccc; font-family:'Outfit'; font-size:0.8em; cursor:pointer;">📋 Ver Estado</button>
+                                    </div>
+                                </div>
+                                <pre id="admMstStateOutput" style="margin-top:12px; background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.08); border-radius:6px; padding:10px; font-size:0.75em; color:#a0e0a0; max-height:150px; overflow-y:auto; display:none;"></pre>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Ações de Salvar e Sincronizar -->
                     <div style="display: flex; gap: 12px; margin-top: 10px;">
                         <button onclick="saveAdminBalancingConfig(false)" style="flex: 1; padding: 12px; background: linear-gradient(135deg, #3498db, #2980b9); border: none; border-radius: 8px; color: #fff; font-family: 'Outfit'; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);">💾 Aplicar Apenas Localmente</button>
@@ -3004,7 +3104,7 @@
             <!-- Página Poço dos Desejos -->
             <div id="wishingwellPage" class="content-page">
                 <div class="page-title"><img src="img/23_wishingwell.png" class="game-icon-lg" alt=""> O Poço dos Desejos</div>
-                <div class="wishing-well-container" data-layout-label="🪙 Container Poço">
+                <div class="wishing-well-container layout-editable" data-layout-label="🪙 Container Poço">
                     <div class="well-description">
                         Jogue seu Ouro no poço para abençoar o servidor! Quando a meta global for atingida, um Evento Aleatório acontecerá para todos.
                     </div>
@@ -7486,6 +7586,679 @@
         <div class="ember e8"></div>
     </div>
 
+<!-- ============================================================ -->
+<!-- SISTEMA DE MAESTRIA POR RECURSO — IndexMaestria.html ONLY   -->
+<!-- ============================================================ -->
+<style>
+/* === MAESTRIA: Barra de progresso visível na página de skill === */
+.mastery-skill-bar-wrap {
+    margin: 8px 0 0 0;
+    padding: 0;
+}
+.mastery-skill-bar-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.72em;
+    color: #c084fc;
+    margin-bottom: 3px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+}
+.mastery-skill-bar-label .mst-icon { font-size: 1.1em; }
+.mastery-skill-bar-outer {
+    height: 7px;
+    background: rgba(120, 60, 200, 0.12);
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid rgba(180, 130, 255, 0.18);
+    position: relative;
+}
+.mastery-skill-bar-inner {
+    height: 100%;
+    background: linear-gradient(90deg, #7c3aed, #c084fc, #e879f9);
+    border-radius: 6px;
+    transition: width 0.5s ease;
+    box-shadow: 0 0 8px rgba(192, 132, 252, 0.5);
+}
+.mastery-skill-bar-milestones {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.62em;
+    color: #7c5caf;
+    margin-top: 2px;
+}
+
+/* === Card de recurso com indicador de maestria === */
+.mastery-resource-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 0.68em;
+    color: #c084fc;
+    font-weight: 700;
+    background: rgba(124, 58, 237, 0.15);
+    border: 1px solid rgba(180, 130, 255, 0.25);
+    border-radius: 8px;
+    padding: 1px 6px;
+    margin-left: 6px;
+    vertical-align: middle;
+    letter-spacing: 0.02em;
+}
+.mastery-resource-badge.mst-max {
+    background: linear-gradient(135deg, rgba(234,179,8,0.25), rgba(251,146,60,0.15));
+    border-color: rgba(234,179,8,0.5);
+    color: #fbbf24;
+    animation: masteryPulse 2s ease-in-out infinite;
+}
+@keyframes masteryPulse {
+    0%, 100% { box-shadow: 0 0 4px rgba(251,191,36,0.3); }
+    50% { box-shadow: 0 0 12px rgba(251,191,36,0.7); }
+}
+
+/* === Mini barra de maestria no card de recurso === */
+.mastery-mini-bar {
+    height: 3px;
+    background: rgba(124,58,237,0.15);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 4px;
+}
+.mastery-mini-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #7c3aed, #c084fc);
+    border-radius: 3px;
+    transition: width 0.4s ease;
+}
+
+/* === Grade de Maestria (painel dentro da skill page) === */
+.mastery-panel {
+    background: rgba(15, 8, 30, 0.7);
+    border: 1px solid rgba(180, 130, 255, 0.2);
+    border-radius: 14px;
+    padding: 18px;
+    margin-top: 16px;
+}
+.mastery-panel-title {
+    font-size: 1em;
+    font-weight: 700;
+    color: #c084fc;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.mastery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 12px;
+}
+.mastery-item-card {
+    background: rgba(0,0,0,0.35);
+    border: 1px solid rgba(180,130,255,0.15);
+    border-radius: 10px;
+    padding: 12px;
+    transition: border-color 0.2s;
+}
+.mastery-item-card:hover { border-color: rgba(192,132,252,0.45); }
+.mastery-item-card.mst-max-card {
+    border-color: rgba(234,179,8,0.45);
+    background: rgba(234,179,8,0.06);
+}
+.mastery-item-name {
+    font-size: 0.82em;
+    font-weight: 600;
+    color: #e2d9f3;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
+}
+.mastery-item-level {
+    font-size: 0.75em;
+    color: #c084fc;
+    margin-bottom: 4px;
+}
+.mastery-item-xpbar-outer {
+    height: 5px;
+    background: rgba(124,58,237,0.12);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 8px;
+    border: 1px solid rgba(180,130,255,0.12);
+}
+.mastery-item-xpbar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #7c3aed, #c084fc);
+    border-radius: 4px;
+    transition: width 0.4s ease;
+}
+.mastery-item-bonuses {
+    font-size: 0.68em;
+    color: #888;
+    line-height: 1.5;
+}
+.mastery-bonus-active { color: #86efac; }
+.mastery-bonus-locked { color: #555; }
+
+/* === Admin tab buttons === */
+.adm-tab-btn { padding: 6px 13px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; color: #aaa; font-family: 'Outfit'; font-size: 0.8em; cursor: pointer; transition: all 0.2s; }
+.adm-tab-btn:hover { background: rgba(255,255,255,0.12); color: #fff; }
+.adm-tab-btn.active { background: rgba(192,132,252,0.2); border-color: rgba(192,132,252,0.5); color: #c084fc; font-weight: 700; }
+</style>
+
+<script>
+// ================================================================
+// SISTEMA DE MAESTRIA — ENGINE COMPLETA (indexMaestria.html)
+// ================================================================
+
+// --- Configuração de Maestria (editável pelo admin) ---
+window.masteryConfig = {
+    maxLevel: 50,
+    gatherXpMult: 0.20,    // 20% do XP base vira XP de Maestria na coleta
+    craftXpMult: 0.15,     // 15% do XP base vira XP de Maestria no craft
+    globalMult: 1.0,       // multiplicador global extra
+    xpBase: 50,            // XP necessário para o nível 1
+    xpCurveMult: 1.18,     // multiplicador da curva exponencial
+    // Bônus por marco de nível:
+    xpBonusPerGroup: 5,    // +5% XP a cada 5 níveis
+    doubleChanceAt5: 5,    // +5% drop duplo no nível 5
+    speedReducAt10: 10,    // -10% tempo autofarm no nível 10
+    tripleChanceAt25: 3,   // +3% drop triplo no nível 25
+    costReducAt35: 5,      // +5% chance de não consumir material no nível 35
+    maxDoubleBonus: 15,    // +15% drop duplo adicional no nível 50
+};
+
+// --- Tabela de XP de Maestria (calculada dinamicamente) ---
+function buildMasteryXpTable() {
+    const t = [0]; // nível 0 não precisa de XP
+    for (let i = 1; i <= window.masteryConfig.maxLevel; i++) {
+        t.push(Math.floor(window.masteryConfig.xpBase * Math.pow(window.masteryConfig.xpCurveMult, i - 1)));
+    }
+    return t;
+}
+
+function getMasteryXpTable() {
+    return buildMasteryXpTable();
+}
+
+// --- Inicializa estrutura de maestria no gameState ---
+function initMastery() {
+    if (!gameState.mastery) gameState.mastery = {};
+    const allResources = [
+        { sk: 'woodcutting', ids: ['wood1','wood2','wood3','wood4','wood5'] },
+        { sk: 'mining', ids: ['ore1','ore2','ore3','ore4','ore5','ore6','ore7','ore8','ore9'] },
+        { sk: 'fishing', ids: ['fish1','fish2','fish3','fish4','fish5'] },
+        { sk: 'herbalism', ids: ['herb1','herb2','herb3','herb4','herb5'] },
+        { sk: 'cooking', ids: ['cookedFish1','cookedFish2','cookedFish3','cookedFish4','cookedFish5'] },
+        { sk: 'crafting', ids: ['craftedItem1','craftedItem2','craftedItem3','craftedItem4','craftedItem5'] },
+        { sk: 'smithing', ids: ['bar1','bar2','bar3','bar4','bar5','bar6','bar7','bar8','bar9','blade1','blade2','blade3'] },
+        { sk: 'enchanting', ids: [] } // enchanting IDs preenchidos dinamicamente
+    ];
+    allResources.forEach(function(entry) {
+        if (!gameState.mastery[entry.sk]) gameState.mastery[entry.sk] = {};
+        entry.ids.forEach(function(id) {
+            if (!gameState.mastery[entry.sk][id]) {
+                gameState.mastery[entry.sk][id] = { level: 0, xp: 0 };
+            }
+        });
+    });
+    // enchanting — pega IDs da variável global se disponível
+    if (typeof enchantingRecipes !== 'undefined') {
+        if (!gameState.mastery['enchanting']) gameState.mastery['enchanting'] = {};
+        enchantingRecipes.forEach(function(r) {
+            if (!gameState.mastery['enchanting'][r.id]) {
+                gameState.mastery['enchanting'][r.id] = { level: 0, xp: 0 };
+            }
+        });
+    }
+}
+
+// --- Retorna nível atual de maestria ---
+function getMasteryLevel(skill, resourceId) {
+    if (!gameState.mastery || !gameState.mastery[skill]) return 0;
+    const m = gameState.mastery[skill][resourceId];
+    return m ? m.level : 0;
+}
+
+// --- Retorna os bônus ativos para um nível de maestria ---
+function getMasteryBonuses(skill, resourceId) {
+    const lvl = getMasteryLevel(skill, resourceId);
+    const cfg = window.masteryConfig;
+    const bonus = {
+        xpBoostPct: 0,       // % extra de XP da skill
+        doubleChancePct: 0,  // % extra de chance de drop duplo
+        tripleChancePct: 0,  // % de chance de drop triplo
+        speedReducPct: 0,    // % de redução no intervalo de autofarm
+        costReducChance: 0,  // % de chance de não consumir material
+    };
+    if (lvl <= 0) return bonus;
+    // XP boost: +cfg.xpBonusPerGroup% a cada 5 níveis
+    bonus.xpBoostPct = Math.floor(lvl / 5) * cfg.xpBonusPerGroup;
+    // Drop duplo: começa no nível 5
+    if (lvl >= 5)  bonus.doubleChancePct += cfg.doubleChanceAt5;
+    // Speed redução: no nível 10
+    if (lvl >= 10) bonus.speedReducPct += cfg.speedReducAt10;
+    // Drop triplo: no nível 25
+    if (lvl >= 25) bonus.tripleChancePct += cfg.tripleChanceAt25;
+    // Cost reduction (craft): no nível 35
+    if (lvl >= 35) bonus.costReducChance += cfg.costReducAt35;
+    // MÁXIMO nível 50: bônus adicional de drop duplo
+    if (lvl >= 50) bonus.doubleChancePct += cfg.maxDoubleBonus;
+    return bonus;
+}
+
+// --- Adiciona XP de Maestria a um recurso ---
+function addMasteryXP(skill, resourceId, baseXP) {
+    initMastery();
+    if (!gameState.mastery[skill]) gameState.mastery[skill] = {};
+    if (!gameState.mastery[skill][resourceId]) {
+        gameState.mastery[skill][resourceId] = { level: 0, xp: 0 };
+    }
+    const m = gameState.mastery[skill][resourceId];
+    if (m.level >= window.masteryConfig.maxLevel) return; // já no máximo
+
+    const cfg = window.masteryConfig;
+    const xpGain = Math.max(1, Math.floor(baseXP * cfg.globalMult));
+    m.xp += xpGain;
+
+    const xpTable = getMasteryXpTable();
+    let leveled = false;
+    while (m.level < cfg.maxLevel && m.xp >= xpTable[m.level + 1]) {
+        m.xp -= xpTable[m.level + 1];
+        m.level++;
+        leveled = true;
+        onMasteryLevelUp(skill, resourceId, m.level);
+    }
+    if (leveled) {
+        // Atualiza UI após level-up de maestria
+        setTimeout(function() { updateMasteryBarsOnPage(skill); }, 100);
+    }
+}
+
+// --- Callback de level-up de maestria ---
+function onMasteryLevelUp(skill, resourceId, newLevel) {
+    const cfg = window.masteryConfig;
+    const resourceName = getMasteryResourceName(skill, resourceId);
+    const isMilestone = (newLevel === 5 || newLevel === 10 || newLevel === 25 || newLevel === 35 || newLevel === 50);
+    const isMax = newLevel >= cfg.maxLevel;
+
+    if (isMax) {
+        showNotification('🏆 MAESTRIA MÁXIMA!', `${resourceName} atingiu Maestria Nível 50! Todos os bônus desbloqueados!`, 'success', '⭐');
+        if (typeof triggerCombatVictoryEffect === 'function') triggerCombatVictoryEffect();
+        if (typeof spawnConfetti === 'function') {
+            spawnConfetti(window.innerWidth / 2, window.innerHeight * 0.4, 60, ['#fbbf24','#c084fc','#e879f9','#ffffff']);
+        }
+    } else if (isMilestone) {
+        const milestoneMsg = {
+            5:  '🎲 Drop duplo desbloqueado!',
+            10: '⚡ Velocidade de autofarm aumentada!',
+            25: '💎 Chance de triplo drop desbloqueada!',
+            35: '🔩 Redução de custo de craft desbloqueada!',
+        };
+        showNotification(`⭐ Marco de Maestria! Nv.${newLevel}`, `${resourceName} — ${milestoneMsg[newLevel] || ''}`, 'success', '⭐');
+        if (typeof spawnConfetti === 'function') {
+            spawnConfetti(window.innerWidth / 2, window.innerHeight * 0.5, 30, ['#c084fc','#e879f9','#a78bfa','#f0abfc']);
+        }
+    } else {
+        showNotification(`⭐ Maestria Nv.${newLevel}`, `${resourceName} ganhou nível de Maestria!`, 'info', '⭐');
+    }
+
+    if (typeof spawnFloatingText === 'function') {
+        spawnFloatingText(window.innerWidth * 0.7, 120, `⭐ Maestria Nv.${newLevel}`, { type: 'special', duration: 1.2 });
+    }
+}
+
+// --- Retorna nome legível do recurso ---
+function getMasteryResourceName(skill, resourceId) {
+    try {
+        const lists = {
+            woodcutting: resources.woodcutting,
+            mining: resources.mining,
+            fishing: resources.fishing,
+            herbalism: resources.herbalism,
+        };
+        if (lists[skill]) {
+            const found = lists[skill].find(function(r) { return r.id === resourceId; });
+            if (found) return found.name;
+        }
+        if (skill === 'cooking') {
+            const found = cookingRecipes.find(function(r) { return r.id === resourceId; });
+            if (found) return found.name;
+        }
+        if (skill === 'crafting') {
+            const found = craftingRecipes.find(function(r) { return r.id === resourceId; });
+            if (found) return found.name;
+        }
+        if (skill === 'smithing') {
+            const found = smithingRecipes.find(function(r) { return r.id === resourceId; });
+            if (found) return found.name;
+        }
+    } catch(e) {}
+    return resourceId;
+}
+
+// ================================================================
+// OVERRIDE DE farmResource — Aplica e Concede XP de Maestria
+// ================================================================
+(function() {
+    const _origFarmResource = window.farmResource || farmResource;
+    window.farmResource = function(skill, resourceId, event) {
+        // Aplica bônus de maestria ANTES de chamar o original
+        const bonus = getMasteryBonuses(skill, resourceId);
+
+        // Injeta bônus no gameState temporariamente via flag
+        window._masteryBonusActive = bonus;
+
+        const result = _origFarmResource.call(this, skill, resourceId, event);
+
+        // Concede XP de maestria após a coleta
+        if (result !== false) {
+            try {
+                const resourceList = (typeof resources !== 'undefined') ? resources[skill] : null;
+                const resource = resourceList ? resourceList.find(function(r) { return r.id === resourceId; }) : null;
+                if (resource) {
+                    const masteryXP = Math.max(1, Math.floor(resource.xpGain * window.masteryConfig.gatherXpMult));
+                    addMasteryXP(skill, resourceId, masteryXP);
+                }
+            } catch(e) {}
+        }
+
+        window._masteryBonusActive = null;
+        return result;
+    };
+    // Expõe globalmente para gathering.js poder usar
+    if (typeof farmResource !== 'undefined') window.farmResource = window.farmResource;
+})();
+
+// ================================================================
+// OVERRIDE de startCrafting — Concede XP de Maestria após craft
+// ================================================================
+(function() {
+    const _origStartCrafting = window.startCrafting || (typeof startCrafting !== 'undefined' ? startCrafting : null);
+    if (!_origStartCrafting) return;
+    window.startCrafting = function(skill, recipeId, qtyOpt) {
+        // Wrap: intercepta o setTimeout interno para adicionar XP de maestria
+        const _origSetTimeout = window.setTimeout;
+        const capturedSkill = skill;
+        const capturedRecipeId = recipeId;
+        const result = _origStartCrafting.call(this, skill, recipeId, qtyOpt);
+        // XP de maestria é adicionado quando o craft termina (post-hoc via timer watcher)
+        // Usamos polling leve para detectar quando o timer some (craft concluído)
+        _watchCraftCompletion(capturedSkill, capturedRecipeId);
+        return result;
+    };
+})();
+
+function _watchCraftCompletion(skill, recipeId) {
+    const timerId = skill + '_' + recipeId;
+    const checkInterval = setInterval(function() {
+        if (!gameState.craftingTimers[timerId]) {
+            clearInterval(checkInterval);
+            // Craft terminou — concede XP de maestria
+            const allRecipes = {
+                cooking: (typeof cookingRecipes !== 'undefined') ? cookingRecipes : [],
+                crafting: (typeof craftingRecipes !== 'undefined') ? craftingRecipes : [],
+                smithing: (typeof smithingRecipes !== 'undefined') ? smithingRecipes : [],
+                enchanting: (typeof enchantingRecipes !== 'undefined') ? enchantingRecipes : [],
+            };
+            const recipeList = allRecipes[skill] || [];
+            const recipe = recipeList.find(function(r) { return r.id === recipeId; });
+            if (recipe) {
+                const masteryXP = Math.max(1, Math.floor(recipe.xpGain * window.masteryConfig.craftXpMult));
+                addMasteryXP(skill, recipeId, masteryXP);
+            }
+        }
+    }, 500);
+}
+
+// ================================================================
+// UI — Barras de Maestria nas páginas de skill
+// ================================================================
+
+function getMasterySkillStats(skill) {
+    if (!gameState.mastery || !gameState.mastery[skill]) return { totalLevels: 0, maxPossible: 0, avgLevel: 0 };
+    const entries = Object.values(gameState.mastery[skill]);
+    const totalLevels = entries.reduce(function(a, e) { return a + (e.level || 0); }, 0);
+    const maxPossible = entries.length * window.masteryConfig.maxLevel;
+    const avgLevel = entries.length > 0 ? (totalLevels / entries.length).toFixed(1) : 0;
+    return { totalLevels, maxPossible, avgLevel };
+}
+
+function getMasterySkillResourceNames(skill) {
+    const map = {
+        woodcutting: (typeof resources !== 'undefined') ? resources.woodcutting : [],
+        mining: (typeof resources !== 'undefined') ? resources.mining : [],
+        fishing: (typeof resources !== 'undefined') ? resources.fishing : [],
+        herbalism: (typeof resources !== 'undefined') ? resources.herbalism : [],
+        cooking: (typeof cookingRecipes !== 'undefined') ? cookingRecipes : [],
+        crafting: (typeof craftingRecipes !== 'undefined') ? craftingRecipes : [],
+        smithing: (typeof smithingRecipes !== 'undefined') ? smithingRecipes : [],
+        enchanting: (typeof enchantingRecipes !== 'undefined') ? enchantingRecipes : [],
+    };
+    return map[skill] || [];
+}
+
+function renderMasteryPanel(skill, containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    initMastery();
+    const xpTable = getMasteryXpTable();
+    const cfg = window.masteryConfig;
+    const stats = getMasterySkillStats(skill);
+    const resourceList = getMasterySkillResourceNames(skill);
+    const masteryData = (gameState.mastery && gameState.mastery[skill]) ? gameState.mastery[skill] : {};
+    const pct = stats.maxPossible > 0 ? Math.min(100, (stats.totalLevels / stats.maxPossible * 100)) : 0;
+
+    let html = `<div class="mastery-panel">
+        <div class="mastery-panel-title">⭐ Maestria — ${skillName(skill)}</div>
+        <!-- Barra global de maestria da skill -->
+        <div class="mastery-skill-bar-wrap">
+            <div class="mastery-skill-bar-label">
+                <span><span class="mst-icon">⭐</span> Progresso Total de Maestria</span>
+                <span>${stats.totalLevels} / ${stats.maxPossible} níveis &nbsp;|&nbsp; Média: ${stats.avgLevel}</span>
+            </div>
+            <div class="mastery-skill-bar-outer">
+                <div class="mastery-skill-bar-inner" style="width:${pct.toFixed(1)}%;"></div>
+            </div>
+            <div class="mastery-skill-bar-milestones">
+                <span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span>
+            </div>
+        </div>
+        <div class="mastery-grid" style="margin-top:14px;">`;
+
+    resourceList.forEach(function(res) {
+        const id = res.id;
+        const m = masteryData[id] || { level: 0, xp: 0 };
+        const lvl = m.level || 0;
+        const xp = m.xp || 0;
+        const isMax = lvl >= cfg.maxLevel;
+        const nextXP = !isMax ? (xpTable[lvl + 1] || 1) : 1;
+        const barPct = isMax ? 100 : Math.min(100, (xp / nextXP * 100));
+        const bonus = getMasteryBonuses(skill, id);
+        const icon = res.icon || (res.image ? `<img src="${res.image}" style="width:14px;height:14px;object-fit:contain;">` : '📦');
+        const stars = lvl >= cfg.maxLevel ? '🏆' : (lvl >= 25 ? '⭐⭐⭐' : (lvl >= 10 ? '⭐⭐' : (lvl >= 1 ? '⭐' : '○')));
+
+        html += `<div class="mastery-item-card ${isMax ? 'mst-max-card' : ''}">
+            <div class="mastery-item-name">${icon} ${res.name} <span style="margin-left:auto;">${stars}</span></div>
+            <div class="mastery-item-level">Maestria Nv.<strong>${lvl}</strong> / ${cfg.maxLevel} &nbsp;&nbsp; ${isMax ? '🏆 MÁXIMO' : `${xp} / ${nextXP} XP`}</div>
+            <div class="mastery-item-xpbar-outer">
+                <div class="mastery-item-xpbar-fill" style="width:${barPct.toFixed(1)}%"></div>
+            </div>
+            <div class="mastery-item-bonuses">
+                <div class="${lvl >= 5 ? 'mastery-bonus-active' : 'mastery-bonus-locked'}">🎲 Drop Duplo ${bonus.doubleChancePct > 0 ? '+' + bonus.doubleChancePct + '%' : '(Nv.5)'}</div>
+                <div class="${lvl >= 10 ? 'mastery-bonus-active' : 'mastery-bonus-locked'}">⚡ Autofarm ${bonus.speedReducPct > 0 ? '-' + bonus.speedReducPct + '%t' : '(Nv.10)'}</div>
+                <div class="${lvl >= 25 ? 'mastery-bonus-active' : 'mastery-bonus-locked'}">💎 Drop Triplo ${bonus.tripleChancePct > 0 ? '+' + bonus.tripleChancePct + '%' : '(Nv.25)'}</div>
+                <div class="${lvl >= 35 ? 'mastery-bonus-active' : 'mastery-bonus-locked'}">🔩 -Custo Craft ${bonus.costReducChance > 0 ? '+' + bonus.costReducChance + '%' : '(Nv.35)'}</div>
+                ${bonus.xpBoostPct > 0 ? `<div class="mastery-bonus-active">📈 +${bonus.xpBoostPct}% XP</div>` : ''}
+                ${isMax ? '<div class="mastery-bonus-active" style="color:#fbbf24;">🏆 +'+cfg.maxDoubleBonus+'% Drop Duplo (Bônus Máximo)</div>' : ''}
+            </div>
+        </div>`;
+    });
+
+    html += `</div></div>`;
+    container.innerHTML = html;
+}
+
+function skillName(skill) {
+    const names = { woodcutting:'Corte de Madeira', mining:'Mineração', fishing:'Pesca', herbalism:'Herbalismo', cooking:'Culinária', crafting:'Artesanato', smithing:'Ferraria', enchanting:'Encantamento' };
+    return names[skill] || skill;
+}
+
+// Atualiza barras de maestria na página ativa
+function updateMasteryBarsOnPage(skill) {
+    const containerId = 'masteryPanel_' + skill;
+    if (document.getElementById(containerId)) {
+        renderMasteryPanel(skill, containerId);
+    }
+    // Atualiza mini badges nos cards de recurso
+    if (gameState.mastery && gameState.mastery[skill]) {
+        Object.keys(gameState.mastery[skill]).forEach(function(rid) {
+            const lvl = gameState.mastery[skill][rid].level || 0;
+            const badge = document.getElementById('mst_badge_' + rid);
+            if (badge) {
+                badge.textContent = lvl > 0 ? (lvl >= window.masteryConfig.maxLevel ? '🏆' : '⭐' + lvl) : '';
+                badge.className = 'mastery-resource-badge' + (lvl >= window.masteryConfig.maxLevel ? ' mst-max' : '');
+                badge.style.display = lvl > 0 ? 'inline-flex' : 'none';
+            }
+            const miniBar = document.getElementById('mst_minibar_fill_' + rid);
+            if (miniBar) {
+                const xpTable = getMasteryXpTable();
+                const m = (gameState.mastery[skill] || {})[rid] || { level: 0, xp: 0 };
+                const isMax = m.level >= window.masteryConfig.maxLevel;
+                const nextXP = !isMax ? (xpTable[m.level + 1] || 1) : 1;
+                const pct = isMax ? 100 : Math.min(100, (m.xp / nextXP * 100));
+                miniBar.style.width = pct + '%';
+            }
+        });
+    }
+}
+
+// Injeta o painel de maestria e mini-barras nas páginas de skill ao abrir
+const _origShowPage = window.showPage;
+window.showPage = function(page) {
+    if (_origShowPage) _origShowPage.call(this, page);
+    const gatherSkills = ['woodcutting','mining','fishing','herbalism'];
+    const craftSkills  = ['cooking','crafting','smithing','enchanting'];
+    const allSkills    = gatherSkills.concat(craftSkills);
+    if (allSkills.includes(page)) {
+        // Injeta container do painel de maestria se ainda não existe
+        setTimeout(function() {
+            const pageDiv = document.getElementById(page + 'Page') ||
+                            document.querySelector('[id$="Page"][style*="display: block"]') ||
+                            document.querySelector('.content-page[style*="display: block"]');
+            if (!pageDiv) return;
+            let mastContainer = document.getElementById('masteryPanel_' + page);
+            if (!mastContainer) {
+                mastContainer = document.createElement('div');
+                mastContainer.id = 'masteryPanel_' + page;
+                pageDiv.appendChild(mastContainer);
+            }
+            renderMasteryPanel(page, 'masteryPanel_' + page);
+        }, 150);
+    }
+};
+
+// ================================================================
+// FUNÇÕES DE ADMIN — Leitura e escrita dos controles
+// ================================================================
+window.admPreviewMasteryXpCurve = function() {
+    const xpBase = parseFloat(document.getElementById('admMstXpBase').value) || 50;
+    const curveMult = parseFloat(document.getElementById('admMstXpCurveMult').value) || 1.18;
+    const MAX = 50;
+    let rows = '<strong style="color:#c084fc;">Prévia da Curva (selecione níveis-chave):</strong><br>';
+    [1,5,10,15,20,25,30,35,40,45,50].forEach(function(lvl) {
+        const xp = Math.floor(xpBase * Math.pow(curveMult, lvl - 1));
+        const cumXP = (function() { let s = 0; for (let i = 1; i <= lvl; i++) s += Math.floor(xpBase * Math.pow(curveMult, i-1)); return s; })();
+        rows += `Nv.${lvl}: <span style="color:#86efac;">${xp.toLocaleString()} XP</span> &nbsp; (Total: ${cumXP.toLocaleString()})<br>`;
+    });
+    document.getElementById('admMstXpPreview').innerHTML = rows;
+};
+
+window.admSetMasteryLevel = function() {
+    const skill = document.getElementById('admMstSkillSelect').value;
+    const rid = document.getElementById('admMstResourceId').value.trim();
+    const lvl = parseInt(document.getElementById('admMstTargetLevel').value) || 1;
+    if (!skill || !rid) { showNotification('❌ Erro', 'Preencha skill e ID do recurso.', 'error'); return; }
+    initMastery();
+    if (!gameState.mastery[skill]) gameState.mastery[skill] = {};
+    gameState.mastery[skill][rid] = { level: Math.min(lvl, window.masteryConfig.maxLevel), xp: 0 };
+    showNotification('⭐ Maestria Definida', `${skill}/${rid} → Nível ${lvl}`, 'success');
+    updateMasteryBarsOnPage(skill);
+};
+
+window.admResetAllMastery = function() {
+    if (!confirm('Resetar TODA a maestria do save atual? Isso não pode ser desfeito.')) return;
+    gameState.mastery = {};
+    initMastery();
+    showNotification('🗑️ Maestria Resetada', 'Todos os níveis de maestria foram zerados.', 'info');
+    ['woodcutting','mining','fishing','herbalism','cooking','crafting','smithing','enchanting'].forEach(function(sk) {
+        updateMasteryBarsOnPage(sk);
+    });
+};
+
+window.admShowMasteryState = function() {
+    const pre = document.getElementById('admMstStateOutput');
+    pre.style.display = 'block';
+    pre.textContent = JSON.stringify(gameState.mastery, null, 2);
+};
+
+// Lê campos admin e aplica na masteryConfig
+window.applyMasteryAdminConfig = function() {
+    const getN = function(id, def) { const el = document.getElementById(id); return el ? (parseFloat(el.value) || def) : def; };
+    window.masteryConfig.gatherXpMult   = getN('admMstGatherXpMult', 0.20);
+    window.masteryConfig.craftXpMult    = getN('admMstCraftXpMult', 0.15);
+    window.masteryConfig.globalMult     = getN('admMstGlobalMult', 1.0);
+    window.masteryConfig.xpBonusPerGroup= getN('admMstXpBonus', 5);
+    window.masteryConfig.doubleChanceAt5= getN('admMstDoubleBase', 5);
+    window.masteryConfig.speedReducAt10 = getN('admMstSpeedReduc', 10);
+    window.masteryConfig.tripleChanceAt25= getN('admMstTripleChance', 3);
+    window.masteryConfig.costReducAt35  = getN('admMstCostReduc', 5);
+    window.masteryConfig.maxDoubleBonus = getN('admMstMaxDouble', 15);
+    window.masteryConfig.xpBase         = getN('admMstXpBase', 50);
+    window.masteryConfig.xpCurveMult    = getN('admMstXpCurveMult', 1.18);
+    showNotification('⭐ Maestria', 'Configuração de Maestria aplicada!', 'success');
+};
+
+// Preenche campos admin ao abrir o painel
+const _origFillAdminInputs = window.fillAdminInputsFromCurrentConfig;
+window.fillAdminInputsFromCurrentConfig = function() {
+    if (_origFillAdminInputs) _origFillAdminInputs.apply(this, arguments);
+    const cfg = window.masteryConfig;
+    const setVal = function(id, val) { const el = document.getElementById(id); if (el) el.value = val; };
+    setVal('admMstGatherXpMult',  cfg.gatherXpMult);
+    setVal('admMstCraftXpMult',   cfg.craftXpMult);
+    setVal('admMstGlobalMult',    cfg.globalMult);
+    setVal('admMstXpBonus',       cfg.xpBonusPerGroup);
+    setVal('admMstDoubleBase',    cfg.doubleChanceAt5);
+    setVal('admMstSpeedReduc',    cfg.speedReducAt10);
+    setVal('admMstTripleChance',  cfg.tripleChanceAt25);
+    setVal('admMstCostReduc',     cfg.costReducAt35);
+    setVal('admMstMaxDouble',     cfg.maxDoubleBonus);
+    setVal('admMstXpBase',        cfg.xpBase);
+    setVal('admMstXpCurveMult',   cfg.xpCurveMult);
+};
+
+// Adiciona botão "Aplicar Maestria" ao painel admin maestria ao carregar
+document.addEventListener('DOMContentLoaded', function() {
+    const mastTab = document.getElementById('admTab_maestria');
+    if (mastTab) {
+        const applyBtn = document.createElement('button');
+        applyBtn.textContent = '✅ Aplicar Configuração de Maestria';
+        applyBtn.style.cssText = 'margin-top:14px; padding:10px 20px; background:linear-gradient(135deg,#7c3aed,#5b21b6); border:none; border-radius:8px; color:#fff; font-family:Outfit,sans-serif; font-weight:bold; cursor:pointer; font-size:0.9em; width:100%;';
+        applyBtn.onclick = window.applyMasteryAdminConfig;
+        mastTab.querySelector('.card').appendChild(applyBtn);
+    }
+    // Inicializa maestria no gameState quando o jogo carrega
+    setTimeout(function() {
+        if (typeof gameState !== 'undefined' && gameState.mastery !== undefined) {
+            initMastery();
+        }
+    }, 2000);
+});
+
+console.log('[indexMaestria] ⭐ Sistema de Maestria carregado. masteryConfig:', window.masteryConfig);
+</script>
 </body>
 
 </html>

@@ -2,6 +2,7 @@
         // FUNÇÕES DE UI
         // ============================================
         function updateUI() {
+            if (window.isGamePausedForEditor || (window.LayoutEditor && window.LayoutEditor.isActive && window.LayoutEditor.isActive())) return;
             const sidebarGoldEl = document.getElementById('sidebarGold');
             if (sidebarGoldEl) sidebarGoldEl.textContent = gameState.gold;
             const goldBarEl = document.getElementById('sidebarGoldBar');
