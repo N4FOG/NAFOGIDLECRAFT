@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎨 Teste Hover Sidebar — ANTES vs DEPOIS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: radial-gradient(ellipse at 50% 20%, rgba(28, 48, 75, 0.45) 0%, rgba(10, 16, 26, 0.92) 65%, rgba(3, 6, 10, 0.98) 100%),
+                        linear-gradient(135deg, #0a1628, #1a2a4a);
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 30px;
+        }
+
+        h1 {
+            text-align: center;
+            font-family: 'Cinzel', serif;
+            color: #ffd700;
+            font-size: 1.8em;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #888;
+            font-size: 0.9em;
+            margin-bottom: 30px;
+        }
+
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .column {
+            background: rgba(15, 25, 40, 0.95);
+            border-radius: 18px;
+            padding: 20px;
+            border: 1.5px solid rgba(170, 204, 255, 0.15);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .column-title {
+            text-align: center;
+            font-family: 'Cinzel', serif;
+            font-size: 1.2em;
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+            border-bottom: 2px solid;
+        }
+
+        .column-title.antes {
+            color: #ff6666;
+            border-color: #ff6666;
+        }
+
+        .column-title.depois {
+            color: #66ff88;
+            border-color: #66ff88;
+        }
+
+        .sidebar-category {
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            color: #ff9944;
+            background: linear-gradient(90deg, rgba(255, 153, 68, 0.12), transparent);
+            padding: 1px 10px;
+            border-left: 3px solid #ff9944;
+            border-radius: 4px;
+            margin-top: 14px;
+            margin-bottom: 8px;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+            font-size: 0.9em;
+            text-transform: uppercase;
+        }
+
+        .sidebar-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        /* Ícones de imagem */
+        .game-icon {
+            width: 34px;
+            height: 34px;
+            object-fit: contain;
+            vertical-align: middle;
+            flex-shrink: 0;
+        }
+        .game-icon-sm {
+            width: 30px;
+            height: 30px;
+            object-fit: contain;
+            vertical-align: middle;
+            flex-shrink: 0;
+        }
+
+        /* ======================================
+           SKILL BAR (usado dentro de botões)
+           ====================================== */
+        .menu-btn-skill-container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            gap: 2px;
+        }
+        .menu-btn-skill-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+        .menu-btn-skill-name {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.92em;
+        }
+        .menu-btn-skill-level {
+            background: rgba(255, 215, 0, 0.18);
+            color: #ffd700;
+            font-size: 0.75em;
+            font-weight: 800;
+            padding: 1px 7px;
+            border-radius: 6px;
+            min-width: 24px;
+            text-align: center;
+        }
+        .menu-btn-skill-progress {
+            width: 100%;
+            height: 4px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 3px;
+        }
+        .menu-btn-skill-progress-bar {
+            height: 100%;
+            width: 35%;
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        /* ================================================
+           ★★★  ANTES — ESTILO ATUAL (hover genérico)  ★★★
+           ================================================ */
+        .antes .menu-btn {
+            background: #2a3a4a;
+            color: #fff;
+            border: 2px solid #3a4a5a;
+            padding: 6px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        /* Cores temáticas (só background e border, SEM hover próprio) */
+        .antes .menu-btn.mercado    { background: #4a6a3a; border-color: #8bc34a; }
+        .antes .menu-btn.worldboss  { background: #2a3a4a; border-color: #3a4a5a; } /* ❌ Sem classe */
+        .antes .menu-btn.wishingwell{ background: #2a3a4a; border-color: #3a4a5a; } /* ❌ Sem classe */
+        .antes .menu-btn.observatory{ background: #2a3a4a; border-color: #3a4a5a; } /* ❌ Sem classe */
+        .antes .menu-btn.character  { background: #5a3a7a; border-color: #9a6ac9; }
+        .antes .menu-btn.pets       { background: #9a4a7a; border-color: #c96ac9; }
+        .antes .menu-btn.tech       { background: #4a7a6a; border-color: #4ac97a; }
+        .antes .menu-btn.alchemy    { background: #7a4a6a; border-color: #c97a9a; }
+        .antes .menu-btn.runar      { background: #2a3a4a; border-color: #3a4a5a; } /* ❌ Sem classe */
+        .antes .menu-btn.woodcutting{ background: #4a6a3a; border-color: #8bc34a; }
+        .antes .menu-btn.mining     { background: #7a6a3a; border-color: #c9b04a; }
+        .antes .menu-btn.fishing    { background: #3a6a7a; border-color: #4ac9d9; }
+        .antes .menu-btn.herbalism  { background: #2a3a4a; border-color: #3a4a5a; } /* ❌ Sem classe */
+        .antes .menu-btn.crafting   { background: #9a6a4a; border-color: #c99a4a; }
+        .antes .menu-btn.smithing   { background: #7a4a4a; border-color: #c97a7a; }
+        .antes .menu-btn.cooking    { background: #c97a3a; border-color: #ff9f4a; }
+        .antes .menu-btn.enchanting { background: #2a3a4a; border-color: #3a4a5a; } /* ❌ Sem classe */
+        .antes .menu-btn.runeforge  { background: #2a3a4a; border-color: #3a4a5a; } /* ❌ Sem classe */
+        .antes .menu-btn.combat     { background: #aa4444; border-color: #ff6666; }
+        .antes .menu-btn.dungeon    { background: #3a1a4a; border-color: #8a4ac9; }
+
+        /* ❌ Hover genérico — MESMO para todos, ignora a cor temática */
+        .antes .menu-btn:hover {
+            background: #3a4a5a;
+            transform: translateX(5px);
+        }
+
+        /* Barra de progresso genérica */
+        .antes .menu-btn-skill-progress-bar {
+            background: linear-gradient(90deg, #888, #aaa);
+        }
+
+
+        /* =================================================
+           ★★★  DEPOIS — ESTILO NOVO (hover temático)  ★★★
+           ================================================= */
+        .depois .menu-btn {
+            color: #fff;
+            border: 2px solid #3a4a5a;
+            padding: 6px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: 600;
+            font-family: 'Outfit', sans-serif;
+            letter-spacing: 0.4px;
+            transition: all 0.22s cubic-bezier(0.25, 0.8, 0.25, 1);
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+            /* Efeito de brilho superior (glassmorphism sutil) */
+            background: #2a3a4a;
+        }
+
+        /* Brilho no topo do botão */
+        .depois .menu-btn::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 45%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.06), transparent);
+            border-radius: 10px 10px 0 0;
+            pointer-events: none;
+            transition: opacity 0.22s ease;
+            opacity: 1;
+        }
+        .depois .menu-btn:hover::after {
+            opacity: 0;
+        }
+
+        /* ✅ Cores temáticas + HOVERS INDIVIDUAIS */
+
+        /* -- COMÉRCIO -- */
+        .depois .menu-btn.mercado {
+            background: linear-gradient(160deg, rgba(74, 106, 58, 0.85), rgba(54, 82, 42, 0.95));
+            border-color: rgba(139, 195, 74, 0.35);
+            border-bottom: 2px solid rgba(139, 195, 74, 0.2);
+        }
+        .depois .menu-btn.mercado:hover {
+            background: linear-gradient(160deg, rgba(90, 130, 70, 0.95), rgba(68, 100, 52, 0.98));
+            border-color: rgba(139, 195, 74, 0.6);
+            transform: translateY(-2px);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), 0 6px 18px rgba(139, 195, 74, 0.2);
+            color: #e0ffe0;
+        }
+
+        /* -- MULTIPLAYER -- */
+        .depois .menu-btn.worldboss {
+            background: linear-gradient(160deg, rgba(90, 50, 30, 0.85), rgba(70, 35, 20, 0.95));
+            border-color: rgba(255, 120, 50, 0.35);
+            border-bottom: 2px solid rgba(255, 120, 50, 0.2);
+        }
+        .depois .menu-btn.worldboss:hover {
+            background: linear-gradient(160deg, rgba(115, 62, 38, 0.95), rgba(88, 45, 25, 0.98));
+            border-color: rgba(255, 140, 70, 0.6);
+            transform: translateY(-2px);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), 0 6px 18px rgba(255, 120, 50, 0.2);
+            color: #ffe0c8;
+        }
+
+        .depois .menu-btn.wishingwell {
+            background: linear-gradient(160deg, rgba(40, 70, 100, 0.85), rgba(28, 50, 78, 0.95));
+            border-color: rgba(100, 180, 255, 0.35);
+            border-bottom: 2px solid rgba(100, 180, 255, 0.2);
+        }
+        .depois .menu-btn.wishingwell:hover {
+            background: linear-gradient(160deg, rgba(50, 88, 128, 0.95), rgba(38, 65, 98, 0.98));
+            border-color: rgba(120, 200, 255, 0.6);
+            transform: translateY(-2px);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), 0 6px 18px rgba(100, 180, 255, 0.2);
+            color: #d0eaff;
+        }
+
+        .depois .menu-btn.observatory {
+            background: linear-gradient(160deg, rgba(50, 55, 85, 0.85), rgba(35, 38, 68, 0.95));
+            border-color: rgba(150, 160, 230, 0.35);
+            border-bottom: 2px solid rgba(150, 160, 230, 0.2);
+        }
+        .depois .menu-btn.observatory:hover {
+            background: linear-gradient(160deg, rgba(65, 72, 110, 0.95), rgba(48, 52, 88, 0.98));
+            border-color: rgba(170, 180, 255, 0.6);
+            transform: translateY(-2px);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), 0 6px 18px rgba(150, 160, 230, 0.2);
+            color: #e0e4ff;
+        }
+
+        /* -- ESPECIAL -- */
+        .depois .menu-btn.character {
+            background: linear-gradient(160deg, rgba(90, 58, 122, 0.85), rgba(68, 42, 95, 0.95));
+            border-color: rgba(154, 106, 201, 0.35);
+            border-bottom: 2px solid rgba(154, 106, 201, 0.2);
+        }
+        .depois .menu-btn.character:hover {
+            background: linear-gradient(160deg, rgba(110, 72, 148, 0.95), rgba(85, 54, 118, 0.98));
+            border-color: rgba(174, 126, 221, 0.6);
+            transform: translateY(-2px);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), 0 6px 18px rgba(154, 106, 201, 0.2);
+            color: #e8d8f8;
+        }
+
+        .depois .menu-btn.pets {
+            background: linear-gradient(160deg, rgba(154, 74, 122, 0.85), rgba(120, 55, 95, 0.95));
+            border-color: rgba(201, 106, 201, 0.35);
+            border-bottom: 2px solid rgba(201, 106, 201, 0.2);
+        }
+        .depois .menu-btn.pets:hover {
+            background: linear-gradient(160deg, rgba(178, 90, 142, 0.95), rgba(142, 68, 115, 0.98));
+            border-color: rgba(221, 126, 221, 0.6);
+            transform: translateY(-2px);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), 0 6px 18px rgba(201, 106, 201, 0.2);
+            color: #fdd8f8;
+        }
+
+        .depois .menu-btn.tech {
+            background: linear-gradient(160deg, rgba(74, 122, 106, 0.85), rgba(55, 95, 82, 0.95));
+            border-color: rgba(74, 201, 122, 0.35);
+            border-bottom: 2px solid rgba(74, 201, 122, 0.2);
+        }
+        .depois .menu-btn.tech:hover {
+            background: linear-gradient(160deg, rgba(90, 148, 128, 0.95), rgba(68, 118, 100, 0.98));
+            border-color: rgba(94, 221, 142, 0.6);
+            transform: translateY(-2px);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), 0 6px 18px rgba(74, 201, 122, 0.2);
+            color: #d0f8e0;
+        }
+
+        .depois .menu-btn.alchemy {
+            background: linear-gradient(160deg, rgba(122, 74, 106, 0.85), rgba(95, 55, 82, 0.95));
+            border-color: rgba(201, 122, 154, 0.35);
+            border-bottom: 2px solid rgba(201, 122, 154, 0.2);
+        }
+        .depois .menu-btn.alchemy:hover {
+            background: linear-gradient(160deg, rgba(148, 90, 128, 0.95), rgba(118, 68, 100, 0.98));
+            border-color: rgba(221, 142, 174, 0.6);
+            transform: translateY(-2px);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), 0 6px 18px rgba(201, 122, 154, 0.2);
+            color: #fdd8e8;
+        }
+
+        .depois .menu-btn.runar {
+            background: linear-gradient(160deg, rgba(80, 60, 110, 0.85), rgba(60, 42, 88, 0.95));
+            border-color: rgba(160, 120, 220, 0.35);
+            border-bottom: 2px solid rgba(160, 120, 220, 0.2);
+        }
+        .depois .menu-btn.runar:hover {
+            background: linear-gradient(160deg, rgba(100, 75, 138, 0.95), rgba(78, 55, 110, 0.98));
+            border-color: rgba(180, 140, 240, 0.6);
+            transform: translateY(-2px);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), 0 6px 18px rgba(160, 120, 220, 0.2);
+            color: #e4d4ff;
+        }
+
+        /* -- COLETA (com barra de XP) -- */
+        .depois .menu-btn.woodcutting {
+            background: linear-gradient(160deg, rgba(74, 106, 58, 0.85), rgba(54, 82, 42, 0.95));
+            border-color: rgba(139, 195, 74, 0.35);
+            border-bottom: 2px solid rgba(139, 195, 74, 0.2);
+        }
+        .depois .menu-btn.woodcutting:hover {
+            background: linear-gradient(160deg, rgba(90, 130, 70, 0.95), rgba(68, 100, 52, 0.98));
+            border-color: rgba(139, 195, 74, 0.6);
+            transform: translateY(-2px);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), 0 6px 18px rgba(139, 195, 74, 0.2);
+        }
+        .depois .menu-btn.woodcutting .menu-btn-skill-progress-bar {
+            background: linear-gradient(90deg, #6a9a3a, #8bc34a);
+        }
+
+        .depois .menu-btn.mining {
+            background: linear-gradient(160deg, rgba(122, 106, 58, 0.85), rgba(95, 82, 42, 0.95));
+            border-color: rgba(201, 176, 74, 0.35);
+            border-bottom: 2px solid rgba(201, 176, 74, 0.2);
+        }
+        .depois .menu-btn.mining:hover {
+            background: linear-gradient(160deg, rgba(148, 128, 70, 0.95), rgba(118, 100, 52, 0.98));
+            border-color: rgba(201, 176, 74, 0.6);
+            transform: translateY(-2px);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), 0 6px 18px rgba(201, 176, 74, 0.2);
+        }
+        .depois .menu-btn.mining .menu-btn-skill-progress-bar {
+            background: linear-gradient(90deg, #b0962a, #c9b04a);
+        }
+
+        .depois .menu-btn.fishing {
+            background: linear-gradient(160deg, rgba(58, 106, 122, 0.85), rgba(42, 82, 95, 0.95));
+            border-color: rgba(74, 201, 217, 0.35);
+            border-bottom: 2px solid rgba(74, 201, 217, 0.2);
+        }
+        .depois .menu-btn.fishing:hover {
+            background: linear-gradient(160deg, rgba(70, 128, 148, 0.95), rgba(52, 100, 118, 0.98));
+            border-color: rgba(74, 201, 217, 0.6);
+            transform: translateY(-2px);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), 0 6px 18px rgba(74, 201, 217, 0.2);
+        }
+        .depois .menu-btn.fishing .menu-btn-skill-progress-bar {
+            background: linear-gradient(90deg, #2aa0b8, #4ac9d9);
+        }
+
+        .depois .menu-btn.herbalism {
+            background: linear-gradient(160deg, rgba(58, 100, 70, 0.85), rgba(40, 78, 52, 0.95));
+            border-color: rgba(90, 200, 110, 0.35);
+            border-bottom: 2px solid rgba(90, 200, 110, 0.2);
+        }
+        .depois .menu-btn.herbalism:hover {
+            background: linear-gradient(160deg, rgba(72, 125, 88, 0.95), rgba(52, 98, 65, 0.98));
+            border-color: rgba(110, 220, 130, 0.6);
+            transform: translateY(-2px);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), 0 6px 18px rgba(90, 200, 110, 0.2);
+        }
+        .depois .menu-btn.herbalism .menu-btn-skill-progress-bar {
+            background: linear-gradient(90deg, #4aaa5a, #6acc7a);
+        }
+
+        /* -- CRAFT -- */
+        .depois .menu-btn.crafting {
+            background: linear-gradient(160deg, rgba(154, 106, 74, 0.85), rgba(120, 82, 55, 0.95));
+            border-color: rgba(201, 154, 74, 0.35);
+            border-bottom: 2px solid rgba(201, 154, 74, 0.2);
+        }
+        .depois .menu-btn.crafting:hover {
+            background: linear-gradient(160deg, rgba(178, 128, 90, 0.95), rgba(142, 100, 68, 0.98));
+            border-color: rgba(221, 174, 94, 0.6);
+            transform: translateY(-2px);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), 0 6px 18px rgba(201, 154, 74, 0.2);
+        }
+        .depois .menu-btn.crafting .menu-btn-skill-progress-bar {
+            background: linear-gradient(90deg, #b08a3a, #c99a4a);
+        }
+
+        .depois .menu-btn.smithing {
+            background: linear-gradient(160deg, rgba(122, 74, 74, 0.85), rgba(95, 55, 55, 0.95));
+            border-color: rgba(201, 122, 122, 0.35);
+            border-bottom: 2px solid rgba(201, 122, 122, 0.2);
+        }
+        .depois .menu-btn.smithing:hover {
+            background: linear-gradient(160deg, rgba(148, 90, 90, 0.95), rgba(118, 68, 68, 0.98));
+            border-color: rgba(221, 142, 142, 0.6);
+            transform: translateY(-2px);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), 0 6px 18px rgba(201, 122, 122, 0.2);
+        }
+        .depois .menu-btn.smithing .menu-btn-skill-progress-bar {
+            background: linear-gradient(90deg, #b06060, #c97a7a);
+        }
+
+        .depois .menu-btn.cooking {
+            background: linear-gradient(160deg, rgba(180, 110, 52, 0.85), rgba(145, 85, 38, 0.95));
+            border-color: rgba(255, 159, 74, 0.35);
+            border-bottom: 2px solid rgba(255, 159, 74, 0.2);
+        }
+        .depois .menu-btn.cooking:hover {
+            background: linear-gradient(160deg, rgba(205, 130, 65, 0.95), rgba(168, 102, 48, 0.98));
+            border-color: rgba(255, 179, 94, 0.6);
+            transform: translateY(-2px);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), 0 6px 18px rgba(255, 159, 74, 0.2);
+        }
+        .depois .menu-btn.cooking .menu-btn-skill-progress-bar {
+            background: linear-gradient(90deg, #d08030, #ff9f4a);
+        }
+
+        .depois .menu-btn.enchanting {
+            background: linear-gradient(160deg, rgba(70, 58, 120, 0.85), rgba(52, 42, 95, 0.95));
+            border-color: rgba(140, 120, 220, 0.35);
+            border-bottom: 2px solid rgba(140, 120, 220, 0.2);
+        }
+        .depois .menu-btn.enchanting:hover {
+            background: linear-gradient(160deg, rgba(88, 72, 148, 0.95), rgba(65, 55, 118, 0.98));
+            border-color: rgba(160, 140, 240, 0.6);
+            transform: translateY(-2px);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), 0 6px 18px rgba(140, 120, 220, 0.2);
+        }
+        .depois .menu-btn.enchanting .menu-btn-skill-progress-bar {
+            background: linear-gradient(90deg, #8060c0, #a080e0);
+        }
+
+        .depois .menu-btn.runeforge {
+            background: linear-gradient(160deg, rgba(75, 55, 100, 0.85), rgba(55, 38, 78, 0.95));
+            border-color: rgba(150, 110, 200, 0.35);
+            border-bottom: 2px solid rgba(150, 110, 200, 0.2);
+        }
+        .depois .menu-btn.runeforge:hover {
+            background: linear-gradient(160deg, rgba(95, 70, 128, 0.95), rgba(72, 50, 100, 0.98));
+            border-color: rgba(170, 130, 220, 0.6);
+            transform: translateY(-2px);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), 0 6px 18px rgba(150, 110, 200, 0.2);
+        }
+
+        /* -- COMBATE -- */
+        .depois .menu-btn.combat {
+            background: linear-gradient(160deg, rgba(170, 68, 68, 0.85), rgba(135, 50, 50, 0.95));
+            border-color: rgba(255, 102, 102, 0.35);
+            border-bottom: 2px solid rgba(255, 102, 102, 0.2);
+        }
+        .depois .menu-btn.combat:hover {
+            background: linear-gradient(160deg, rgba(195, 82, 82, 0.95), rgba(158, 62, 62, 0.98));
+            border-color: rgba(255, 122, 122, 0.6);
+            transform: translateY(-2px);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), 0 6px 18px rgba(255, 102, 102, 0.2);
+            color: #ffd8d8;
+        }
+
+        .depois .menu-btn.dungeon {
+            background: linear-gradient(160deg, rgba(58, 26, 74, 0.85), rgba(42, 18, 58, 0.95));
+            border-color: rgba(138, 74, 201, 0.35);
+            border-bottom: 2px solid rgba(138, 74, 201, 0.2);
+        }
+        .depois .menu-btn.dungeon:hover {
+            background: linear-gradient(160deg, rgba(75, 35, 98, 0.95), rgba(58, 25, 78, 0.98));
+            border-color: rgba(158, 94, 221, 0.6);
+            transform: translateY(-2px);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), 0 6px 18px rgba(138, 74, 201, 0.2);
+            color: #e8d0ff;
+        }
+
+        /* -- GUIA -- */
+        .depois .menu-btn.wiki {
+            background: linear-gradient(160deg, rgba(26, 42, 74, 0.85), rgba(42, 58, 106, 0.95));
+            border-color: rgba(74, 106, 170, 0.35);
+            border-bottom: 2px solid rgba(74, 106, 170, 0.2);
+            color: #aaccff;
+        }
+        .depois .menu-btn.wiki:hover {
+            background: linear-gradient(160deg, rgba(36, 55, 95, 0.95), rgba(52, 70, 125, 0.98));
+            border-color: rgba(100, 140, 210, 0.6);
+            transform: translateY(-2px);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), 0 6px 18px rgba(74, 106, 170, 0.2);
+            color: #c8ddff;
+        }
+
+        /* -- ADMIN -- */
+        .depois .menu-btn.admin {
+            background: linear-gradient(160deg, rgba(74, 26, 26, 0.85), rgba(106, 42, 42, 0.95));
+            border-color: rgba(170, 74, 74, 0.35);
+            border-bottom: 2px solid rgba(170, 74, 74, 0.2);
+            color: #ffaacc;
+        }
+        .depois .menu-btn.admin:hover {
+            background: linear-gradient(160deg, rgba(95, 35, 35, 0.95), rgba(128, 55, 55, 0.98));
+            border-color: rgba(200, 90, 90, 0.6);
+            transform: translateY(-2px);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), 0 6px 18px rgba(170, 74, 74, 0.2);
+            color: #ffc8dd;
+        }
+
+        /* ✅ Active state (quando está na página selecionada) */
+        .depois .menu-btn:active {
+            transform: translateY(0px) scale(0.97);
+            transition-duration: 0.08s;
+        }
+
+        /* ==============
+           LEGENDA
+           ============== */
+        .legend {
+            max-width: 900px;
+            margin: 28px auto 0;
+            background: rgba(15, 25, 40, 0.85);
+            border-radius: 14px;
+            padding: 16px 20px;
+            border: 1px solid rgba(255, 215, 0, 0.12);
+            font-size: 0.85em;
+            color: #aaa;
+        }
+        .legend h3 {
+            color: #ffd700;
+            font-family: 'Cinzel', serif;
+            font-size: 1em;
+            margin-bottom: 8px;
+        }
+        .legend ul { list-style: none; padding: 0; }
+        .legend li { padding: 3px 0; }
+        .legend .tag-fix { color: #66ff88; font-weight: 700; }
+        .legend .tag-bug { color: #ff6666; font-weight: 700; }
+        .legend .tag-new { color: #66ccff; font-weight: 700; }
+
+        /* Badge de problema */
+        .badge {
+            font-size: 0.65em;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-weight: 700;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
+        .badge-missing {
+            background: rgba(255, 80, 80, 0.25);
+            color: #ff6666;
+            border: 1px solid rgba(255, 80, 80, 0.4);
+        }
+        .badge-fixed {
+            background: rgba(80, 255, 120, 0.15);
+            color: #66ff88;
+            border: 1px solid rgba(80, 255, 120, 0.3);
+        }
+
+        /* Hint text */
+        .hint {
+            text-align: center;
+            color: #666;
+            font-size: 0.78em;
+            margin-top: 8px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🎨 Teste de Hover — Sidebar Buttons</h1>
+    <p class="subtitle">Passe o mouse sobre cada botão para comparar o comportamento</p>
+
+    <div class="comparison">
+
+        <!-- ============ COLUNA ANTES ============ -->
+        <div class="column antes">
+            <div class="column-title antes">❌ ANTES (atual)</div>
+            <p class="hint">Hover genérico: todos vão para cinza (#3a4a5a) + translateX(5px)</p>
+
+            <div class="sidebar-category">🏪 COMÉRCIO</div>
+            <div class="sidebar-menu">
+                <button class="menu-btn mercado"><img src="img/21_shop.png" class="game-icon" alt=""> Mercado & Academia</button>
+            </div>
+
+            <div class="sidebar-category">🌍 CIDADE MULTIPLAYER</div>
+            <div class="sidebar-menu">
+                <button class="menu-btn worldboss"><img src="img/22_world.png" class="game-icon" alt=""> Chefes Globais <span class="badge badge-missing">SEM CSS</span></button>
+                <button class="menu-btn wishingwell"><img src="img/23_wishingwell.png" class="game-icon" alt=""> Poço dos Desejos <span class="badge badge-missing">SEM CSS</span></button>
+                <button class="menu-btn observatory"><img src="img/04_trophy.png" class="game-icon" alt=""> Grande Observatório <span class="badge badge-missing">SEM CSS</span></button>
+            </div>
+
+            <div class="sidebar-category">🐉 ESPECIAL</div>
+            <div class="sidebar-menu">
+                <button class="menu-btn character"><img src="img/24_mage.png" class="game-icon" alt=""> Personagem</button>
+                <button class="menu-btn pets"><img src="img/25_dragon.png" class="game-icon" alt=""> Mascotes</button>
+                <button class="menu-btn tech"><img src="img/29_tecnologias.png" class="game-icon" alt=""> Tecnologias</button>
+                <button class="menu-btn alchemy"><img src="img/09_potion.png" class="game-icon" alt=""> Alquimia</button>
+                <button class="menu-btn runar"><img src="img/10_portal.png" class="game-icon" alt=""> Runar <span class="badge badge-missing">SEM CSS</span></button>
+            </div>
+
+            <div class="sidebar-category">📦 COLETA</div>
+            <div class="sidebar-menu">
+                <button class="menu-btn woodcutting">
+                    <div class="menu-btn-skill-container">
+                        <div class="menu-btn-skill-header">
+                            <span class="menu-btn-skill-name"><img src="img/08_tree.png" class="game-icon-sm" alt=""> Corte de Lenha</span>
+                            <span class="menu-btn-skill-level">12</span>
+                        </div>
+                        <div class="menu-btn-skill-progress"><div class="menu-btn-skill-progress-bar"></div></div>
+                    </div>
+                </button>
+                <button class="menu-btn mining">
+                    <div class="menu-btn-skill-container">
+                        <div class="menu-btn-skill-header">
+                            <span class="menu-btn-skill-name"><img src="img/11_pickaxe.png" class="game-icon-sm" alt=""> Mineração</span>
+                            <span class="menu-btn-skill-level">8</span>
+                        </div>
+                        <div class="menu-btn-skill-progress"><div class="menu-btn-skill-progress-bar"></div></div>
+                    </div>
+                </button>
+                <button class="menu-btn fishing">
+                    <div class="menu-btn-skill-container">
+                        <div class="menu-btn-skill-header">
+                            <span class="menu-btn-skill-name"><img src="img/12_fishingrod.png" class="game-icon-sm" alt=""> Pesca</span>
+                            <span class="menu-btn-skill-level">5</span>
+                        </div>
+                        <div class="menu-btn-skill-progress"><div class="menu-btn-skill-progress-bar"></div></div>
+                    </div>
+                </button>
+                <button class="menu-btn herbalism">
+                    <div class="menu-btn-skill-container">
+                        <div class="menu-btn-skill-header">
+                            <span class="menu-btn-skill-name"><img src="img/13_herb.png" class="game-icon-sm" alt=""> Herbolaria</span>
+                            <span class="menu-btn-skill-level">3</span>
+                        </div>
+                        <div class="menu-btn-skill-progress"><div class="menu-btn-skill-progress-bar" style="width:15%"></div></div>
+                    </div>
+                    <span class="badge badge-missing">SEM CSS</span>
+                </button>
+            </div>
+
+            <div class="sidebar-category">🔨 CRAFT</div>
+            <div class="sidebar-menu">
+                <button class="menu-btn crafting">
+                    <div class="menu-btn-skill-container">
+                        <div class="menu-btn-skill-header">
+                            <span class="menu-btn-skill-name"><img src="img/14_hammer.png" class="game-icon-sm" alt=""> Criação</span>
+                            <span class="menu-btn-skill-level">7</span>
+                        </div>
+                        <div class="menu-btn-skill-progress"><div class="menu-btn-skill-progress-bar" style="width:55%"></div></div>
+                    </div>
+                </button>
+                <button class="menu-btn smithing">
+                    <div class="menu-btn-skill-container">
+                        <div class="menu-btn-skill-header">
+                            <span class="menu-btn-skill-name"><img src="img/15_crossedhammers.png" class="game-icon-sm" alt=""> Ferraria</span>
+                            <span class="menu-btn-skill-level">4</span>
+                        </div>
+                        <div class="menu-btn-skill-progress"><div class="menu-btn-skill-progress-bar" style="width:20%"></div></div>
+                    </div>
+                </button>
+                <button class="menu-btn cooking">
+                    <div class="menu-btn-skill-container">
+                        <div class="menu-btn-skill-header">
+                            <span class="menu-btn-skill-name"><img src="img/28_culinaria.png" class="game-icon-sm" alt=""> Culinária</span>
+                            <span class="menu-btn-skill-level">2</span>
+                        </div>
+                        <div class="menu-btn-skill-progress"><div class="menu-btn-skill-progress-bar" style="width:10%"></div></div>
+                    </div>
+                </button>
+                <button class="menu-btn enchanting">
+                    <div class="menu-btn-skill-container">
+                        <div class="menu-btn-skill-header">
+                            <span class="menu-btn-skill-name"><img src="img/16_crystalball.png" class="game-icon-sm" alt=""> Encantamento</span>
+                            <span class="menu-btn-skill-level">1</span>
+                        </div>
+                        <div class="menu-btn-skill-progress"><div class="menu-btn-skill-progress-bar" style="width:5%"></div></div>
+                    </div>
+                    <span class="badge badge-missing">SEM CSS</span>
+                </button>
+                <button class="menu-btn runeforge"><img src="img/10_portal.png" class="game-icon" alt=""> Forja de Runas <span class="badge badge-missing">SEM CSS</span></button>
+            </div>
+
+            <div class="sidebar-category">⚔️ COMBATE</div>
+            <div class="sidebar-menu">
+                <button class="menu-btn combat"><img src="img/17_crossedswords.png" class="game-icon" alt=""> Arena de Combate</button>
+                <button class="menu-btn dungeon"><img src="img/19_castle.png" class="game-icon" alt=""> Masmorras</button>
+            </div>
+
+            <div class="sidebar-category">📖 GUIA</div>
+            <div class="sidebar-menu">
+                <button class="menu-btn" style="background: linear-gradient(135deg, rgba(26,42,74,0.8), rgba(42,58,106,0.8)); border: 1px solid #4a6aaa; color: #aaccff;"><img src="img/18_book.png" class="game-icon" alt=""> MiniWiki</button>
+            </div>
+        </div>
+
+        <!-- ============ COLUNA DEPOIS ============ -->
+        <div class="column depois">
+            <div class="column-title depois">✅ DEPOIS (novo)</div>
+            <p class="hint">Hover temático: gradiente + glow + translateY(-2px) por botão</p>
+
+            <div class="sidebar-category">🏪 COMÉRCIO</div>
+            <div class="sidebar-menu">
+                <button class="menu-btn mercado"><img src="img/21_shop.png" class="game-icon" alt=""> Mercado & Academia</button>
+            </div>
+
+            <div class="sidebar-category">🌍 CIDADE MULTIPLAYER</div>
+            <div class="sidebar-menu">
+                <button class="menu-btn worldboss"><img src="img/22_world.png" class="game-icon" alt=""> Chefes Globais <span class="badge badge-fixed">NOVO</span></button>
+                <button class="menu-btn wishingwell"><img src="img/23_wishingwell.png" class="game-icon" alt=""> Poço dos Desejos <span class="badge badge-fixed">NOVO</span></button>
+                <button class="menu-btn observatory"><img src="img/04_trophy.png" class="game-icon" alt=""> Grande Observatório <span class="badge badge-fixed">NOVO</span></button>
+            </div>
+
+            <div class="sidebar-category">🐉 ESPECIAL</div>
+            <div class="sidebar-menu">
+                <button class="menu-btn character"><img src="img/24_mage.png" class="game-icon" alt=""> Personagem</button>
+                <button class="menu-btn pets"><img src="img/25_dragon.png" class="game-icon" alt=""> Mascotes</button>
+                <button class="menu-btn tech"><img src="img/29_tecnologias.png" class="game-icon" alt=""> Tecnologias</button>
+                <button class="menu-btn alchemy"><img src="img/09_potion.png" class="game-icon" alt=""> Alquimia</button>
+                <button class="menu-btn runar"><img src="img/10_portal.png" class="game-icon" alt=""> Runar <span class="badge badge-fixed">NOVO</span></button>
+            </div>
+
+            <div class="sidebar-category">📦 COLETA</div>
+            <div class="sidebar-menu">
+                <button class="menu-btn woodcutting">
+                    <div class="menu-btn-skill-container">
+                        <div class="menu-btn-skill-header">
+                            <span class="menu-btn-skill-name"><img src="img/08_tree.png" class="game-icon-sm" alt=""> Corte de Lenha</span>
+                            <span class="menu-btn-skill-level">12</span>
+                        </div>
+                        <div class="menu-btn-skill-progress"><div class="menu-btn-skill-progress-bar"></div></div>
+                    </div>
+                </button>
+                <button class="menu-btn mining">
+                    <div class="menu-btn-skill-container">
+                        <div class="menu-btn-skill-header">
+                            <span class="menu-btn-skill-name"><img src="img/11_pickaxe.png" class="game-icon-sm" alt=""> Mineração</span>
+                            <span class="menu-btn-skill-level">8</span>
+                        </div>
+                        <div class="menu-btn-skill-progress"><div class="menu-btn-skill-progress-bar"></div></div>
+                    </div>
+                </button>
+                <button class="menu-btn fishing">
+                    <div class="menu-btn-skill-container">
+                        <div class="menu-btn-skill-header">
+                            <span class="menu-btn-skill-name"><img src="img/12_fishingrod.png" class="game-icon-sm" alt=""> Pesca</span>
+                            <span class="menu-btn-skill-level">5</span>
+                        </div>
+                        <div class="menu-btn-skill-progress"><div class="menu-btn-skill-progress-bar"></div></div>
+                    </div>
+                </button>
+                <button class="menu-btn herbalism">
+                    <div class="menu-btn-skill-container">
+                        <div class="menu-btn-skill-header">
+                            <span class="menu-btn-skill-name"><img src="img/13_herb.png" class="game-icon-sm" alt=""> Herbolaria</span>
+                            <span class="menu-btn-skill-level">3</span>
+                        </div>
+                        <div class="menu-btn-skill-progress"><div class="menu-btn-skill-progress-bar" style="width:15%"></div></div>
+                    </div>
+                    <span class="badge badge-fixed">NOVO</span>
+                </button>
+            </div>
+
+            <div class="sidebar-category">🔨 CRAFT</div>
+            <div class="sidebar-menu">
+                <button class="menu-btn crafting">
+                    <div class="menu-btn-skill-container">
+                        <div class="menu-btn-skill-header">
+                            <span class="menu-btn-skill-name"><img src="img/14_hammer.png" class="game-icon-sm" alt=""> Criação</span>
+                            <span class="menu-btn-skill-level">7</span>
+                        </div>
+                        <div class="menu-btn-skill-progress"><div class="menu-btn-skill-progress-bar" style="width:55%"></div></div>
+                    </div>
+                </button>
+                <button class="menu-btn smithing">
+                    <div class="menu-btn-skill-container">
+                        <div class="menu-btn-skill-header">
+                            <span class="menu-btn-skill-name"><img src="img/15_crossedhammers.png" class="game-icon-sm" alt=""> Ferraria</span>
+                            <span class="menu-btn-skill-level">4</span>
+                        </div>
+                        <div class="menu-btn-skill-progress"><div class="menu-btn-skill-progress-bar" style="width:20%"></div></div>
+                    </div>
+                </button>
+                <button class="menu-btn cooking">
+                    <div class="menu-btn-skill-container">
+                        <div class="menu-btn-skill-header">
+                            <span class="menu-btn-skill-name"><img src="img/28_culinaria.png" class="game-icon-sm" alt=""> Culinária</span>
+                            <span class="menu-btn-skill-level">2</span>
+                        </div>
+                        <div class="menu-btn-skill-progress"><div class="menu-btn-skill-progress-bar" style="width:10%"></div></div>
+                    </div>
+                </button>
+                <button class="menu-btn enchanting">
+                    <div class="menu-btn-skill-container">
+                        <div class="menu-btn-skill-header">
+                            <span class="menu-btn-skill-name"><img src="img/16_crystalball.png" class="game-icon-sm" alt=""> Encantamento</span>
+                            <span class="menu-btn-skill-level">1</span>
+                        </div>
+                        <div class="menu-btn-skill-progress"><div class="menu-btn-skill-progress-bar" style="width:5%"></div></div>
+                    </div>
+                    <span class="badge badge-fixed">NOVO</span>
+                </button>
+                <button class="menu-btn runeforge"><img src="img/10_portal.png" class="game-icon" alt=""> Forja de Runas <span class="badge badge-fixed">NOVO</span></button>
+            </div>
+
+            <div class="sidebar-category">⚔️ COMBATE</div>
+            <div class="sidebar-menu">
+                <button class="menu-btn combat"><img src="img/17_crossedswords.png" class="game-icon" alt=""> Arena de Combate</button>
+                <button class="menu-btn dungeon"><img src="img/19_castle.png" class="game-icon" alt=""> Masmorras</button>
+            </div>
+
+            <div class="sidebar-category">📖 GUIA</div>
+            <div class="sidebar-menu">
+                <button class="menu-btn wiki"><img src="img/18_book.png" class="game-icon" alt=""> MiniWiki</button>
+            </div>
+
+            <div class="sidebar-category" style="color: #ff6b6b; border-left-color: #ff6b6b;">🛡️ ADMIN</div>
+            <div class="sidebar-menu">
+                <button class="menu-btn admin">🛠️ Painel Admin</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- LEGENDA -->
+    <div class="legend">
+        <h3>📋 Resumo das Mudanças</h3>
+        <ul>
+            <li><span class="tag-bug">ANTES:</span> Hover único para TODOS → <code>background: #3a4a5a; translateX(5px)</code> — perde a cor temática</li>
+            <li><span class="tag-fix">DEPOIS:</span> Hover individual por botão → gradiente clareado + <code>translateY(-2px)</code> + glow temático</li>
+            <li><span class="tag-new">NOVO:</span> 6 classes adicionadas: <code>worldboss</code>, <code>wishingwell</code>, <code>observatory</code>, <code>runar</code>, <code>herbalism</code>, <code>enchanting</code>, <code>runeforge</code></li>
+            <li><span class="tag-fix">FIX:</span> Barra de progresso das skills agora recebe cor temática por skill (era cinza genérica)</li>
+            <li><span class="tag-fix">FIX:</span> MiniWiki e Admin deixam de usar style inline e ganham classe própria (<code>.wiki</code>, <code>.admin</code>)</li>
+        </ul>
+    </div>
+
+</body>
+</html>

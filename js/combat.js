@@ -187,6 +187,7 @@
                 element: elementEmoji,
                 weakness: weakness,
                 hp: hp,
+                maxHp: hp,
                 atk: atk,
                 def: def,
                 gold: gold,
@@ -549,9 +550,13 @@
             const waveIndex = Math.min((a.wave - 1), arenaEnemies.length - 1);
             const enemy = { ...arenaEnemies[waveIndex] };
             
-            const arenaScaling = window.balancingConfig?.arenaWaveScaling || 1.0;
+            const baseHp = Number(enemy.hp || enemy.maxHp || 50);
+            enemy.maxHp = baseHp;
+            enemy.hp = baseHp;
+
+            const arenaScaling = Number(window.balancingConfig?.arenaWaveScaling) || 1.0;
             if (arenaScaling !== 1.0) {
-                enemy.maxHp = Math.max(1, Math.floor((enemy.maxHp || 50) * arenaScaling));
+                enemy.maxHp = Math.max(1, Math.floor(baseHp * arenaScaling));
                 enemy.hp = enemy.maxHp;
                 if (enemy.atk) enemy.atk = Math.max(1, Math.floor(enemy.atk * arenaScaling));
                 if (enemy.def) enemy.def = Math.max(0, Math.floor(enemy.def * arenaScaling));
@@ -564,8 +569,8 @@
             }
 
             a.currentEnemy = enemy;
-            a.playerHP = gameState.combat.maxPlayerHealth;
-            a.enemyHP = enemy.hp;
+            a.playerHP = Number(gameState.combat?.maxPlayerHealth) || 100;
+            a.enemyHP = Number(enemy.hp) || 50;
             a.inBattle = true;
             a.defenseMode = false;
             a.cooldowns = {};
@@ -1462,20 +1467,24 @@
 
         function renderArenaHPBars() {
             const a = gameState.arena;
-            const maxP = gameState.combat.maxPlayerHealth;
+            const maxP = gameState.combat?.maxPlayerHealth || 100;
             const pb = document.getElementById('arenaPlayerHPBar');
             const pt = document.getElementById('arenaPlayerHPText');
             const eb = document.getElementById('arenaEnemyHPBar');
             const et = document.getElementById('arenaEnemyHPText');
-            if (pb) pb.style.width = Math.max(0, a.playerHP / maxP * 100) + '%';
-            if (pt) pt.textContent = `${Math.max(0,a.playerHP)} / ${maxP}`;
-            if (eb && a.currentEnemy) eb.style.width = Math.max(0, a.enemyHP / a.currentEnemy.hp * 100) + '%';
-            if (et && a.currentEnemy) et.textContent = `${Math.max(0,a.enemyHP)} / ${a.currentEnemy.hp}`;
+            const maxEnemyHP = (a.currentEnemy && (a.currentEnemy.maxHp || a.currentEnemy.hp)) || 100;
+            const curEnemyHP = Math.max(0, Number(a.enemyHP) || 0);
+            const curPlayerHP = Math.max(0, Number(a.playerHP) || 0);
+
+            if (pb) pb.style.width = Math.max(0, curPlayerHP / maxP * 100) + '%';
+            if (pt) pt.textContent = `${curPlayerHP} / ${maxP}`;
+            if (eb && a.currentEnemy) eb.style.width = Math.max(0, curEnemyHP / maxEnemyHP * 100) + '%';
+            if (et && a.currentEnemy) et.textContent = `${curEnemyHP} / ${maxEnemyHP}`;
             
             // Efeito Glitch quando HP do inimigo está baixo (< 30%)
             const enemyFighter = document.getElementById('arenaEnemyFighter');
             if (enemyFighter && a.currentEnemy) {
-                const hpPct = a.enemyHP / a.currentEnemy.hp;
+                const hpPct = curEnemyHP / maxEnemyHP;
                 if (a.inBattle && hpPct < 0.30 && hpPct > 0) {
                     enemyFighter.classList.add('glitchIntense');
                 } else {
@@ -1537,10 +1546,14 @@
             if (tab === 'battle') {
                 const waveEnemy = arenaEnemies[Math.min(a.wave - 1, arenaEnemies.length - 1)];
                 const displayEnemy = a.inBattle ? enemy : waveEnemy;
-                const playerHPPct = a.inBattle ? Math.max(0, a.playerHP / maxP * 100) : 100;
-                const enemyHPPct = a.inBattle ? Math.max(0, a.enemyHP / displayEnemy.hp * 100) : 100;
-                const playerHPDisplay = a.inBattle ? `${a.playerHP} / ${maxP}` : `${maxP} / ${maxP}`;
-                const enemyHPDisplay = a.inBattle ? `${a.enemyHP} / ${displayEnemy.hp}` : `${displayEnemy.hp} / ${displayEnemy.hp}`;
+                const maxEnemyHP = (displayEnemy && (displayEnemy.maxHp || displayEnemy.hp)) || 100;
+                const curEnemyHP = Math.max(0, Number(a.enemyHP) || 0);
+                const curPlayerHP = Math.max(0, Number(a.playerHP) || 0);
+
+                const playerHPPct = a.inBattle ? Math.max(0, curPlayerHP / maxP * 100) : 100;
+                const enemyHPPct = a.inBattle ? Math.max(0, curEnemyHP / maxEnemyHP * 100) : 100;
+                const playerHPDisplay = a.inBattle ? `${curPlayerHP} / ${maxP}` : `${maxP} / ${maxP}`;
+                const enemyHPDisplay = a.inBattle ? `${curEnemyHP} / ${maxEnemyHP}` : `${maxEnemyHP} / ${maxEnemyHP}`;
 
                 // Calcular chance de crítico do oponente para exibição
                 let enemyCritChance = 8;

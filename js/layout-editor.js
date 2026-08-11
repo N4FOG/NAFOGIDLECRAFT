@@ -60,9 +60,16 @@ const LayoutEditor = (function() {
             label: '📊 Barra Superior',
             icon: '📊',
             children: [
-                { id: 'topResContainer', label: '🌲 Estoque de Recursos', selector: '.top-bar-resources' },
-                { id: 'topWorkersContainer', label: '👷 Trabalhadores Alocados', selector: '.top-bar-item' },
-                { id: 'topForgeContainer', label: '🔥 Fornalha & Calor', selector: '.furnace-info' }
+                { id: 'topResContainer', label: '🌲 Grupo de Recursos', icon: '🌲' },
+                { id: 'topResItemWood', label: '🪵 Recursos: Madeira', icon: '🪵' },
+                { id: 'topResItemOre', label: '⛏️ Recursos: Minério', icon: '⛏️' },
+                { id: 'topResItemFish', label: '🐟 Recursos: Peixes', icon: '🐟' },
+                { id: 'topResItemHerbs', label: '🌿 Recursos: Ervas', icon: '🌿' },
+                { id: 'topResItemBars', label: '🔩 Recursos: Barras', icon: '🔩' },
+                { id: 'topResItemFood', label: '🍖 Recursos: Comida', icon: '🍖' },
+                { id: 'topWorkersItem', label: '👷 Trabalhadores no Topo', icon: '👷' },
+                { id: 'topPetItem', label: '🐾 Mascote no Topo', icon: '🐾' },
+                { id: 'topForgeItem', label: '🔥 Fornalha & Calor', icon: '🔥' }
             ]
         },
         {
@@ -70,9 +77,13 @@ const LayoutEditor = (function() {
             label: '📋 Menu Lateral',
             icon: '📋',
             children: [
-                { id: 'playerInfoBar', label: '👤 Perfil do Jogador', selector: '#playerInfoBar' },
-                { id: 'sidebarStats', label: '📈 Status & Atributos', selector: '#sidebarStats' },
-                { id: 'sidebarQuickLinks', label: '🔗 Atalhos Rápidos', selector: '#sidebarQuickLinks' }
+                { id: 'playerInfoBar', label: '👤 Perfil do Jogador', icon: '👤' },
+                { id: 'sidebarQuickLinks', label: '⚡ Atalhos Rápidos', icon: '⚡' },
+                { id: 'qlBtnInventory', label: '📦 Botão Inventário', icon: '📦' },
+                { id: 'qlBtnProperty', label: '🏡 Botão Propriedade', icon: '🏡' },
+                { id: 'qlBtnCharacter', label: '🧙 Botão Personagem', icon: '🧙' },
+                { id: 'qlBtnPets', label: '🐉 Botão Mascotes', icon: '🐉' },
+                { id: 'sidebarStats', label: '📈 Status & Atributos', icon: '📈' }
             ]
         },
         {
@@ -80,8 +91,13 @@ const LayoutEditor = (function() {
             label: '📄 Janela de Conteúdo',
             icon: '🎮',
             children: [
-                { id: 'inventorySection', label: '🎒 Mochila & Inventário', selector: '#inventoryPage' },
-                { id: 'craftingSection', label: '🔨 Telas de Profissões', selector: '#craftingPage' }
+                { id: 'globalActiveBuffs', label: '⚡ Barra de Buffs', icon: '⚡' },
+                { id: 'inventoryPage', label: '🎒 Mochila & Inventário', icon: '🎒' },
+                { id: 'craftingPage', label: '🔨 Crafting & Profissões', icon: '🔨' },
+                { id: 'smithingPage', label: '⚔️ Forja & Metalurgia', icon: '⚔️' },
+                { id: 'combatPage', label: '🛡️ Arena de Combate', icon: '🛡️' },
+                { id: 'dungeonPage', label: '🏰 Dungeons & Masmorras', icon: '🏰' },
+                { id: 'propertyPage', label: '🏡 Acampamento / Vila', icon: '🏡' }
             ]
         },
         {
@@ -163,7 +179,7 @@ const LayoutEditor = (function() {
     }
 
     // ==========================================
-    // REGISTRO DE WIDGETS
+    // REGISTRO DE WIDGETS (CONTAINERS E SUB-ELEMENTOS)
     // ==========================================
     function _registerWidgets() {
         _registeredWidgets = {};
@@ -177,8 +193,30 @@ const LayoutEditor = (function() {
                     el: el,
                     label: def.label,
                     icon: def.icon,
+                    isChild: false,
                     children: def.children || []
                 };
+            }
+
+            if (def.children && def.children.length > 0) {
+                def.children.forEach(child => {
+                    const childEl = child.id ? document.getElementById(child.id) : (child.selector ? document.querySelector(child.selector) : null);
+                    const childKey = child.id || child.selector;
+                    if (childEl && childKey) {
+                        childEl.classList.add('hud-widget-root', 'hud-widget-child');
+                        childEl.setAttribute('data-hud-label', child.label);
+                        if (!childEl.id && child.id) childEl.id = child.id;
+                        const key = childEl.id || childKey;
+                        _registeredWidgets[key] = {
+                            el: childEl,
+                            label: child.label,
+                            icon: child.icon || '🔹',
+                            isChild: true,
+                            parentId: def.id,
+                            parentLabel: def.label
+                        };
+                    }
+                });
             }
         });
     }
@@ -509,12 +547,21 @@ const LayoutEditor = (function() {
             let childrenHTML = '';
             if (hasChildren && isExpanded) {
                 node.children.forEach(child => {
+                    const childKey = child.id || child.selector;
+                    const isChildSel = childKey === selId;
+                    const childCfg = widgetsCfg[childKey] || {};
+                    const isChildHidden = childCfg.hidden === true;
                     childrenHTML += `
-                        <div class="hud-tree-subitem" 
-                             onmouseover="LayoutEditor.highlightSubitem('${child.selector}', true)" 
-                             onmouseout="LayoutEditor.highlightSubitem('${child.selector}', false)"
-                             onclick="LayoutEditor.selectById('${node.id}')">
-                            <span>🔍 ${child.label}</span>
+                        <div class="hud-tree-subitem ${isChildSel ? 'active' : ''}" 
+                             onmouseover="LayoutEditor.highlightSubitem('${child.selector || '#' + child.id}', true)" 
+                             onmouseout="LayoutEditor.highlightSubitem('${child.selector || '#' + child.id}', false)"
+                             onclick="LayoutEditor.selectById('${childKey}')">
+                            <span class="hud-sp-item-title">${child.icon || '🔹'} ${child.label}</span>
+                            <button class="hud-sp-eye-btn ${isChildHidden ? 'hidden-eye' : ''}" 
+                                    onclick="event.stopPropagation(); LayoutEditor.toggleVisibility('${childKey}')" 
+                                    title="Exibir/Ocultar Sub-elemento">
+                                ${isChildHidden ? '🙈' : '👁️'}
+                            </button>
                         </div>
                     `;
                 });
@@ -548,9 +595,12 @@ const LayoutEditor = (function() {
             const posX = selCfg.x || 0;
             const posY = selCfg.y || 0;
 
+            const childBadge = selW.isChild ? `<div class="hud-sp-child-badge">🔹 Sub-elemento de ${selW.parentLabel || 'Container'}</div>` : '';
+
             selControlsHTML = `
                 <div class="hud-sp-section">
                     <div class="hud-sp-section-title">⚙️ Propriedades de ${selW.label}</div>
+                    ${childBadge}
                     
                     <div class="hud-sp-row">
                         <span class="hud-sp-coord-badge">Posição X: ${posX}px | Y: ${posY}px</span>
@@ -558,7 +608,7 @@ const LayoutEditor = (function() {
 
                     <div class="hud-sp-field">
                         <label>📐 Escala de Tamanho: <b id="hudScaleVal">${Math.round(scale * 100)}%</b></label>
-                        <input type="range" min="70" max="130" step="5" value="${Math.round(scale * 100)}" 
+                        <input type="range" min="50" max="150" step="5" value="${Math.round(scale * 100)}" 
                             ${!_state.allowResize ? 'disabled' : ''}
                             oninput="LayoutEditor.setWidgetScale('${selId}', this.value)">
                     </div>
@@ -759,6 +809,11 @@ const LayoutEditor = (function() {
             _registerWidgets();
             _createEditUI();
 
+            if (_toolbar) _toolbar.style.display = '';
+            if (_sidePanel) _sidePanel.style.display = '';
+            if (_gridOverlay) _gridOverlay.style.display = '';
+            if (_guideContainer) _guideContainer.style.display = '';
+
             document.body.classList.add('layout-editor-active', 'hud-edit-mode-active');
             
             const config = _getSavedConfig();
@@ -778,6 +833,10 @@ const LayoutEditor = (function() {
 
             if (_state.animFrameId) cancelAnimationFrame(_state.animFrameId);
             if (_selectionBox) _selectionBox.style.display = 'none';
+            if (_toolbar) _toolbar.style.display = 'none';
+            if (_sidePanel) _sidePanel.style.display = 'none';
+            if (_gridOverlay) _gridOverlay.style.display = 'none';
+            if (_guideContainer) _guideContainer.style.display = 'none';
             _clearAlignmentLines();
             _selectWidget(null);
 

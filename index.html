@@ -1461,8 +1461,8 @@
 
     <!-- BARRA DE STATUS SUPERIOR (index.html) -->
     <div id="topStatsBar" class="top-stats-bar layout-editable" data-layout-label="📊 Barra Superior">
-        <div class="top-bar-resources">
-            <div class="top-res-item" onclick="showPage('woodcutting')">
+        <div id="topResContainer" class="top-bar-resources layout-editable" data-layout-label="🌲 Estoque de Recursos">
+            <div id="topResItemWood" class="top-res-item layout-editable" data-layout-label="🪵 Madeira" onclick="showPage('woodcutting')">
                 <span class="top-res-icon"><img src="img/08_tree.png" class="game-icon" alt="Madeira"></span>
                 <span id="topResWood" class="top-res-qty">0</span>
                 <div class="top-bar-tooltip">
@@ -1470,7 +1470,7 @@
                     <div class="tooltip-list" id="tooltipWoodList"></div>
                 </div>
             </div>
-            <div class="top-res-item" onclick="showPage('mining')">
+            <div id="topResItemOre" class="top-res-item layout-editable" data-layout-label="⛏️ Minério" onclick="showPage('mining')">
                 <span class="top-res-icon"><img src="img/11_pickaxe.png" class="game-icon" alt="Minério"></span>
                 <span id="topResOre" class="top-res-qty">0</span>
                 <div class="top-bar-tooltip">
@@ -1478,7 +1478,7 @@
                     <div class="tooltip-list" id="tooltipOreList"></div>
                 </div>
             </div>
-            <div class="top-res-item" onclick="showPage('fishing')">
+            <div id="topResItemFish" class="top-res-item layout-editable" data-layout-label="🐟 Peixe" onclick="showPage('fishing')">
                 <span class="top-res-icon"><img src="img/12_fishingrod.png" class="game-icon" alt="Peixe"></span>
                 <span id="topResFish" class="top-res-qty">0</span>
                 <div class="top-bar-tooltip">
@@ -1486,7 +1486,7 @@
                     <div class="tooltip-list" id="tooltipFishList"></div>
                 </div>
             </div>
-            <div class="top-res-item" onclick="showPage('herbalism')">
+            <div id="topResItemHerbs" class="top-res-item layout-editable" data-layout-label="🌿 Ervas" onclick="showPage('herbalism')">
                 <span class="top-res-icon"><img src="img/13_herb.png" class="game-icon" alt="Ervas"></span>
                 <span id="topResHerbs" class="top-res-qty">0</span>
                 <div class="top-bar-tooltip">
@@ -1494,7 +1494,7 @@
                     <div class="tooltip-list" id="tooltipHerbsList"></div>
                 </div>
             </div>
-            <div class="top-res-item" onclick="showPage('smithing')">
+            <div id="topResItemBars" class="top-res-item layout-editable" data-layout-label="🔩 Barras" onclick="showPage('smithing')">
                 <span class="top-res-icon"><img src="img/15_crossedhammers.png" class="game-icon" alt="Barras"></span>
                 <span id="topResBars" class="top-res-qty">0</span>
                 <div class="top-bar-tooltip">
@@ -1502,7 +1502,7 @@
                     <div class="tooltip-list" id="tooltipBarsList"></div>
                 </div>
             </div>
-            <div class="top-res-item" onclick="showPage('cooking')">
+            <div id="topResItemFood" class="top-res-item layout-editable" data-layout-label="🍖 Comida" onclick="showPage('cooking')">
                 <span class="top-res-icon"><img src="img/tridente.png" class="game-icon" alt="Comida"></span>
                 <span id="topResFood" class="top-res-qty">0</span>
                 <div class="top-bar-tooltip">
@@ -1512,7 +1512,7 @@
             </div>
         </div>
         <div class="top-bar-divider"></div>
-        <div class="top-bar-item" onclick="navigateToWorkerCamp()" style="cursor: pointer; position:relative;">
+        <div id="topWorkersItem" class="top-bar-item layout-editable" data-layout-label="👷 Trabalhadores" onclick="navigateToWorkerCamp()" style="cursor: pointer; position:relative;">
             <span class="top-bar-icon"><img src="img/26_worker.png" class="game-icon" alt="Trabalhadores"></span>
             <span class="top-bar-label">Trabalhadores:</span>
             <span id="topWorkers" class="top-bar-value">0/0</span>
@@ -1523,14 +1523,14 @@
             </div>
         </div>
         <div class="top-bar-divider mobile-hide"></div>
-        <div class="top-bar-item mobile-hide" onclick="showPage('pets')" style="cursor: pointer;">
+        <div id="topPetItem" class="top-bar-item mobile-hide layout-editable" data-layout-label="🐾 Mascote" onclick="showPage('pets')" style="cursor: pointer;">
             <span class="top-bar-icon">🐾</span>
             <span class="top-bar-label">Mascote:</span>
             <span id="topActivePet" class="top-bar-value">Nenhum</span>
         </div>
 
         <div class="top-bar-divider mobile-hide"></div>
-        <div class="top-bar-item furnace-info mobile-hide" style="display: flex; align-items: center; gap: 8px;">
+        <div id="topForgeItem" class="top-bar-item furnace-info mobile-hide layout-editable" data-layout-label="🔥 Fornalha" style="display: flex; align-items: center; gap: 8px;">
             <span class="top-bar-icon">🔥</span>
             <span class="top-bar-label">Fornalha:</span>
             <div style="position: relative; width: 60px; height: 12px; background: rgba(0,0,0,0.5); border-radius: 6px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);">
@@ -1822,12 +1822,12 @@
 
             <div class="sidebar-category">📖 GUIA</div>
             <div class="sidebar-menu">
-                <button class="menu-btn" onclick="openMiniWiki()" style="background: linear-gradient(135deg, rgba(26,42,74,0.8), rgba(42,58,106,0.8)); border: 1px solid #4a6aaa; color: #aaccff;"><img src="img/18_book.png" class="game-icon" alt="Wiki"> MiniWiki</button>
+                <button class="menu-btn wiki" onclick="openMiniWiki()"><img src="img/18_book.png" class="game-icon" alt="Wiki"> MiniWiki</button>
             </div>
 
             <div class="sidebar-category admin-only" id="adminMenuCategory" style="display: none; color: #ff6b6b; border-bottom: 1px solid rgba(255,107,107,0.15);">🛡️ ADMINISTRAÇÃO</div>
             <div class="sidebar-menu admin-only" id="adminMenuContainer" style="display: none;">
-                <button class="menu-btn" onclick="showPage('adminPanel')" style="background: linear-gradient(135deg, rgba(74,26,26,0.8), rgba(106,42,42,0.8)); border: 1px solid #aa4a4a; color: #ffaacc;">🛠️ Painel Admin</button>
+                <button class="menu-btn admin" onclick="showPage('adminPanel')">🛠️ Painel Admin</button>
             </div>
 
         </div>
@@ -7447,7 +7447,14 @@
                 checkAndSpawnWorldBoss: function() {},
                 listenToWorldBoss: function() {},
                 submitWorldBossDamage: function() {},
-                getWorldBossLeaderboard: async function() { return []; }
+                getWorldBossLeaderboard: async function() {
+                    const pName = (window.gameState && window.gameState.player && window.gameState.player.name) || (window.gameState && window.gameState.name) || 'Herói';
+                    const localDmg = window.gameState ? (window.gameState.worldBossDamage || 0) : 0;
+                    if (localDmg > 0) {
+                        return [{ name: pName, damage: localDmg, avatarClass: (window.gameState && window.gameState.player && window.gameState.player.avatar) || '⚔️' }];
+                    }
+                    return [];
+                }
             };
         }
     </script>
@@ -7461,6 +7468,7 @@
     <script src="js/tech.js"></script>
     <script src="js/camp.js"></script>
     <script src="js/dungeons.js"></script>
+    <script src="js/combat.js"></script>
     <script src="js/menu.js"></script>
     <script src="js/ui.js"></script>
     <!-- Módulos de Profissões -->

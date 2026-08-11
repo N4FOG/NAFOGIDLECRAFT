@@ -194,13 +194,16 @@
             const goldStr = goldExtra > 0
                 ? `  💰+${goldExtra}${activeCls?.id === 'leao_ouro' ? '🦁👑' : ''}` : '';
 
-            showNotification('🌾 Coleta!', `+${amount} ${resource.name} · ${xpStr}${goldStr}`, 'success', resource.icon);
+            // Ícone do recurso (com fallback para minérios que usam imagem PNG)
+            const resIcon = resource.icon || (skill === 'mining' ? '⛏️' : '📦');
+
+            showNotification('🌾 Coleta!', `+${amount} ${resource.name} · ${xpStr}${goldStr}`, 'success', resIcon);
             
             // Efeitos visuais de coleta (números flutuantes) — apenas em clique manual
             const isAuto = !event?.clientX;
             if (typeof spawnFloatingText === 'function' && !isAuto) {
                 // Floating perto do clique do mouse
-                spawnFloatingText(event.clientX, event.clientY - 20, `+${amount} ${resource.icon}`, { type: 'item', duration: 0.9 });
+                spawnFloatingText(event.clientX, event.clientY - 20, `+${amount} ${resIcon}`, { type: 'item', duration: 0.9 });
                 if (xpGain > 0) {
                     spawnFloatingText(event.clientX - 10, event.clientY - 45, `+${xpGain} XP`, { type: 'xp', duration: 0.8 });
                 }
@@ -211,7 +214,7 @@
                 // Autofarm: mostrar apenas ~10% das vezes pra não poluir
                 const rx = typeof getGameRightX === 'function' ? getGameRightX() : window.innerWidth - 120;
                 const ry = 80 + Math.random() * 40;
-                spawnFloatingText(rx, ry, `+${amount} ${resource.icon}`, { type: 'item', duration: 0.8 });
+                spawnFloatingText(rx, ry, `+${amount} ${resIcon}`, { type: 'item', duration: 0.8 });
             }
             
             updateUI();

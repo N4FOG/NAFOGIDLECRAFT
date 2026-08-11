@@ -195,7 +195,7 @@ function initWorldBoss() {
         }
     });
 
-    // Inicia a atualização do placar a cada 5 segundos
+    // Inicia a atualização do placar a cada 20 segundos
     startLeaderboardRefresh();
 }
 
@@ -205,7 +205,7 @@ function startLeaderboardRefresh() {
         if (gameState.currentPage === 'worldboss') {
             refreshWorldBossLeaderboard();
         }
-    }, 5000);
+    }, 20000);
 }
 
 function renderWorldBoss(boss) {
@@ -216,6 +216,21 @@ function renderWorldBoss(boss) {
         container.innerHTML = '<div style="text-align:center; padding: 40px; color:#aaa;">Nenhum Chefe Global ativo no momento.</div>';
         return;
     }
+
+    if (boss && gameState.currentWorldBossName !== boss.name) {
+        gameState.currentWorldBossName = boss.name;
+        if (boss.hp >= boss.maxHp) {
+            gameState.worldBossDamage = 0;
+        }
+    }
+
+    let bossKey = boss.spawnTime || boss.defeatTime || (boss.name + '_' + (boss.maxHp || 10000));
+    if (typeof bossKey === 'object') {
+        bossKey = bossKey.toMillis ? bossKey.toMillis() : (bossKey.seconds ? bossKey.seconds * 1000 : JSON.stringify(bossKey));
+    }
+    bossKey = String(bossKey);
+
+    const hasClaimed = Boolean(gameState.claimedWorldBossRewards && gameState.claimedWorldBossRewards[bossKey]);
 
     const hpPercent = Math.max(0, (boss.hp / boss.maxHp) * 100).toFixed(4);
     const isDead = boss.hp <= 0;
@@ -240,7 +255,10 @@ function renderWorldBoss(boss) {
 
             <div style="margin-top: 10px; display:flex; gap:10px;">
                 ${isDead 
-                    ? `<button class="menu-btn" onclick="forceClaimCurrentBossReward()" style="background:linear-gradient(135deg, #ffd700, #b8860b); color:#000; font-weight:bold; font-size:1.15em; padding: 12px 28px; border-radius:8px; cursor:pointer; box-shadow:0 0 15px rgba(255,215,0,0.4);">🎁 Reivindicar Bênção do Titã (+Dano, Ouro e XP)</button>` 
+                    ? (hasClaimed
+                        ? `<button class="menu-btn" disabled style="background:#333; border:1px solid #555; color:#888; font-weight:bold; font-size:1.05em; padding: 12px 28px; border-radius:8px; cursor:not-allowed; opacity:0.8;">✅ Recompensa Já Reivindicada</button>`
+                        : `<button class="menu-btn" onclick="forceClaimCurrentBossReward()" style="background:linear-gradient(135deg, #ffd700, #b8860b); color:#000; font-weight:bold; font-size:1.15em; padding: 12px 28px; border-radius:8px; cursor:pointer; box-shadow:0 0 15px rgba(255,215,0,0.4);">🎁 Reivindicar Bênção do Titã (+Dano, Ouro e XP)</button>`
+                      )
                     : `<button class="menu-btn" id="btnToggleWBBattle" onclick="toggleWorldBossBattle()" style="background:linear-gradient(135deg, ${gameState.isFightingWorldBoss ? '#555, #333' : '#a00, #600'}); border:1px solid #f55; color:#fff; font-size:1.2em; padding: 10px 30px;">${gameState.isFightingWorldBoss ? '⚔️ Lutando (Sair da Batalha)' : '🔥 Entrar na Batalha'}</button>`
                 }
             </div>
@@ -249,9 +267,9 @@ function renderWorldBoss(boss) {
                 <!-- Dano dinâmico -->
             </div>
 
-            <!-- Top Contribuições (atualizado a cada 5s) -->
+            <!-- Top Contribuições (atualizado a cada 20s) -->
             <div style="width:100%; max-width:800px; margin-top:20px; background:rgba(0,0,0,0.3); border-radius:10px; padding:20px;">
-                <h3 style="font-family:'Cinzel',serif; color:#fff; text-align:center; border-bottom:1px solid #444; padding-bottom:10px;">🏆 Top Contribuições (Atualiza a cada 5s)</h3>
+                <h3 style="font-family:'Cinzel',serif; color:#fff; text-align:center; border-bottom:1px solid #444; padding-bottom:10px;">🏆 Top Contribuições (Atualiza a cada 20s)</h3>
                 <div id="wbLeaderboardList" style="margin-top:15px; display:flex; flex-direction:column; gap:8px; max-height:400px; overflow-y:auto; padding-right:10px;">
                     <div style="text-align:center; color:#888;">Carregando contribuições...</div>
                 </div>
@@ -429,10 +447,11 @@ function worldBossCombatTick() {
 
     if (totalDmg > 0) {
         accumulatedDamage += totalDmg;
+        gameState.worldBossDamage = (gameState.worldBossDamage || 0) + totalDmg;
         showWorldBossHit(totalDmg, elapsedSeconds > 1);
     }
 
-    // Sincroniza a cada 5 segundos (requisito: "envio do dano do jogador enviado a cada 5 segundos")
+    // Sincroniza a cada 5 segundos
     if (now - lastDamageSync > 5000 && accumulatedDamage > 0) {
         syncWorldBossDamage();
     }
@@ -479,7 +498,7 @@ function syncWorldBossDamage() {
     accumulatedDamage = 0; 
     lastDamageSync = Date.now();
     
-    const avatar = gameState.player?.avatar || 'knight';
+    const avatar = gameState.player?.avatar || '⚔️';
     if (window.FirebaseService && typeof window.FirebaseService.submitWorldBossDamage === 'function') {
         window.FirebaseService.submitWorldBossDamage(dmgToSend, pName, avatar);
     }
@@ -493,13 +512,41 @@ async function refreshWorldBossLeaderboard() {
     
     if (gameState.currentPage !== 'worldboss') return;
     
-    const lbData = await window.FirebaseService.getWorldBossLeaderboard();
+    let lbData = [];
+    if (window.FirebaseService && typeof window.FirebaseService.getWorldBossLeaderboard === 'function') {
+        try {
+            lbData = await window.FirebaseService.getWorldBossLeaderboard() || [];
+        } catch (e) {
+            console.warn("Erro ao buscar leaderboard do World Boss via Firebase:", e);
+        }
+    }
+    
+    if (!Array.isArray(lbData)) lbData = [];
+
+    const pName = gameState.player?.name || gameState.name || 'Herói';
+    const avatarClass = gameState.player?.avatar || '⚔️';
+    const localDmg = (gameState.worldBossDamage || 0) + (accumulatedDamage || 0);
+
+    if (localDmg > 0) {
+        let playerEntry = lbData.find(p => p.name === pName);
+        if (playerEntry) {
+            playerEntry.damage = Math.max(playerEntry.damage || 0, localDmg);
+        } else {
+            lbData.push({
+                name: pName,
+                damage: localDmg,
+                avatarClass: avatarClass
+            });
+        }
+        lbData.sort((a, b) => (b.damage || 0) - (a.damage || 0));
+    }
     
     if (!lbData || lbData.length === 0) {
         listEl.innerHTML = '<div style="text-align:center; color:#888;">Nenhum dano registrado ainda.</div>';
         return;
     }
     
+    const avatarMap = { knight: '🛡️', warrior: '⚔️', mage: '🧙‍♂️', archer: '🏹', paladin: '✨', rogue: '🗡️' };
     let html = '';
     lbData.forEach((p, index) => {
         let badge = `<span style="display:inline-block; width:24px; text-align:center; color:#888;">#${index+1}</span>`;
@@ -507,17 +554,26 @@ async function refreshWorldBossLeaderboard() {
         if (index === 1) badge = '🥈';
         if (index === 2) badge = '🥉';
         
-        const avatarImg = `img/avatars/${p.avatarClass || 'knight'}.png`;
+        let rawAv = p.avatarClass || p.avatar || '⚔️';
+        const avatarIcon = avatarMap[rawAv] || (rawAv.length <= 4 ? rawAv : '⚔️');
+        const isSelf = p.name === pName;
+        const cardStyle = isSelf 
+            ? 'background:rgba(255,215,0,0.12); border:1.5px solid rgba(255,215,0,0.4);' 
+            : 'background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1);';
         
         html += `
-            <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.05); padding:10px 15px; border-radius:6px; border:1px solid rgba(255,255,255,0.1);">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 15px; border-radius:6px; ${cardStyle}">
                 <div style="display:flex; align-items:center; gap:12px;">
                     <div style="font-size:1.2em;">${badge}</div>
-                    <img src="${avatarImg}" onerror="this.src='img/avatars/knight.png'" style="width:32px; height:32px; border-radius:50%; border:1px solid #ffd700; background:#222;">
-                    <div style="font-family:'Outfit', sans-serif; font-size:1.1em; color:#fff;">${p.name}</div>
+                    <div style="width:34px; height:34px; border-radius:50%; border:1px solid #ffd700; background:rgba(255,215,0,0.15); display:flex; align-items:center; justify-content:center; font-size:1.2em; box-shadow:0 0 6px rgba(255,215,0,0.25);">
+                        ${avatarIcon}
+                    </div>
+                    <div style="font-family:'Outfit', sans-serif; font-size:1.1em; color:#fff;">
+                        ${p.name} ${isSelf ? '<span style="color:#ffd700; font-size:0.8em; font-weight:bold;">(Você)</span>' : ''}
+                    </div>
                 </div>
                 <div style="font-family:'Cinzel', serif; font-size:1.1em; font-weight:bold; color:#f55;">
-                    ⚔️ ${formatNumber(p.damage)}
+                    ⚔️ ${formatNumber(p.damage || 0)}
                 </div>
             </div>
         `;
@@ -566,7 +622,7 @@ async function checkAndClaimWorldBossRewards(bossData) {
         
         // 2. Equipamento Ancestral Único por Chefe
         const equipId = bInfo.rewardEquip || 'wb_dragon_crown';
-        addNewEquipmentToInventory(equipId, 'ancient');
+        addNewEquipmentToInventory(equipId, 'ancient', 50);
         
         // 3. Item/Recurso Extra Único
         if (bInfo.rewardExtraItem) {
@@ -602,6 +658,26 @@ async function checkAndClaimWorldBossRewards(bossData) {
 }
 
 window.forceClaimCurrentBossReward = function() {
+    if (!currentWorldBoss) return;
+
+    let bossKey = currentWorldBoss.spawnTime || currentWorldBoss.defeatTime || (currentWorldBoss.name + '_' + (currentWorldBoss.maxHp || 10000));
+    if (typeof bossKey === 'object') {
+        bossKey = bossKey.toMillis ? bossKey.toMillis() : (bossKey.seconds ? bossKey.seconds * 1000 : JSON.stringify(bossKey));
+    }
+    bossKey = String(bossKey);
+
+    gameState.claimedWorldBossRewards = gameState.claimedWorldBossRewards || {};
+    if (gameState.claimedWorldBossRewards[bossKey]) {
+        if (typeof showNotification === 'function') {
+            showNotification('⚠️ Já Reivindicado', 'Você já recebeu a recompensa deste Chefe Global!', 'warning');
+        }
+        updateWorldBossUI();
+        return;
+    }
+
+    // Trava imediatamente antes de entregar itens
+    gameState.claimedWorldBossRewards[bossKey] = true;
+
     const bossName = currentWorldBoss ? currentWorldBoss.name : "Dragão Ancestral de Ouro";
     const bInfo = worldBossesList.find(b => b.name === bossName) || worldBossesList[0];
     
@@ -609,7 +685,9 @@ window.forceClaimCurrentBossReward = function() {
     const equipId = bInfo.rewardEquip || 'wb_dragon_crown';
     
     gameState.gold = (gameState.gold || 0) + goldGain;
-    addNewEquipmentToInventory(equipId, 'ancient');
+    
+    // Entrega equipamento ancestral respeitando o teto de gap de 50 GS
+    addNewEquipmentToInventory(equipId, 'ancient', 50);
     
     if (bInfo.rewardExtraItem) {
         const exType = bInfo.rewardExtraItem.type;
@@ -630,15 +708,6 @@ window.forceClaimCurrentBossReward = function() {
         expiresAt: Date.now() + 4 * 60 * 60 * 1000 // 4 horas
     };
     
-    if (currentWorldBoss) {
-        let bossKey = currentWorldBoss.spawnTime || currentWorldBoss.defeatTime || (currentWorldBoss.name + '_' + (currentWorldBoss.maxHp || 10000));
-        if (typeof bossKey === 'object') {
-            bossKey = bossKey.toMillis ? bossKey.toMillis() : (bossKey.seconds ? bossKey.seconds * 1000 : JSON.stringify(bossKey));
-        }
-        gameState.claimedWorldBossRewards = gameState.claimedWorldBossRewards || {};
-        gameState.claimedWorldBossRewards[String(bossKey)] = true;
-    }
-    
     localStorage.setItem('idleCraftSave', JSON.stringify(gameState));
     if (typeof updateSidebarBuffs === 'function') updateSidebarBuffs();
     
@@ -648,6 +717,7 @@ window.forceClaimCurrentBossReward = function() {
     
     showWorldBossRewardModal(bossName, itemName, itemIcon, goldGain, bInfo.rewardExtraItem, bInfo.buff);
     showNotification(`👑 Recompensa de ${bossName}!`, `Você recebeu ${itemName} + ${bInfo.buff.name}!`, 'success');
+    updateWorldBossUI();
 };
 
 function showWorldBossRewardModal(bossName, itemName, itemIcon, goldGain, extraItem, buff) {

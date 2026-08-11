@@ -7216,7 +7216,14 @@
                 checkAndSpawnWorldBoss: function() {},
                 listenToWorldBoss: function() {},
                 submitWorldBossDamage: function() {},
-                getWorldBossLeaderboard: async function() { return []; }
+                getWorldBossLeaderboard: async function() {
+                    const pName = (window.gameState && window.gameState.player && window.gameState.player.name) || (window.gameState && window.gameState.name) || 'Herói';
+                    const localDmg = window.gameState ? (window.gameState.worldBossDamage || 0) : 0;
+                    if (localDmg > 0) {
+                        return [{ name: pName, damage: localDmg, avatarClass: (window.gameState && window.gameState.player && window.gameState.player.avatar) || 'knight' }];
+                    }
+                    return [];
+                }
             };
         }
     </script>
@@ -7230,6 +7237,7 @@
     <script src="js/tech.js"></script>
     <script src="js/camp.js"></script>
     <script src="js/dungeons.js"></script>
+    <script src="js/combat.js"></script>
     <script src="js/menu.js"></script>
     <script src="js/ui.js"></script>
     <!-- Módulos de Profissões -->

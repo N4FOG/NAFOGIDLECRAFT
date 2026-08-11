@@ -931,7 +931,7 @@
             return `rarity-${eq.rarity}-card`;
         }
 
-        function addNewEquipmentToInventory(equipId, forcedQuality) {
+        function addNewEquipmentToInventory(equipId, forcedQuality, maxGsGap = 50) {
             if (!gameState.equipment.instances) gameState.equipment.instances = {};
             
             // Rolar qualidade individual baseada em chances de loot ou forçar uma qualidade
@@ -1055,6 +1055,28 @@
                 elementValue: elVal
             };
             gameState.equipment.inventory[instId] = 1;
+
+            // Trava de teto de gap de Gear Score se maxGsGap for definido
+            if (maxGsGap && typeof calculateGearScore === 'function' && typeof getEquipmentItemData === 'function') {
+                const slot = baseItem ? baseItem.slot : null;
+                const curInstId = slot && gameState.equipment?.equipped?.[slot];
+                const curEq = curInstId ? getEquipmentItemData(curInstId) : null;
+                const curGS = curEq ? calculateGearScore(curEq) : 0;
+                const targetMaxGS = curGS + maxGsGap;
+                
+                let genEq = getEquipmentItemData(instId);
+                let genGS = calculateGearScore(genEq);
+                
+                if (genGS > targetMaxGS && genGS > 0) {
+                    const ratio = targetMaxGS / genGS;
+                    for (let s in statRolls) {
+                        statRolls[s] = parseFloat((statRolls[s] * ratio).toFixed(3));
+                    }
+                    for (let s in bonusStats) {
+                        bonusStats[s] = Math.max(1, Math.floor(bonusStats[s] * ratio));
+                    }
+                }
+            }
 
             // Auto-equipar se ativo nas configurações
             if (gameState.settings?.autoEquip) {

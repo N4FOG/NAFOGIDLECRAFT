@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
-import { getFirestore, doc, setDoc, getDoc, getDocs, collection, query, orderBy, limit, serverTimestamp, onSnapshot, increment, runTransaction } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+import { getFirestore, doc, setDoc, updateDoc, getDoc, getDocs, collection, query, orderBy, limit, serverTimestamp, onSnapshot, increment, runTransaction } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCf0MilY-r6vU-KFfKJSbdoCAHsM70OxFI",
@@ -194,16 +194,25 @@ window.FirebaseService = {
     const lbRef = doc(db, "worldboss", "leaderboard");
     
     try {
-      // We don't use a transaction here to avoid high contention.
-      // We just increment the damage on the boss, and in the leaderboard document.
       await setDoc(bossRef, { hp: increment(-damage) }, { merge: true });
       
       const updateData = {};
       updateData[`contributors.${playerName}.damage`] = increment(damage);
-      updateData[`contributors.${playerName}.avatarClass`] = avatarClass;
+      updateData[`contributors.${playerName}.avatarClass`] = avatarClass || 'knight';
       updateData[`contributors.${playerName}.lastUpdate`] = serverTimestamp();
       
-      await setDoc(lbRef, updateData, { merge: true });
+      try {
+        await updateDoc(lbRef, updateData);
+      } catch (err) {
+        // Se o documento leaderboard ainda não existir no Firestore, cria com estrutura aninhada
+        const initData = { contributors: {} };
+        initData.contributors[playerName] = {
+          damage: damage,
+          avatarClass: avatarClass || 'knight',
+          lastUpdate: serverTimestamp()
+        };
+        await setDoc(lbRef, initData, { merge: true });
+      }
     } catch (e) {
       console.error("Erro ao enviar dano ao World Boss: ", e);
     }
@@ -217,16 +226,34 @@ window.FirebaseService = {
     try {
       const docSnap = await getDoc(lbRef);
       if (docSnap.exists()) {
-        const data = docSnap.data().contributors || {};
+        const rawData = docSnap.data() || {};
+        let data = rawData.contributors || {};
+        
+        // Suporte / Fallback para chaves com ponto gravadas como top-level no Firestore (ex: "contributors.Hero.damage")
+        if (Object.keys(data).length === 0) {
+          data = {};
+          Object.keys(rawData).forEach(key => {
+            if (key.startsWith("contributors.")) {
+              const parts = key.split(".");
+              if (parts.length >= 3) {
+                const pName = parts[1];
+                const field = parts[2];
+                if (!data[pName]) data[pName] = { damage: 0, avatarClass: 'knight' };
+                if (field === 'damage') data[pName].damage = rawData[key];
+                if (field === 'avatarClass') data[pName].avatarClass = rawData[key];
+              }
+            }
+          });
+        }
         
         // Convert to array and sort by damage
         const players = Object.keys(data).map(name => ({
           name: name,
-          damage: data[name].damage,
-          avatarClass: data[name].avatarClass || 'knight'
+          damage: typeof data[name] === 'object' ? (data[name].damage || 0) : Number(data[name] || 0),
+          avatarClass: typeof data[name] === 'object' ? (data[name].avatarClass || 'knight') : 'knight'
         }));
         
-        players.sort((a, b) => b.damage - a.damage);
+        players.sort((a, b) => (b.damage || 0) - (a.damage || 0));
         return players.slice(0, 50); // Top 50
       }
       return [];
