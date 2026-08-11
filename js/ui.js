@@ -771,184 +771,26 @@
                 for (let i in gameState.autoIntervals) clearInterval(gameState.autoIntervals[i]);
                 if (gameState.combat.combatInterval) clearInterval(gameState.combat.combatInterval);
                 if (gameState.pets.autoCollectInterval) clearInterval(gameState.pets.autoCollectInterval);
-                const loaded = JSON.parse(saved);
-                // Garantir que equipment existe no save antigo
-                if (!loaded.equipment) loaded.equipment = { equipped: { helmet: null, amulet: null, weapon: null, armor: null, shield: null, ring: null, pants: null, boots: null }, inventory: {} };
-                if (!loaded.equipment.instances) loaded.equipment.instances = {};
-                if (!loaded.runes) loaded.runes = {};
-                if (!loaded.pets) loaded.pets = { owned: [], active: null, autoCollectInterval: null };
-                if (!loaded.pets.levels) loaded.pets.levels = {};
-                if (!loaded.tools) loaded.tools = {};
-                if (!loaded.dungeons) loaded.dungeons = {};
-                if (!loaded.workers) loaded.workers = { allocated: {} };
-                loaded.craftingTimers = {};
-                if (!loaded.property) loaded.property = {
-                    farm:    { level: 0, slots: [], lastTick: 0 },
-                    sawmill: { level: 0, queue: null, progress: 0, lastTick: 0 },
-                    forge:   { level: 0, queue: null, progress: 0, lastTick: 0 },
-                    stable:  { level: 0, lastTick: 0 },
-                    library: { level: 0, studySkill: 'woodcutting', xpAccum: 0, lastTick: 0 },
-                    tavern:  { level: 0, goldAccum: 0, lastTick: 0 }
-                };
-                gameState = loaded;
                 
-                // Migração de configurações do jogador
+                const loaded = JSON.parse(saved);
+                
+                if (typeof window.sanitizeAndMigrateSave === 'function') {
+                    gameState = window.sanitizeAndMigrateSave(loaded);
+                } else {
+                    gameState = loaded;
+                }
+
                 if (!gameState.settings) {
                     gameState.settings = {
-                        autoEquip: false,
-                        devMode: false,
-                        keybindings: true,
-                        maxNotifications: 5,
-                        hiddenNotificationCategories: {},
-                        fontSize: '100%',
-                        numberFormat: 'standard'
+                        autoEquip: false, devMode: false, keybindings: true, maxNotifications: 5,
+                        hiddenNotificationCategories: {}, fontSize: '100%', numberFormat: 'standard'
                     };
-                } else {
-                    if (gameState.settings.autoEquip === undefined) gameState.settings.autoEquip = false;
-                    if (gameState.settings.devMode === undefined) gameState.settings.devMode = false;
-                    if (gameState.settings.keybindings === undefined) gameState.settings.keybindings = true;
-                    if (gameState.settings.maxNotifications === undefined) gameState.settings.maxNotifications = 5;
-                    if (gameState.settings.hiddenNotificationCategories === undefined) gameState.settings.hiddenNotificationCategories = {};
-                    if (gameState.settings.fontSize === undefined) gameState.settings.fontSize = '100%';
-                    if (gameState.settings.numberFormat === undefined) gameState.settings.numberFormat = 'standard';
                 }
-                if (typeof applyFontSize === 'function') {
-                    applyFontSize(gameState.settings.fontSize);
-                }
+                if (typeof applyFontSize === 'function') applyFontSize(gameState.settings.fontSize);
 
-                // Migração de equipamentos não-instanciados antigos no inventário e equipados
-                if (gameState.equipment) {
-                    if (!gameState.equipment.instances) gameState.equipment.instances = {};
-                    if (!gameState.equipment.inventory) gameState.equipment.inventory = {};
-                    if (!gameState.equipment.equipped) gameState.equipment.equipped = {};
-
-                    // 1. Migrar inventário
-                    for (let [id, qty] of Object.entries(gameState.equipment.inventory)) {
-                        if (qty > 0 && !id.startsWith('inst_')) {
-                            const base = equipmentData[id];
-                            if (base) {
-                                delete gameState.equipment.inventory[id];
-                                for (let k = 0; k < qty; k++) {
-                                    const instId = 'inst_' + Date.now() + '_' + Math.floor(Math.random() * 100000) + '_' + k;
-                                    const initialQuality = base.rarity || 'common';
-                                    
-                                    const qualityRanges = {
-                                        common: { min: 0.85, max: 1.10 },
-                                        uncommon: { min: 0.90, max: 1.15 },
-                                        rare: { min: 0.95, max: 1.20 },
-                                        epic: { min: 1.00, max: 1.30 },
-                                        legendary: { min: 1.05, max: 1.40 },
-                                        ancient: { min: 1.10, max: 1.50 }
-                                    };
-                                    const range = qualityRanges[initialQuality] || qualityRanges.common;
-                                    const statRolls = {};
-                                    if (base.stats) {
-                                        for (let stat in base.stats) {
-                                            statRolls[stat] = parseFloat((range.min + Math.random() * (range.max - range.min)).toFixed(2));
-                                        }
-                                    }
-
-                                    gameState.equipment.instances[instId] = {
-                                        id: id,
-                                        slots: 2,
-                                        runas: [null, null],
-                                        quality: initialQuality,
-                                        statRolls: statRolls,
-                                        element: null,
-                                        elementValue: 0
-                                    };
-                                    gameState.equipment.inventory[instId] = 1;
-                                }
-                            }
-                        }
-                    }
-
-                    // 2. Migrar equipados
-                    for (let slot in gameState.equipment.equipped) {
-                        const id = gameState.equipment.equipped[slot];
-                        if (id && !id.startsWith('inst_')) {
-                            const base = equipmentData[id];
-                            if (base) {
-                                const instId = 'inst_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
-                                const initialQuality = base.rarity || 'common';
-                                
-                                const qualityRanges = {
-                                    common: { min: 0.85, max: 1.10 },
-                                    uncommon: { min: 0.90, max: 1.15 },
-                                    rare: { min: 0.95, max: 1.20 },
-                                    epic: { min: 1.00, max: 1.30 },
-                                    legendary: { min: 1.05, max: 1.40 },
-                                    ancient: { min: 1.10, max: 1.50 }
-                                };
-                                const range = qualityRanges[initialQuality] || qualityRanges.common;
-                                const statRolls = {};
-                                if (base.stats) {
-                                    for (let stat in base.stats) {
-                                        statRolls[stat] = parseFloat((range.min + Math.random() * (range.max - range.min)).toFixed(2));
-                                    }
-                                }
-
-                                gameState.equipment.instances[instId] = {
-                                    id: id,
-                                    slots: 2,
-                                    runas: [null, null],
-                                    quality: initialQuality,
-                                    statRolls: statRolls,
-                                    element: null,
-                                    elementValue: 0
-                                };
-                                gameState.equipment.equipped[slot] = instId;
-                            }
-                        }
-                    }
-                }
-
-                if (!gameState.notificationStyle) gameState.notificationStyle = 'style3';
-                if (!gameState.customThemeColors) {
-                    gameState.customThemeColors = {
-                        bgPrimary: '#101a24',
-                        bgPrimary2: '#050a0f',
-                        bgSecondary: '#1a2a3a',
-                        accentColor: '#ff9944',
-                        textColor: '#e0e6ed',
-                        gameContainerBg: null,
-                        sidebarBg: null,
-                        contentAreaBg: null
-                    };
-                } else {
-                    // Migração: adicionar chaves novas se ausentes em saves antigos
-                    if (!('gameContainerBg' in gameState.customThemeColors)) gameState.customThemeColors.gameContainerBg = null;
-                    if (!('sidebarBg' in gameState.customThemeColors)) gameState.customThemeColors.sidebarBg = null;
-                    if (!('contentAreaBg' in gameState.customThemeColors)) gameState.customThemeColors.contentAreaBg = null;
-                }
-                if (!gameState.customFont) gameState.customFont = 'default';
-                // Migração: Limpar autofarm legado
-                ['woodcutting', 'mining', 'fishing', 'herbalism'].forEach(s => {
-                    if (gameState.skills && gameState.skills[s]) {
-                        gameState.skills[s].auto = {};
-                    }
-                });
-                if (!gameState.skills.herbalism) {
-                    gameState.skills.herbalism = { level: 1, xp: 0, auto: {} };
-                }
-                if (!gameState.skills.enchanting) {
-                    gameState.skills.enchanting = { level: 1, xp: 0, auto: false };
-                }
-                if (gameState.player && !gameState.player.enchantments) {
-                    gameState.player.enchantments = { weapon: null, armor: null };
-                }
-                // Migração: arena
-                if (!gameState.arena) {
-                    gameState.arena = { wave:1, wins:0, streak:0, bestStreak:0, stamina:5, maxStamina:5, lastStaminaRegen:0, arenaCoins:0, weeklyPoints:0, shopPurchased:{}, battleLog:[], inBattle:false, autoMode:false, currentEnemy:null, playerHP:0, enemyHP:0, defenseMode:false, cooldowns:{}, pendingRage:false, lastAction:null, autoInterval:null, arenaTab:'battle' };
-                } else {
-                    if (gameState.arena.maxStamina === undefined) gameState.arena.maxStamina = 5;
-                    if (gameState.arena.weeklyPoints === undefined) gameState.arena.weeklyPoints = 0;
-                    if (gameState.arena.bestStreak === undefined) gameState.arena.bestStreak = 0;
-                    gameState.arena.inBattle = false;
-                    gameState.arena.autoInterval = null;
-                }
                 applyCustomTheme();
                 startPetAutoCollect();
+                startWorkerCycle();
                 updateUI();
                 showPage(gameState.currentPage || 'property');
                 showNotification('📂 Carregado!', 'Progresso restaurado.', 'success');

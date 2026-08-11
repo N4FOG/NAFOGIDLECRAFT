@@ -1271,6 +1271,24 @@
         <div class="menu-title">IDLE CRAFT</div>
         <div class="menu-subtitle">MASCOTES · TECNOLOGIA · ALQUIMIA</div>
 
+        <!-- Daily Buff Banner — Menu Principal -->
+        <div id="menuDailyBuffBanner" class="menu-daily-buff-banner" onclick="if(window.DailyBuffSystem) { window.DailyBuffSystem.render(); }" title="Clique para ver o buff completo após entrar no jogo">
+            <div class="mdb-shimmer"></div>
+            <div class="mdb-particles" id="mdbParticles"></div>
+            <div class="mdb-left">
+                <div class="mdb-label">🎴 BUFF DO DIA</div>
+                <div class="mdb-icon" id="mdbIcon">🌟</div>
+            </div>
+            <div class="mdb-center">
+                <div class="mdb-name" id="mdbName">Carregando...</div>
+                <div class="mdb-desc" id="mdbDesc">O buff de hoje está sendo preparado</div>
+            </div>
+            <div class="mdb-right">
+                <div class="mdb-category" id="mdbCategory">...</div>
+                <div class="mdb-cta">▶ RESGATAR</div>
+            </div>
+        </div>
+
         <div class="menu-buttons-row">
             <button class="menu-btn-main continue" id="menuContinueBtn" onclick="menuContinue()">
                 ▶ CONTINUAR
@@ -1833,6 +1851,7 @@
         </div>
 
         <div class="content-area layout-editable" id="gameContentArea" data-layout-label="📄 Área de Conteúdo">
+            <div id="dailyBuffCardContainer" class="layout-editable" data-layout-label="🎴 Buff Diário" style="margin-bottom: 12px;"></div>
             <div class="layout-editable" id="globalActiveBuffs" data-layout-label="⚡ Buffs Ativos" style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; align-items:center;"></div>
 
             <!-- Página Painel Admin -->
@@ -7458,7 +7477,16 @@
             };
         }
     </script>
-    <script type="module" src="js/firebase-service.js"></script>
+    <script>
+        // Firebase carregado dinamicamente — silencia erros de CORS no protocolo file://
+        (function() {
+            var s = document.createElement('script');
+            s.type = 'module';
+            s.src  = 'js/firebase-service.js';
+            s.onerror = function() { /* Firebase indisponível no modo local/Electron — ok */ };
+            document.head.appendChild(s);
+        })();
+    </script>
     <script src="js/core.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/stats.js"></script>
@@ -7481,6 +7509,7 @@
     <script src="js/layout-editor.js"></script>
     <script src="js/worldboss.js"></script>
     <script src="js/inspect.js"></script>
+    <script src="js/daily-buff.js"></script>
 
     <!-- Brasas Ambientais Flutuantes (Etapa 5) -->
     <div class="ambient-embers" id="ambientEmbers">

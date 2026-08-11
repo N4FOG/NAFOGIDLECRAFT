@@ -44,10 +44,11 @@
             if (state.level >= 10) return;
             
             state.xp += amount;
-            const req = 200 * state.level;
             
             let leveledUp = false;
-            while (state.xp >= req && state.level < 10) {
+            while (state.level < 10) {
+                const req = 200 * state.level;
+                if (state.xp < req) break;
                 state.xp -= req;
                 state.level++;
                 leveledUp = true;

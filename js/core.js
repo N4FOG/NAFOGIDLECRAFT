@@ -120,8 +120,139 @@
                 allocated: {}   // { 'wood1': 2, 'ore1': 1, ... }
             }
         };
-        
 
+        // ============================================
+        // FUNÇÃO DE ESTADO INICIAL COMPLETO (RESET LIMPO)
+        // ============================================
+        function getInitialGameState() {
+            return {
+                player: null,
+                gold: 0,
+                skills: {
+                    woodcutting: { level: 1, xp: 0, auto: {} },
+                    mining:      { level: 1, xp: 0, auto: {} },
+                    fishing:     { level: 1, xp: 0, auto: {} },
+                    herbalism:   { level: 1, xp: 0, auto: {} },
+                    smithing:    { level: 1, xp: 0, auto: false },
+                    crafting:    { level: 1, xp: 0, auto: false },
+                    cooking:     { level: 1, xp: 0, auto: false },
+                    alchemy:     { level: 1, xp: 0, auto: false },
+                    enchanting:  { level: 1, xp: 0, auto: false }
+                },
+                inventory: {},
+                bankSlots: 20,
+                upgrades: { healthBonus: 0 },
+                combat: {
+                    playerHealth: 100, maxPlayerHealth: 100, playerDefense: 0, playerStrength: 10,
+                    monster: null, inCombat: false, combatInterval: null
+                },
+                autoIntervals: {},
+                craftingTimers: {},
+                pets: { owned: [], active: null, autoCollectInterval: null, levels: {}, enshrined: {} },
+                techTree: {
+                    gathering: { upgrades: [{ id: 'efficiency1', name: 'Eficiência I', currentLevel: 0, maxLevel: 3, cost: 500, effectValue: 10, effectType: 'xpBoost', required: null }, { id: 'double1', name: 'Dobro I', currentLevel: 0, maxLevel: 5, cost: 800, effectValue: 5, effectType: 'doubleChance', required: 'efficiency1' }, { id: 'autospeed1', name: 'Automação Rápida', currentLevel: 0, maxLevel: 3, cost: 1200, effectValue: 1, effectType: 'autoSpeed', required: 'double1' }] },
+                    combat:    { upgrades: [{ id: 'critical1', name: 'Crítico I', currentLevel: 0, maxLevel: 3, cost: 600, effectValue: 15, effectType: 'criticalChance', required: null }, { id: 'vampirism', name: 'Vampirismo', currentLevel: 0, maxLevel: 3, cost: 1000, effectValue: 5, effectType: 'lifesteal', required: 'critical1' }, { id: 'durability', name: 'Durabilidade', currentLevel: 0, maxLevel: 3, cost: 1500, effectValue: 25, effectType: 'healthBoost', required: 'vampirism' }] },
+                    crafting:  { upgrades: [{ id: 'materialEfficiency', name: 'Eficiência de Materiais', currentLevel: 0, maxLevel: 3, cost: 700, effectValue: 10, effectType: 'costReduction', required: null }, { id: 'craftSpeed', name: 'Craft Rápido', currentLevel: 0, maxLevel: 3, cost: 1100, effectValue: 20, effectType: 'craftSpeed', required: 'materialEfficiency' }, { id: 'masterCraft', name: 'Mestre Artesão', currentLevel: 0, maxLevel: 3, cost: 2000, effectValue: 25, effectType: 'valueBoost', required: 'craftSpeed' }] },
+                    alchemy:   { upgrades: [{ id: 'potionMaster1', name: 'Mestre Poções I', currentLevel: 0, maxLevel: 3, cost: 800, effectValue: 20, effectType: 'potionDuration', required: null }, { id: 'potionPower1', name: 'Potência I', currentLevel: 0, maxLevel: 3, cost: 1200, effectValue: 15, effectType: 'potionPower', required: 'potionMaster1' }, { id: 'doublePotion', name: 'Poção Dupla', currentLevel: 0, maxLevel: 3, cost: 2000, effectValue: 25, effectType: 'doublePotion', required: 'potionPower1' }] }
+                },
+                alchemy: { inventory: {}, activePotions: {}, craftingTimers: {} },
+                equipment: {
+                    equipped: { helmet: null, amulet: null, weapon: null, armor: null, shield: null, ring: null, pants: null, boots: null },
+                    inventory: {},
+                    instances: {}
+                },
+                runes: {},
+                currentRunarTab: 'equip',
+                tools: {},
+                dungeons: {},
+                arena: { wave: 1, wins: 0, streak: 0, bestStreak: 0, stamina: 5, maxStamina: 5, lastStaminaRegen: 0, arenaCoins: 0, weeklyPoints: 0, shopPurchased: {}, battleLog: [], inBattle: false, autoMode: false, currentEnemy: null, playerHP: 0, enemyHP: 0, defenseMode: false, cooldowns: {}, pendingRage: false, lastAction: null, autoInterval: null, arenaTab: 'battle' },
+                property: {
+                    farm:        { level: 0, slots: [], lastTick: 0 },
+                    sawmill:     { level: 0, queue: null, progress: 0, lastTick: 0, bladeId: null, bladeDurability: 0, spec: null },
+                    forge:       { level: 0, queue: null, progress: 0, lastTick: 0, heat: 0, fuelId: null, fuelQty: 0, spec: null },
+                    stable:      { level: 0, lastTick: 0 },
+                    library:     { level: 0, studySkill: 'woodcutting', xpAccum: 0, lastTick: 0 },
+                    tavern:      { level: 0, goldAccum: 0, lastTick: 0 },
+                    workerCamp:  { level: 0 }
+                },
+                workers: { allocated: {} }
+            };
+        }
+
+        // Expor no escopo global para menu.js e ui.js poderem usar
+        window.getInitialGameState = getInitialGameState;
+
+        // ============================================
+        // SANITIZADOR E MIGRADOR UNIVERSAL DE SALVAMENTO
+        // ============================================
+        function sanitizeAndMigrateSave(loaded) {
+            if (!loaded || typeof loaded !== 'object') return getInitialGameState();
+
+            const defaults = getInitialGameState();
+
+            // 1. Garantir Perícias e Sanitizar Níveis (NUNCA resetar se já for >= 1)
+            if (!loaded.skills) loaded.skills = {};
+            const skillKeys = ['woodcutting','mining','fishing','herbalism','smithing','crafting','cooking','alchemy','enchanting'];
+            skillKeys.forEach(s => {
+                if (!loaded.skills[s]) {
+                    loaded.skills[s] = { level: 1, xp: 0, auto: (s === 'smithing'||s === 'crafting'||s === 'cooking'||s === 'alchemy'||s === 'enchanting') ? false : {} };
+                } else {
+                    // Preservar nível existente ou garantir no mínimo 1
+                    const existingLvl = parseInt(loaded.skills[s].level);
+                    loaded.skills[s].level = (!isNaN(existingLvl) && existingLvl >= 1) ? existingLvl : 1;
+                    const existingXp = parseInt(loaded.skills[s].xp);
+                    loaded.skills[s].xp = (!isNaN(existingXp) && existingXp >= 0) ? existingXp : 0;
+                }
+            });
+
+            // 2. Garantir Propriedades (NUNCA resetar nível das existentes)
+            if (!loaded.property) loaded.property = defaults.property;
+            const propKeys = ['farm','sawmill','forge','stable','library','tavern','workerCamp'];
+            propKeys.forEach(p => {
+                if (!loaded.property[p]) {
+                    loaded.property[p] = defaults.property[p] || { level: 0 };
+                } else {
+                    const existingPropLvl = parseInt(loaded.property[p].level);
+                    loaded.property[p].level = (!isNaN(existingPropLvl) && existingPropLvl >= 0) ? existingPropLvl : 0;
+                }
+            });
+
+            // 3. Garantir Estruturas Secundárias
+            if (!loaded.equipment) loaded.equipment = defaults.equipment;
+            if (!loaded.equipment.instances) loaded.equipment.instances = {};
+            if (!loaded.equipment.equipped) loaded.equipment.equipped = defaults.equipment.equipped;
+            if (!loaded.equipment.inventory) loaded.equipment.inventory = {};
+
+            if (!loaded.pets) loaded.pets = defaults.pets;
+            if (!loaded.pets.levels) loaded.pets.levels = {};
+            if (!loaded.pets.enshrined) loaded.pets.enshrined = {};
+
+            if (!loaded.techTree) {
+                loaded.techTree = defaults.techTree;
+            } else {
+                ['gathering','combat','crafting','alchemy'].forEach(cat => {
+                    if (!loaded.techTree[cat]) loaded.techTree[cat] = defaults.techTree[cat] || { upgrades: [] };
+                });
+            }
+
+            if (!loaded.alchemy) loaded.alchemy = defaults.alchemy;
+            if (!loaded.alchemy.activePotions) loaded.alchemy.activePotions = {};
+            if (!loaded.alchemy.inventory) loaded.alchemy.inventory = {};
+
+            if (!loaded.workers) loaded.workers = defaults.workers;
+            if (!loaded.workers.allocated) loaded.workers.allocated = {};
+
+            if (!loaded.arena) loaded.arena = defaults.arena;
+            if (!loaded.runes) loaded.runes = {};
+            if (!loaded.tools) loaded.tools = {};
+            if (!loaded.dungeons) loaded.dungeons = {};
+
+            loaded.craftingTimers = {};
+
+            return loaded;
+        }
+
+        window.sanitizeAndMigrateSave = sanitizeAndMigrateSave;
 
         // ============================================
         // AUTOSAVE E LOOP DE UI
@@ -227,6 +358,14 @@
             // World Boss Buff (Bênção do Titã)
             if (window.getWorldBossBuffBonus) {
                 finalXP = Math.floor(finalXP * (1 + window.getWorldBossBuffBonus()));
+            }
+
+            // Daily Buff System (Buff Diário)
+            if (window.DailyBuffSystem && window.DailyBuffSystem.getBonus) {
+                const dailyXP = window.DailyBuffSystem.getBonus('allXP');
+                if (dailyXP > 0) {
+                    finalXP = Math.floor(finalXP * (1 + dailyXP / 100));
+                }
             }
             
             // Aprendiz: Dobra o XP ganho em skills nível < 30

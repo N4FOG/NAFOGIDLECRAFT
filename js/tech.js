@@ -20,8 +20,13 @@
         }
 
         function applyTechBonus(type, skill = null) {
-            const g = gameState.techTree.gathering.upgrades;
-            const c = gameState.techTree.combat.upgrades;
+            // Guard: techTree pode não existir em saves antigos ou durante carregamento
+            if (!gameState || !gameState.techTree) return 0;
+            if (!gameState.techTree.gathering || !gameState.techTree.combat ||
+                !gameState.techTree.crafting  || !gameState.techTree.alchemy) return 0;
+
+            const g  = gameState.techTree.gathering.upgrades;
+            const c  = gameState.techTree.combat.upgrades;
             const cr = gameState.techTree.crafting.upgrades;
             const al = gameState.techTree.alchemy.upgrades;
 

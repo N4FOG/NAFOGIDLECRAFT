@@ -447,6 +447,9 @@
                                                 'success', '🏕️'
                                             );
                                         }
+                                    }
+                                    if (typeof triggerWorkerCollectionFX === 'function') {
+                                        triggerWorkerCollectionFX('📦');
                                     } else {
                                         if (craftSkill === 'alchemy') {
                                             gameState.alchemy.inventory[recipe.id] = (gameState.alchemy.inventory[recipe.id] || 0) + totalProducedWorkers;
@@ -579,6 +582,9 @@
                             `${count} trabalhador${count > 1 ? 'es' : ''} coletou ${qty}x ${resource.icon} ${resource.name} (+${xpGain}XP)`,
                             'success', '🏕️'
                         );
+                    }
+                    if (typeof triggerWorkerCollectionFX === 'function') {
+                        triggerWorkerCollectionFX(resource.icon || '📦');
                     }
                     anyWork = true;
                 }                        if (anyWork) updateUI();

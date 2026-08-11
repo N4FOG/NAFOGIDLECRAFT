@@ -37,91 +37,30 @@
             for (let i in gameState.autoIntervals) clearInterval(gameState.autoIntervals[i]);
             if (gameState.combat.combatInterval) clearInterval(gameState.combat.combatInterval);
             if (gameState.pets.autoCollectInterval) clearInterval(gameState.pets.autoCollectInterval);
+            
             const loaded = JSON.parse(saved);
-
-            // Capturar timestamp ANTES de sobrescrever o gameState
             const lastSaveTimestamp = loaded.lastSave || null;
 
-            if (!loaded.equipment) loaded.equipment = { equipped: { helmet: null, amulet: null, weapon: null, armor: null, shield: null, ring: null, pants: null, boots: null }, inventory: {} };
-            if (!loaded.equipment.instances) loaded.equipment.instances = {};
-            if (!loaded.runes) loaded.runes = {};
-            if (!loaded.pets) loaded.pets = { owned: [], active: null, autoCollectInterval: null };
-            if (!loaded.pets.levels) loaded.pets.levels = {};
-            if (!loaded.pets.enshrined) loaded.pets.enshrined = {};
-            if (!loaded.tools) loaded.tools = {};
-            if (!loaded.dungeons) loaded.dungeons = {};
-            if (!loaded.property) loaded.property = {
-                farm:    { level: 0, slots: [], lastTick: 0 },
-                sawmill: { level: 0, queue: null, progress: 0, lastTick: 0 },
-                forge:   { level: 0, queue: null, progress: 0, lastTick: 0 },
-                stable:  { level: 0, lastTick: 0 },
-                library: { level: 0, studySkill: 'woodcutting', xpAccum: 0, lastTick: 0 },
-                tavern:  { level: 0, goldAccum: 0, lastTick: 0 }
-            };
-            if (!loaded.player) loaded.player = { name: 'Herói', gender: 'M', avatar: '🧙‍♂️', classId: null };
-            gameState = loaded;
+            // Sanitização e Migração Centralizada (preserva todos os níveis existentes)
+            if (typeof window.sanitizeAndMigrateSave === 'function') {
+                gameState = window.sanitizeAndMigrateSave(loaded);
+            } else {
+                gameState = loaded;
+            }
+
+            if (!gameState.player) gameState.player = { name: 'Herói', gender: 'M', avatar: '🧙‍♂️', classId: null };
             if (!gameState.notificationStyle) gameState.notificationStyle = 'style3';
             
             // Migrar configurações
             if (!gameState.settings) {
                 gameState.settings = {
-                    autoEquip: false,
-                    devMode: false,
-                    keybindings: true,
-                    maxNotifications: 5,
-                    hiddenNotificationCategories: {},
-                    fontSize: '100%',
-                    numberFormat: 'standard'
+                    autoEquip: false, devMode: false, keybindings: true, maxNotifications: 5,
+                    hiddenNotificationCategories: {}, fontSize: '100%', numberFormat: 'standard'
                 };
-            } else {
-                if (gameState.settings.autoEquip === undefined) gameState.settings.autoEquip = false;
-                if (gameState.settings.devMode === undefined) gameState.settings.devMode = false;
-                if (gameState.settings.keybindings === undefined) gameState.settings.keybindings = true;
-                if (gameState.settings.maxNotifications === undefined) gameState.settings.maxNotifications = 5;
-                if (gameState.settings.hiddenNotificationCategories === undefined) gameState.settings.hiddenNotificationCategories = {};
-                if (gameState.settings.fontSize === undefined) gameState.settings.fontSize = '100%';
-                if (gameState.settings.numberFormat === undefined) gameState.settings.numberFormat = 'standard';
             }
-            if (typeof applyFontSize === 'function') {
-                applyFontSize(gameState.settings.fontSize);
-            }
-            if (!gameState.customThemeColors) {
-                gameState.customThemeColors = {
-                    bgPrimary: '#101a24',
-                    bgPrimary2: '#050a0f',
-                    bgSecondary: '#1a2a3a',
-                    accentColor: '#ff9944',
-                    textColor: '#e0e6ed',
-                    gameContainerBg: null,
-                    sidebarBg: null,
-                    contentAreaBg: null
-                };
-            } else {
-                // Migração: adicionar chaves novas se ausentes em saves antigos
-                if (!('gameContainerBg' in gameState.customThemeColors)) gameState.customThemeColors.gameContainerBg = null;
-                if (!('sidebarBg' in gameState.customThemeColors)) gameState.customThemeColors.sidebarBg = null;
-                if (!('contentAreaBg' in gameState.customThemeColors)) gameState.customThemeColors.contentAreaBg = null;
-            }
+            if (typeof applyFontSize === 'function') applyFontSize(gameState.settings.fontSize);
             if (!gameState.customFont) gameState.customFont = 'default';
-            // Migração: Limpar autofarm legado
-            ['woodcutting', 'mining', 'fishing', 'herbalism'].forEach(s => {
-                if (gameState.skills && gameState.skills[s]) {
-                    gameState.skills[s].auto = {};
-                }
-            });
-            if (!gameState.skills.herbalism) {
-                gameState.skills.herbalism = { level: 1, xp: 0, auto: {} };
-            }
-            if (!gameState.skills.enchanting) {
-                gameState.skills.enchanting = { level: 1, xp: 0, auto: false };
-            }
-            if (gameState.player && !gameState.player.enchantments) {
-                gameState.player.enchantments = { weapon: null, armor: null };
-            }
-            if (!gameState.workers) {
-                gameState.workers = { allocated: {} };
-            }
-            gameState.craftingTimers = {};
+
             applyCustomTheme();
             hideMenuScreens();
             startPetAutoCollect();
@@ -304,8 +243,13 @@
         function ngStartGame() {
             if (!ngState.name || !ngState.gender || !ngState.avatar || !ngState.classId) return;
 
-            // Limpar save antigo
+            // Limpar save antigo do localStorage
             localStorage.removeItem('idleCraftSave');
+
+            // Resetar o gameState em memória para o estado padrão limpo
+            if (typeof window.getInitialGameState === 'function') {
+                gameState = window.getInitialGameState();
+            }
 
             // Configurar player no gameState
             gameState.player = {

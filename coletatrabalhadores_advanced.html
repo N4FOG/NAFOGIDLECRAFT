@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎮 Worker FX Advanced — GSAP + Anime.js + Canvas</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+<!-- GSAP 3 (gold standard em animações de games) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<!-- Anime.js (path animations, stagger, spring physics) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js"></script>
+
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+    font-family:'Outfit',sans-serif;
+    background: radial-gradient(ellipse at 50% 0%, rgba(28,48,75,0.6) 0%, rgba(5,10,18,1) 65%), #050d18;
+    color:#dde; min-height:100vh; padding:22px 18px 40px;
+    overflow-x:hidden;
+}
+h1 {
+    text-align:center; font-family:'Cinzel',serif; color:#ffd700;
+    font-size:1.75em; margin-bottom:2px;
+    text-shadow:0 0 24px rgba(255,215,0,0.35);
+}
+.sub { text-align:center; color:#556; font-size:0.82em; margin-bottom:24px; }
+.badge { display:inline-block; background:rgba(255,153,68,0.15); border:1px solid rgba(255,153,68,0.35);
+    border-radius:20px; padding:2px 10px; color:#ff9944; font-size:0.78em; font-weight:700; margin-left:6px; }
+
+.wrap {
+    display:grid; grid-template-columns:200px 1fr; gap:18px;
+    max-width:1120px; margin:0 auto;
+}
+
+/* ── SIDEBAR ── */
+.sb {
+    background:rgba(12,22,38,0.97); border-radius:16px; padding:13px 11px;
+    border:1px solid rgba(160,200,255,0.1); box-shadow:0 10px 30px rgba(0,0,0,0.6);
+    align-self:start; position:sticky; top:18px;
+}
+.sb-title { font-family:'Cinzel',serif; color:#ffd700; font-size:0.88em; text-align:center;
+    border-bottom:1px solid rgba(255,215,0,0.18); padding-bottom:7px; margin-bottom:9px; }
+.st { display:flex; justify-content:space-between; align-items:center;
+    padding:3px 5px; border-radius:6px; font-size:0.77em; margin-bottom:3px; }
+.st.hi { background:rgba(255,153,68,0.09); border:1px solid rgba(255,153,68,0.22); }
+.sl { color:#999; } .sv { color:#ffd700; font-weight:700; }
+.wl { font-size:0.68em; color:#ff9944; font-weight:700; text-transform:uppercase;
+    letter-spacing:1px; margin:9px 0 5px; }
+.wr { display:flex; align-items:center; padding:5px 7px; background:rgba(255,153,68,0.06);
+    border:1px solid rgba(255,153,68,0.16); border-radius:7px; margin-bottom:3px; font-size:0.77em; }
+.wi { font-size:1.05em; margin-right:5px; }
+.wn { flex:1; color:#ccc; }
+.wc { color:#ff9944; font-weight:700; }
+.ql-g { display:grid; grid-template-columns:1fr 1fr; gap:3px; margin-top:9px; }
+.ql { background:rgba(40,55,85,0.6); border:1px solid rgba(80,120,180,0.22);
+    border-radius:7px; padding:4px 3px; font-size:0.68em; color:#a0c0e0;
+    text-align:center; font-weight:700; transition:all .25s; cursor:default; }
+#invBtn { transition:all .25s; }
+
+/* ── GRID ── */
+.grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(285px,1fr)); gap:13px; }
+.card {
+    background:rgba(11,19,30,0.95); border-radius:13px; border:1px solid rgba(255,215,0,0.09);
+    padding:13px; transition:border-color .2s;
+}
+.card:hover { border-color:rgba(255,215,0,0.25); }
+.card-title { font-size:0.8em; font-weight:700; color:#ff9944; margin-bottom:3px; }
+.card-lib { font-size:0.65em; font-weight:700; border-radius:10px; padding:1px 7px;
+    margin-left:5px; vertical-align:middle; }
+.lib-gsap { background:rgba(136,255,100,0.12); color:#88ff64; border:1px solid rgba(136,255,100,0.3); }
+.lib-anime { background:rgba(100,180,255,0.12); color:#64b4ff; border:1px solid rgba(100,180,255,0.3); }
+.lib-canvas { background:rgba(255,100,200,0.12); color:#ff64c8; border:1px solid rgba(255,100,200,0.3); }
+.card-desc { font-size:0.71em; color:#556; margin-bottom:11px; line-height:1.4; }
+.stage {
+    background:rgba(6,12,20,0.75); border-radius:9px; padding:9px;
+    border:1px solid rgba(255,255,255,0.04); height:72px;
+    display:flex; align-items:center; justify-content:space-between; gap:5px;
+}
+.src { display:flex; flex-direction:column; align-items:center; gap:2px; font-size:0.68em; color:#ff9944; }
+.dst { display:flex; flex-direction:column; align-items:center; gap:2px; font-size:0.68em; color:#64a0e0; }
+.src span, .dst span { font-size:1.55em; }
+.arr { color:#223; font-size:0.8em; flex:1; text-align:center; overflow:hidden; }
+.btn {
+    margin-top:9px; width:100%;
+    background:rgba(255,153,68,0.1); border:1px solid rgba(255,153,68,0.28);
+    border-radius:7px; color:#ff9944; font-family:'Outfit',sans-serif;
+    font-weight:700; font-size:0.76em; padding:5px; cursor:pointer; transition:all .18s;
+}
+.btn:hover { background:rgba(255,153,68,0.22); border-color:rgba(255,153,68,0.5); color:#ffba66; }
+
+/* ── FX SHARED ── */
+.fx-node {
+    position:fixed; pointer-events:none; z-index:9999;
+    font-size:1.5em; transform:translate(-50%,-50%);
+}
+.fx-pill {
+    position:fixed; pointer-events:none; z-index:9999;
+    display:flex; align-items:center; gap:4px;
+    border-radius:18px; padding:3px 9px 3px 5px;
+    font-size:0.78em; font-weight:800;
+    transform:translate(-50%,-50%);
+}
+
+/* ── SCREEN GLOW overlay for M3 ── */
+#screenGlow {
+    position:fixed; inset:0; pointer-events:none; z-index:8888;
+    background:radial-gradient(ellipse at 50% 50%, rgba(255,215,0,0.07) 0%, transparent 70%);
+    opacity:0;
+}
+
+/* ── SVG path overlay ── */
+#pathSvg {
+    position:fixed; inset:0; pointer-events:none; z-index:9990; overflow:visible;
+}
+
+/* ── Canvas overlay ── */
+#fxCanvas {
+    position:fixed; inset:0; pointer-events:none; z-index:9995;
+    width:100%; height:100%;
+}
+
+.legend { max-width:1120px; margin:20px auto 0;
+    background:rgba(11,19,30,0.9); border-radius:11px; padding:13px 16px;
+    border:1px solid rgba(255,215,0,0.09); font-size:0.78em; color:#556; }
+.legend h3 { color:#ff9944; font-size:0.92em; margin-bottom:7px; font-family:'Cinzel',serif; }
+.legend ul { display:flex; flex-wrap:wrap; gap:6px 18px; list-style:none; }
+.legend li::before { content:'▸ '; color:#ff9944; }
+</style>
+</head>
+<body>
+
+<h1>🎮 Worker FX Advanced <span class="badge">GSAP + Anime.js + Canvas</span></h1>
+<p class="sub">10 efeitos de nível profissional de games · Bibliotecas reais usadas em studios AAA</p>
+
+<div id="screenGlow"></div>
+<canvas id="fxCanvas"></canvas>
+<svg id="pathSvg"></svg>
+
+<div class="wrap">
+
+    <!-- SIDEBAR MOCK -->
+    <div class="sb">
+        <div class="sb-title">📋 SIDEBAR</div>
+        <div class="st"><span class="sl">📦 Espaços:</span><span class="sv">12/24</span></div>
+        <div class="st"><span class="sl">🏆 Nível:</span><span class="sv">28/300</span></div>
+        <div class="st hi" id="workerRow">
+            <span class="sl">👷 Trabalhadores:</span><span class="sv">3/5</span>
+        </div>
+        <div class="wl">⚙️ Ativos</div>
+        <div class="wr"><span class="wi">🌲</span><span class="wn">João · Madeira</span><span class="wc">×1</span></div>
+        <div class="wr"><span class="wi">⛏️</span><span class="wn">Maria · Minério</span><span class="wc">×1</span></div>
+        <div class="wr"><span class="wi">🌿</span><span class="wn">Pedro · Ervas</span><span class="wc">×1</span></div>
+        <div class="wl" style="margin-top:10px;">⚡ Atalhos</div>
+        <div class="ql-g">
+            <div class="ql" id="invBtn">📦<br>Inv.</div>
+            <div class="ql">🏡<br>Prop.</div>
+            <div class="ql">👤<br>Char.</div>
+            <div class="ql">🐲<br>Pets</div>
+        </div>
+    </div>
+
+    <!-- CARDS -->
+    <div class="grid">
+
+        <!-- A1 GSAP Elastic Arc -->
+        <div class="card">
+            <div class="card-title">A1 — Elastic Arc <span class="card-lib lib-gsap">GSAP</span></div>
+            <div class="card-desc">GSAP timeline com easing elástico. O ícone estica ao lançar e comprime ao chegar — sensação física real.</div>
+            <div class="stage">
+                <div class="src"><span>👷</span>Worker</div>
+                <div class="arr">~elastic~▶</div>
+                <div class="dst"><span>📦</span>Inv.</div>
+            </div>
+            <button class="btn" onclick="fxA1()">▶ Disparar</button>
+        </div>
+
+        <!-- A2 GSAP Magnetic Pull -->
+        <div class="card">
+            <div class="card-title">A2 — Magnetic Pull <span class="card-lib lib-gsap">GSAP</span></div>
+            <div class="card-desc">Começa devagar como se resistisse, depois é sugado magneticamente pelo inventário com aceleração exponencial.</div>
+            <div class="stage">
+                <div class="src"><span>👷</span>Worker</div>
+                <div class="arr">slow→→→FAST▶</div>
+                <div class="dst"><span>📦</span>Inv.</div>
+            </div>
+            <button class="btn" onclick="fxA2()">▶ Disparar</button>
+        </div>
+
+        <!-- A3 GSAP Cinematic -->
+        <div class="card">
+            <div class="card-title">A3 — Cinematic Loot <span class="card-lib lib-gsap">GSAP</span></div>
+            <div class="card-desc">Timeline cinematográfica: pause dramático no início, arco com trail dourado, brilho na tela e escala de impacto ao chegar.</div>
+            <div class="stage">
+                <div class="src"><span>👷</span>Worker</div>
+                <div class="arr">✨ DRAMATIC ✨</div>
+                <div class="dst"><span>📦</span>Inv.</div>
+            </div>
+            <button class="btn" onclick="fxA3()">▶ Disparar</button>
+        </div>
+
+        <!-- A4 Anime.js SVG Path -->
+        <div class="card">
+            <div class="card-title">A4 — SVG Bezier Path <span class="card-lib lib-anime">Anime.js</span></div>
+            <div class="card-desc">O ícone segue uma curva bezier cúbica real renderizada em SVG, com rotação automática na tangente do caminho.</div>
+            <div class="stage">
+                <div class="src"><span>👷</span>Worker</div>
+                <div class="arr">⌒ bezier ⌒▶</div>
+                <div class="dst"><span>📦</span>Inv.</div>
+            </div>
+            <button class="btn" onclick="fxA4()">▶ Disparar</button>
+        </div>
+
+        <!-- A5 Anime.js Stagger Burst -->
+        <div class="card">
+            <div class="card-title">A5 — Stagger Burst <span class="card-lib lib-anime">Anime.js</span></div>
+            <div class="card-desc">5 ícones do mesmo recurso saem em leque com stagger (delay escalonado), como se fossem múltiplas unidades coletadas.</div>
+            <div class="stage">
+                <div class="src"><span>👷</span>Worker</div>
+                <div class="arr">≋≋≋≋≋▶</div>
+                <div class="dst"><span>📦</span>Inv.</div>
+            </div>
+            <button class="btn" onclick="fxA5()">▶ Disparar</button>
+        </div>
+
+        <!-- A6 Canvas Pixel Burst -->
+        <div class="card">
+            <div class="card-title">A6 — Pixel Burst <span class="card-lib lib-canvas">Canvas</span></div>
+            <div class="card-desc">Explosão de pixels coloridos no ponto de coleta (estilo RPG 16-bit), com cada pixel voando em direção diferente.</div>
+            <div class="stage">
+                <div class="src"><span>👷</span>Worker</div>
+                <div class="arr">💥 pixel RPG</div>
+                <div class="dst"><span>📦</span>Inv.</div>
+            </div>
+            <button class="btn" onclick="fxA6()">▶ Disparar</button>
+        </div>
+
+        <!-- A7 Canvas Comet -->
+        <div class="card">
+            <div class="card-title">A7 — Comet Trail <span class="card-lib lib-canvas">Canvas</span></div>
+            <div class="card-desc">Trail renderizado em Canvas com degradê de opacidade e partículas de brilho que decaem fisicamente ao longo do caminho.</div>
+            <div class="stage">
+                <div class="src"><span>👷</span>Worker</div>
+                <div class="arr">☄ canvas trail▶</div>
+                <div class="dst"><span>📦</span>Inv.</div>
+            </div>
+            <button class="btn" onclick="fxA7()">▶ Disparar</button>
+        </div>
+
+        <!-- A8 GSAP Physics Gravity -->
+        <div class="card">
+            <div class="card-title">A8 — Physics Bounce <span class="card-lib lib-gsap">GSAP</span></div>
+            <div class="card-desc">Simula gravidade real: o ícone sobe em arco, cai, quica no "chão virtual" e depois é atraído ao inventário.</div>
+            <div class="stage">
+                <div class="src"><span>👷</span>Worker</div>
+                <div class="arr">⬆ gravity ⬇ quic▶</div>
+                <div class="dst"><span>📦</span>Inv.</div>
+            </div>
+            <button class="btn" onclick="fxA8()">▶ Disparar</button>
+        </div>
+
+        <!-- A9 Anime.js Spring Chain -->
+        <div class="card">
+            <div class="card-title">A9 — Spring Chain <span class="card-lib lib-anime">Anime.js</span></div>
+            <div class="card-desc">3 ícones encadeados com mola (spring physics do Anime.js): o primeiro puxa o segundo que puxa o terceiro com delay amortecido.</div>
+            <div class="stage">
+                <div class="src"><span>👷</span>Worker</div>
+                <div class="arr">⊸⊸⊸ chain ▶</div>
+                <div class="dst"><span>📦</span>Inv.</div>
+            </div>
+            <button class="btn" onclick="fxA9()">▶ Disparar</button>
+        </div>
+
+        <!-- A10 GSAP Loot Pop -->
+        <div class="card">
+            <div class="card-title">A10 — Loot Pop (HUD Premium) <span class="card-lib lib-gsap">GSAP</span></div>
+            <div class="card-desc">Estilo Diablo/Path of Exile: pill dourada com glow, sobe flutuando com wobble e se dissolve em faíscas ao desaparecer.</div>
+            <div class="stage">
+                <div class="src"><span>👷</span>Worker</div>
+                <div class="arr">💰 Diablo style</div>
+                <div class="dst"><span>📦</span>Inv.</div>
+            </div>
+            <button class="btn" onclick="fxA10()">▶ Disparar</button>
+        </div>
+
+    </div>
+</div>
+
+<div class="legend">
+    <h3>📚 Bibliotecas utilizadas</h3>
+    <ul>
+        <li><span style="color:#88ff64">GSAP 3.12</span> — GreenSock, padrão de mercado (Disney, Awwwards, games AAA)</li>
+        <li><span style="color:#64b4ff">Anime.js 3.2</span> — Path SVG, spring physics, stagger</li>
+        <li><span style="color:#ff64c8">Canvas API</span> — Renderização direta de pixels, partículas avançadas</li>
+    </ul>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+//  SETUP
+// ═══════════════════════════════════════
+const resources = [
+    {icon:'🌲',name:'Madeira',color:'#6aaa44'},
+    {icon:'⛏️',name:'Minério',color:'#c9a040'},
+    {icon:'🌿',name:'Erva',color:'#44aa66'},
+    {icon:'🐟',name:'Peixe',color:'#44aacc'},
+    {icon:'🪨',name:'Pedra',color:'#998877'},
+    {icon:'🍄',name:'Cogumelo',color:'#cc6677'},
+    {icon:'💎',name:'Gema',color:'#66aaff'},
+    {icon:'🪵',name:'Tronco',color:'#aa7744'},
+];
+let ri = 0;
+const next = () => { const r = resources[ri]; ri=(ri+1)%resources.length; return r; };
+
+const getSrc = () => {
+    const r = document.getElementById('workerRow').getBoundingClientRect();
+    return {x: r.left+r.width/2, y: r.top+r.height/2};
+};
+const getDst = () => {
+    const r = document.getElementById('invBtn').getBoundingClientRect();
+    return {x: r.left+r.width/2, y: r.top+r.height/2};
+};
+
+// Canvas setup
+const canvas = document.getElementById('fxCanvas');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+});
+
+// Particle pool for canvas effects
+let particles = [];
+function canvasLoop() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    particles = particles.filter(p => p.life > 0);
+    for(const p of particles) {
+        p.x += p.vx; p.y += p.vy;
+        p.vy += p.gravity || 0;
+        p.vx *= p.friction || 0.98;
+        p.vy *= p.friction || 0.98;
+        p.life -= p.decay;
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, p.life);
+        if(p.type === 'pixel') {
+            ctx.fillStyle = p.color;
+            ctx.fillRect(p.x-p.size/2, p.y-p.size/2, p.size, p.size);
+        } else if(p.type === 'spark') {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+            ctx.fillStyle = p.color;
+            ctx.fill();
+        } else if(p.type === 'comet') {
+            const grd = ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.size*3);
+            grd.addColorStop(0, p.color);
+            grd.addColorStop(1, 'transparent');
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size*3, 0, Math.PI*2);
+            ctx.fillStyle = grd;
+            ctx.fill();
+        }
+        ctx.restore();
+    }
+    requestAnimationFrame(canvasLoop);
+}
+canvasLoop();
+
+function mkNode(icon, extra) {
+    const el = document.createElement('div');
+    el.className = 'fx-node';
+    el.textContent = icon;
+    Object.assign(el.style, extra||{});
+    document.body.appendChild(el);
+    return el;
+}
+
+// ═══════════════════════════════════════
+//  A1 — GSAP Elastic Arc
+// ═══════════════════════════════════════
+function fxA1() {
+    const res = next(), src = getSrc(), dst = getDst();
+    const el = mkNode(res.icon, {filter:`drop-shadow(0 0 8px ${res.color})`});
+    // GSAP motion path via x/y
+    gsap.set(el, {x: src.x, y: src.y});
+    const mid = {x: (src.x+dst.x)/2, y: Math.min(src.y,dst.y) - 70};
+    gsap.timeline()
+        .to(el, {duration:.12, scale:1.6, ease:'back.out(3)'})
+        .to(el, {
+            duration:.8,
+            x: dst.x, y: dst.y,
+            ease: 'elastic.out(1, 0.5)',
+            motionPath: false,
+            onUpdate: function() {
+                const prog = this.progress();
+                const arcY = -80 * Math.sin(Math.PI * prog);
+                gsap.set(el, {y: src.y + (dst.y - src.y)*prog + arcY});
+            }
+        })
+        .to(el, {duration:.15, scale:0, opacity:0, ease:'power2.in', onComplete: ()=>el.remove()});
+}
+
+// ═══════════════════════════════════════
+//  A2 — GSAP Magnetic Pull
+// ═══════════════════════════════════════
+function fxA2() {
+    const res = next(), src = getSrc(), dst = getDst();
+    const el = mkNode(res.icon);
+    const shadow = mkNode('⚫', {fontSize:'0.4em', opacity:'0.3', filter:'blur(4px)'});
+    gsap.set(el, {x:src.x, y:src.y, scale:1.1});
+    gsap.set(shadow, {x:src.x, y:src.y+16});
+    // Slow start → exponential acceleration
+    gsap.timeline()
+        .to(el, {duration:.25, x:src.x+(dst.x-src.x)*.05, y:src.y-10, scale:1.2, ease:'power1.in'})
+        .to(el, {duration:.55, x:dst.x, y:dst.y, scale:0.3, ease:'power4.in',
+            onUpdate: function() {
+                const t = this.progress();
+                const arcY = -40 * Math.sin(Math.PI * Math.pow(1-t,2));
+                gsap.set(el, {y: src.y + (dst.y-src.y)*Math.pow(t,2.5) + arcY});
+                gsap.set(shadow, {x:el._gsap.x, y:el._gsap.y+18, scale:1-t*.8, opacity:0.2*(1-t)});
+            }
+        })
+        .to([el,shadow], {duration:.1, opacity:0, onComplete:()=>{el.remove();shadow.remove();}});
+}
+
+// ═══════════════════════════════════════
+//  A3 — GSAP Cinematic Loot
+// ═══════════════════════════════════════
+function fxA3() {
+    const res = next(), src = getSrc(), dst = getDst();
+    const el = mkNode(res.icon, {
+        filter:`drop-shadow(0 0 12px ${res.color}) drop-shadow(0 0 24px ${res.color})`,
+        fontSize:'2em'
+    });
+    gsap.set(el, {x:src.x, y:src.y, scale:0, rotation:0});
+    const glow = document.getElementById('screenGlow');
+
+    // Trail dots
+    const trails = Array.from({length:8}, ()=>{
+        const t = document.createElement('div');
+        t.style.cssText = `position:fixed;pointer-events:none;z-index:9990;font-size:0.7em;opacity:0;transform:translate(-50%,-50%);`;
+        t.textContent = res.icon;
+        document.body.appendChild(t);
+        return t;
+    });
+
+    gsap.timeline()
+        .to(el, {duration:.2, scale:1.8, ease:'back.out(3)'})                          // pop in
+        .to(el, {duration:.08, scale:1.4, ease:'power2.inOut'})                         // settle
+        .to(el, {duration:.65, x:dst.x, y:dst.y, ease:'power2.inOut',
+            onUpdate: function() {
+                const t = this.progress();
+                const arcY = -90 * Math.sin(Math.PI*t);
+                gsap.set(el, {y: src.y+(dst.y-src.y)*t+arcY, scale: 1.4-t*.9});
+                // update trails
+                trails.forEach((tr,i) => {
+                    const delay = i/trails.length * .5;
+                    const tp = Math.max(0,t-delay);
+                    if(tp<=0) return;
+                    const ay = -90*Math.sin(Math.PI*tp);
+                    gsap.set(tr, {
+                        x: src.x+(dst.x-src.x)*tp,
+                        y: src.y+(dst.y-src.y)*tp+ay,
+                        opacity: (1-tp)*(1-i/trails.length)*0.5
+                    });
+                });
+            },
+            onComplete: () => {
+                // screen glow impact
+                gsap.to(glow, {duration:.12, opacity:1, ease:'power2.out'});
+                gsap.to(glow, {duration:.4, opacity:0, ease:'power2.in', delay:.12});
+                // inv button scale
+                gsap.timeline()
+                    .to('#invBtn', {duration:.08, scale:1.25, backgroundColor:'rgba(255,215,0,0.5)'})
+                    .to('#invBtn', {duration:.3, scale:1, backgroundColor:'rgba(40,55,85,0.6)', ease:'elastic.out(1.2,.5)'});
+                trails.forEach(t=>{gsap.to(t,{duration:.2,opacity:0,onComplete:()=>t.remove()});});
+            }
+        })
+        .to(el, {duration:.2, scale:0, opacity:0, ease:'back.in(2)', onComplete:()=>el.remove()});
+}
+
+// ═══════════════════════════════════════
+//  A4 — Anime.js SVG Bezier Path
+// ═══════════════════════════════════════
+function fxA4() {
+    const res = next(), src = getSrc(), dst = getDst();
+    const el = mkNode(res.icon, {filter:`drop-shadow(0 0 6px ${res.color})`});
+    gsap.set(el, {x:src.x, y:src.y, scale:1.2});
+
+    const svg = document.getElementById('pathSvg');
+    const cp1x = src.x + (dst.x-src.x)*.2;
+    const cp1y = src.y - 120;
+    const cp2x = src.x + (dst.x-src.x)*.8;
+    const cp2y = dst.y - 60;
+
+    const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+    path.setAttribute('d',`M ${src.x} ${src.y} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${dst.x} ${dst.y}`);
+    path.setAttribute('fill','none');
+    path.setAttribute('stroke',`${res.color}44`);
+    path.setAttribute('stroke-width','1.5');
+    path.setAttribute('stroke-dasharray','6 4');
+    svg.appendChild(path);
+
+    // Anime.js path follower
+    const pathEl = anime.path(path);
+    anime({
+        targets: el,
+        translateX: pathEl('x'),
+        translateY: pathEl('y'),
+        rotate: pathEl('angle'),
+        scale: [1.2, 1, 0.3],
+        opacity: [1, 1, 0],
+        duration: 1000,
+        easing: 'easeInOutCubic',
+        complete: () => {
+            el.remove();
+            path.remove();
+        }
+    });
+}
+
+// ═══════════════════════════════════════
+//  A5 — Anime.js Stagger Burst
+// ═══════════════════════════════════════
+function fxA5() {
+    const res = next(), src = getSrc(), dst = getDst();
+    const count = 5;
+    const els = Array.from({length:count}, (_, i) => {
+        const el = document.createElement('div');
+        el.className = 'fx-node';
+        el.textContent = res.icon;
+        el.style.cssText += `filter:drop-shadow(0 0 5px ${res.color}); font-size:${1.1 + i*.08}em;`;
+        document.body.appendChild(el);
+        gsap.set(el, {x:src.x, y:src.y});
+        return el;
+    });
+
+    const spread = 24;
+    els.forEach((el, i) => {
+        const offset = (i - (count-1)/2) * spread;
+        anime({
+            targets: el,
+            keyframes: [
+                {translateX: src.x+offset, translateY: src.y-30, scale:1.3, duration:120},
+                {translateX: dst.x, translateY: dst.y, scale:0.4, duration:700},
+            ],
+            easing: 'easeInExpo',
+            delay: i * 60,
+            opacity: [{value:1},{value:0, duration:200, delay:550}],
+            complete: () => el.remove()
+        });
+    });
+}
+
+// ═══════════════════════════════════════
+//  A6 — Canvas Pixel Burst
+// ═══════════════════════════════════════
+const pixelColors = ['#ff6644','#ffaa22','#ffdd44','#44ffaa','#44aaff','#ff44cc','#ffffff'];
+function fxA6() {
+    const res = next(), src = getSrc(), dst = getDst();
+    // Spawn pixel particles at source
+    for(let i=0; i<40; i++) {
+        const angle = Math.random()*Math.PI*2;
+        const speed = 1.5 + Math.random()*4;
+        particles.push({
+            type:'pixel', x:src.x, y:src.y,
+            vx: Math.cos(angle)*speed, vy: Math.sin(angle)*speed,
+            gravity:0.12, friction:0.93, life:1, decay:0.025+Math.random()*.015,
+            size: 3+Math.random()*5,
+            color: pixelColors[Math.floor(Math.random()*pixelColors.length)]
+        });
+    }
+    // Also fly main icon via GSAP
+    const el = mkNode(res.icon, {fontSize:'1.3em'});
+    gsap.set(el, {x:src.x, y:src.y, scale:1.4});
+    gsap.to(el, {
+        duration:.8, x:dst.x, y:dst.y, scale:0.3, opacity:0,
+        ease:'power3.in',
+        onUpdate: function() {
+            const t = this.progress();
+            const arcY = -50*Math.sin(Math.PI*t);
+            gsap.set(el, {y: src.y+(dst.y-src.y)*t+arcY});
+        },
+        onComplete: ()=>el.remove()
+    });
+}
+
+// ═══════════════════════════════════════
+//  A7 — Canvas Comet Trail
+// ═══════════════════════════════════════
+function fxA7() {
+    const res = next(), src = getSrc(), dst = getDst();
+    const el = mkNode(res.icon, {fontSize:'1.4em', filter:`drop-shadow(0 0 10px ${res.color})`});
+    gsap.set(el, {x:src.x, y:src.y});
+
+    let trailTimer = 0;
+    gsap.to(el, {
+        duration:.9, x:dst.x, y:dst.y, ease:'power2.inOut',
+        onUpdate: function() {
+            const t = this.progress();
+            const arcY = -70*Math.sin(Math.PI*t);
+            const cx = src.x+(dst.x-src.x)*t;
+            const cy = src.y+(dst.y-src.y)*t+arcY;
+            gsap.set(el, {x:cx, y:cy, scale:1.1-t*.6});
+
+            // Spawn comet particles
+            if(performance.now()-trailTimer > 20) {
+                trailTimer = performance.now();
+                for(let k=0;k<3;k++) {
+                    particles.push({
+                        type:'comet', x:cx, y:cy,
+                        vx:(Math.random()-.5)*1.2, vy:(Math.random()-.5)*1.2,
+                        gravity:0, friction:0.9, life:.9, decay:.04,
+                        size:4+Math.random()*3,
+                        color: k===0?'#fff9c4': k===1?`${res.color}`:'#ffffff88'
+                    });
+                }
+            }
+        },
+        onComplete: () => {
+            gsap.timeline()
+                .to('#invBtn',{duration:.1, scale:1.2, borderColor:'rgba(255,215,0,0.9)'})
+                .to('#invBtn',{duration:.3, scale:1, borderColor:'', ease:'elastic.out(1,.5)'});
+            el.remove();
+        }
+    });
+}
+
+// ═══════════════════════════════════════
+//  A8 — GSAP Physics Bounce
+// ═══════════════════════════════════════
+function fxA8() {
+    const res = next(), src = getSrc(), dst = getDst();
+    const el = mkNode(res.icon, {fontSize:'1.4em'});
+    gsap.set(el, {x:src.x, y:src.y, scale:1});
+
+    // Simulated gravity arc with bounce
+    const floor = Math.max(src.y, dst.y) + 20;
+    gsap.timeline()
+        .to(el, {duration:.35, y: src.y-80, x: src.x+(dst.x-src.x)*.35, ease:'power2.out', scale:1.2})
+        .to(el, {duration:.25, y: floor, x: src.x+(dst.x-src.x)*.55, ease:'bounce.out', scale:0.9})
+        .to(el, {duration:.2, y: floor-30, x: src.x+(dst.x-src.x)*.7, ease:'power2.out', scale:1.05})
+        .to(el, {duration:.18, y: floor, x: src.x+(dst.x-src.x)*.78, ease:'power2.in', scale:0.95})
+        .to(el, {duration:.35, x:dst.x, y:dst.y, scale:0.3, opacity:0,
+            ease:'power3.in', onComplete:()=>el.remove()});
+}
+
+// ═══════════════════════════════════════
+//  A9 — Anime.js Spring Chain
+// ═══════════════════════════════════════
+function fxA9() {
+    const res = next(), src = getSrc(), dst = getDst();
+    const count = 3;
+    const els = Array.from({length:count}, (_, i) => {
+        const el = document.createElement('div');
+        el.className='fx-node';
+        el.textContent = res.icon;
+        el.style.fontSize = (1.4 - i*.2) + 'em';
+        el.style.opacity = (1 - i*.2).toString();
+        document.body.appendChild(el);
+        gsap.set(el, {x:src.x, y:src.y});
+        return el;
+    });
+
+    els.forEach((el, i) => {
+        anime({
+            targets: el,
+            keyframes: [
+                { translateX: src.x, translateY: src.y-20, duration:100 },
+                { translateX: dst.x, translateY: dst.y, duration:700 },
+            ],
+            easing: 'spring(1, 80, 12, 0)',
+            delay: i * 90,
+            opacity: [{ value: 1 }, { value: 0, duration: 200, delay: 550 }],
+            scale: [1.2, 0.35],
+            complete: () => el.remove()
+        });
+    });
+}
+
+// ═══════════════════════════════════════
+//  A10 — GSAP Loot Pop (Diablo style)
+// ═══════════════════════════════════════
+function fxA10() {
+    const res = next(), src = getSrc();
+    const amt = Math.floor(Math.random()*5)+1;
+
+    // Floating pill
+    const pill = document.createElement('div');
+    pill.className = 'fx-pill';
+    pill.innerHTML = `<span style="font-size:1.4em">${res.icon}</span><span style="color:#fff;letter-spacing:.5px">+${amt} ${res.name}</span>`;
+    Object.assign(pill.style, {
+        background:`linear-gradient(135deg, rgba(20,38,60,.95), rgba(10,22,40,.98))`,
+        border:`1px solid ${res.color}`,
+        color: res.color,
+        boxShadow:`0 0 16px ${res.color}55, 0 0 32px ${res.color}22, inset 0 1px 0 rgba(255,255,255,.12)`,
+        fontWeight:'800', fontSize:'.82em', left:src.x+'px', top:src.y+'px'
+    });
+    document.body.appendChild(pill);
+
+    gsap.timeline()
+        .fromTo(pill, {scale:0, rotation:-8}, {duration:.22, scale:1.1, rotation:3, ease:'back.out(3)'})
+        .to(pill, {duration:.08, scale:1, rotation:0, ease:'power2.out'})
+        .to(pill, {duration:.9, y:-80, ease:'power1.out'})               // float up
+        .to(pill, {duration:.5, opacity:0, scale:.6, ease:'power2.in',
+            onUpdate: function() {
+                // dissolve into sparks
+                if(Math.random()<.3) {
+                    const r = pill.getBoundingClientRect();
+                    particles.push({
+                        type:'spark',
+                        x:r.left+r.width/2+(Math.random()-.5)*r.width,
+                        y:r.top+r.height/2+(Math.random()-.5)*r.height,
+                        vx:(Math.random()-.5)*3, vy:-1-Math.random()*2,
+                        gravity:0.05, friction:0.95, life:1, decay:.055,
+                        size: 2+Math.random()*2, color:res.color
+                    });
+                }
+            },
+            onComplete:()=>pill.remove()
+        }, '-=.1');
+}
+</script>
+</body>
+</html>
+

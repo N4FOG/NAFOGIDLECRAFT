@@ -597,6 +597,8 @@
         // ============================================
         function updateSidebarBuffs() {
             if (window.isGamePausedForEditor || (window.LayoutEditor && window.LayoutEditor.isActive && window.LayoutEditor.isActive())) return;
+            // Guard: gameState pode não estar carregado ainda (ex: menu inicial)
+            if (!window.gameState || !gameState.alchemy) return;
             // 1. Buffs Temporários (Poções, Mascote, Chefe) no rodapé global
             const globalContainer = document.getElementById('globalActiveBuffs');
             if (globalContainer) {
@@ -744,6 +746,25 @@
                     }
                 }
                 
+                // Buff Diário Ativo (Daily Buff System)
+                if (window.DailyBuffSystem && window.DailyBuffSystem.getActiveBuff) {
+                    const activeDb = window.DailyBuffSystem.getActiveBuff();
+                    if (activeDb) {
+                        const b = activeDb.buff;
+                        const mins = Math.floor(activeDb.remainingSecs / 60);
+                        const secs = activeDb.remainingSecs % 60;
+                        const timeStr = `${mins}:${secs.toString().padStart(2, '0')}`;
+                        globalTags.push(`
+                            <div class="buff-tag dailybuff" onclick="if(window.DailyBuffSystem) window.DailyBuffSystem.render();" title="🎴 Buff Diário: ${b.name}\n✨ ${b.desc}\n⏱️ Restam ${mins}m ${secs}s" style="display:flex; align-items:center; gap:6px; padding:5px 12px; border-radius:12px; background:rgba(20,26,35,0.92); border:1px solid ${b.color}; font-size:0.82em; font-family:'Outfit'; font-weight: bold; cursor:pointer; pointer-events: auto; transition:all 0.15s ease;" onmouseover="this.style.borderColor='#ffffff';this.style.boxShadow='0 0 10px ${b.color}'" onmouseout="this.style.borderColor='${b.color}';this.style.boxShadow='none'">
+                                <span style="font-size:1.15em;">${b.icon}</span>
+                                <span style="color:${b.color};">${b.name}:</span>
+                                <span style="color:#eee; font-weight:normal;">${b.desc}</span>
+                                <span class="buff-timer" style="background:rgba(0,0,0,0.4); padding:1px 6px; border-radius:10px; font-size:0.9em; font-weight:bold; color:#ff9944; font-family:monospace;">${timeStr}</span>
+                            </div>
+                        `);
+                    }
+                }
+
                 globalContainer.innerHTML = globalTags.join('');
             }
             
@@ -992,4 +1013,65 @@ window.toggleWorkerNotification = function(resourceId) {
         else if (['woodcutting', 'mining', 'fishing', 'herbalism'].includes(gameState.currentPage) && typeof updateResourcesPage === 'function') updateResourcesPage(gameState.currentPage);
     }
 }
+
+// ============================================
+// ANIMAÇÃO DE COLETA DE TRABALHADORES (Modelo 8.2 — Jelly Bounce Clean 🟡)
+// ============================================
+window.triggerWorkerCollectionFX = function(resourceIcon) {
+    const srcEl = document.getElementById('sidebarWorkers') || document.getElementById('gameSidebar');
+    const dstEl = document.getElementById('sidebarBank') || document.getElementById('gameSidebar');
+    if (!srcEl || !dstEl) return;
+
+    const srcRect = srcEl.getBoundingClientRect();
+    const dstRect = dstEl.getBoundingClientRect();
+    if (srcRect.width === 0 || srcRect.height === 0) return;
+
+    // Micro-delay aleatório (0 a 180ms) para evitar que ícones simultâneos saiam exatamente no mesmo frame
+    const delay = Math.random() * 180;
+
+    setTimeout(() => {
+        // Espalhamento aleatório (jitter) no ponto de partida da sidebar (X ±16px, Y ±8px)
+        const offsetX = (Math.random() - 0.5) * 32;
+        const offsetY = (Math.random() - 0.5) * 16;
+
+        const src = { 
+            x: srcRect.left + srcRect.width / 2 + offsetX, 
+            y: srcRect.top + srcRect.height / 2 + offsetY 
+        };
+        const dst = { 
+            x: dstRect.left + dstRect.width / 2, 
+            y: dstRect.top + dstRect.height / 2 
+        };
+
+        const arcHeight = -45 - Math.random() * 30;  // Altura de arco variada (-45px a -75px)
+        const duration  = 950 + Math.random() * 250;  // Duração levemente variada (950ms a 1200ms)
+        const tilt      = (Math.random() - 0.5) * 24; // Leve inclinação aleatória (-12° a +12°)
+
+        const el = document.createElement('div');
+        el.className = 'fx82-orb';
+        el.textContent = resourceIcon || '📦';
+        el.style.left = src.x + 'px';
+        el.style.top  = src.y + 'px';
+        el.style.transform = `translate(-50%, -50%) rotate(${tilt}deg)`;
+        document.body.appendChild(el);
+
+        const startTime = performance.now();
+
+        function tick(now) {
+            const t = Math.min((now - startTime) / duration, 1);
+            const ease = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+            const arcY = arcHeight * Math.sin(Math.PI * t);
+            
+            el.style.left = (src.x + (dst.x - src.x) * ease) + 'px';
+            el.style.top  = (src.y + (dst.y - src.y) * ease + arcY) + 'px';
+
+            if (t < 1) {
+                requestAnimationFrame(tick);
+            } else {
+                el.remove(); // Limpo e silencioso ao chegar (sem flash)
+            }
+        }
+        requestAnimationFrame(tick);
+    }, delay);
+};
 

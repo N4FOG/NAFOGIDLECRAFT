@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏗️ Worker Collection FX — 10 Modelos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: radial-gradient(ellipse at 50% 0%, rgba(28,48,75,0.5) 0%, rgba(5,10,18,0.99) 70%), #060c14;
+            color: #dde;
+            min-height: 100vh;
+            padding: 24px 20px 40px;
+        }
+        h1 {
+            text-align: center;
+            font-family: 'Cinzel', serif;
+            color: #ffd700;
+            font-size: 1.7em;
+            margin-bottom: 4px;
+            text-shadow: 0 0 20px rgba(255,215,0,0.3);
+        }
+        .subtitle { text-align: center; color: #778; font-size: 0.85em; margin-bottom: 28px; }
+
+        .demo-wrap {
+            display: grid;
+            grid-template-columns: 210px 1fr;
+            gap: 20px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        /* SIDEBAR MOCK */
+        .sidebar-mock {
+            background: rgba(15,25,40,0.95);
+            border-radius: 16px;
+            padding: 14px 12px;
+            border: 1px solid rgba(170,204,255,0.12);
+            box-shadow: 0 8px 28px rgba(0,0,0,0.5);
+            align-self: start;
+            position: sticky;
+            top: 20px;
+        }
+        .sidebar-title-mock {
+            font-family: 'Cinzel', serif;
+            color: #ffd700;
+            font-size: 0.9em;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,215,0,0.2);
+            padding-bottom: 8px;
+            margin-bottom: 10px;
+        }
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 6px;
+            border-radius: 6px;
+            font-size: 0.78em;
+            margin-bottom: 4px;
+        }
+        .stat-row.highlight {
+            background: rgba(255,153,68,0.1);
+            border: 1px solid rgba(255,153,68,0.25);
+        }
+        .stat-label { color: #aaa; }
+        .stat-value { color: #ffd700; font-weight: 700; }
+
+        .worker-section-label {
+            margin-top: 10px;
+            margin-bottom: 6px;
+            font-size: 0.7em;
+            color: #ff9944;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .worker-row {
+            display: flex;
+            align-items: center;
+            padding: 5px 7px;
+            background: rgba(255,153,68,0.07);
+            border: 1px solid rgba(255,153,68,0.18);
+            border-radius: 8px;
+            margin-bottom: 4px;
+            font-size: 0.78em;
+        }
+        .worker-icon { font-size: 1.05em; margin-right: 5px; }
+        .worker-label { flex: 1; color: #ccc; }
+        .worker-count { color: #ff9944; font-weight: 700; }
+
+        .ql-section-label {
+            margin-top: 10px;
+            font-size: 0.7em;
+            color: #aaa;
+            margin-bottom: 4px;
+            font-weight: 700;
+        }
+        .ql-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4px;
+        }
+        .ql-btn {
+            background: rgba(45,60,90,0.6);
+            border: 1px solid rgba(90,130,190,0.25);
+            border-radius: 8px;
+            padding: 5px 4px;
+            font-size: 0.7em;
+            color: #b0c8e8;
+            text-align: center;
+            font-weight: 700;
+            transition: all 0.25s;
+        }
+
+        /* EXAMPLES GRID */
+        .examples-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+            gap: 14px;
+        }
+        .example-card {
+            background: rgba(14,22,34,0.92);
+            border-radius: 14px;
+            border: 1px solid rgba(255,215,0,0.1);
+            padding: 14px;
+            transition: border-color 0.2s;
+        }
+        .example-card:hover { border-color: rgba(255,215,0,0.28); }
+        .example-title { font-size: 0.82em; font-weight: 700; color: #ff9944; margin-bottom: 4px; }
+        .example-desc { font-size: 0.72em; color: #667; margin-bottom: 12px; line-height: 1.4; }
+        .demo-stage {
+            background: rgba(8,14,22,0.7);
+            border-radius: 10px;
+            padding: 10px;
+            border: 1px solid rgba(255,255,255,0.05);
+            height: 76px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
+        }
+        .demo-source, .demo-target {
+            display: flex; flex-direction: column; align-items: center; gap: 2px;
+            font-size: 0.7em;
+        }
+        .demo-source { color: #ff9944; }
+        .demo-target { color: #6aacff; }
+        .demo-source span, .demo-target span { font-size: 1.6em; }
+        .demo-arrow { color: #334; font-size: 0.85em; flex: 1; text-align: center; white-space: nowrap; overflow: hidden; }
+
+        .trigger-btn {
+            margin-top: 10px;
+            width: 100%;
+            background: rgba(255,153,68,0.12);
+            border: 1px solid rgba(255,153,68,0.3);
+            border-radius: 8px;
+            color: #ff9944;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 0.78em;
+            padding: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .trigger-btn:hover {
+            background: rgba(255,153,68,0.25);
+            border-color: rgba(255,153,68,0.55);
+            color: #ffbb66;
+        }
+
+        /* LEGEND */
+        .legend {
+            max-width: 1100px;
+            margin: 22px auto 0;
+            background: rgba(14,22,34,0.85);
+            border-radius: 12px;
+            padding: 14px 18px;
+            border: 1px solid rgba(255,215,0,0.1);
+            font-size: 0.8em;
+            color: #778;
+        }
+        .legend h3 { color: #ff9944; font-family: 'Cinzel', serif; font-size: 0.95em; margin-bottom: 8px; }
+        .legend ul { display: flex; flex-wrap: wrap; gap: 8px 20px; list-style: none; }
+        .legend li::before { content: '▸ '; color: #ff9944; }
+
+        /* ========= CSS ANIMATIONS FOR EACH MODEL ========= */
+
+        /* M1 - Parabolic arc */
+        .fx1-orb {
+            position: fixed; pointer-events: none; z-index: 9999;
+            font-size: 1.5em;
+            filter: drop-shadow(0 0 7px rgba(255,200,60,0.75));
+            animation: fx1-pulse 0.9s ease-out forwards;
+        }
+        @keyframes fx1-pulse {
+            0%   { opacity: 1; transform: translate(-50%,-50%) scale(1.3); }
+            50%  { opacity: 1; transform: translate(-50%,-50%) scale(1); }
+            100% { opacity: 0; transform: translate(-50%,-50%) scale(0.4); }
+        }
+
+        /* M2 - Sparkle burst */
+        .fx2-orb {
+            position: fixed; pointer-events: none; z-index: 9999;
+            font-size: 1.4em;
+            animation: fx2-spin 0.9s ease-in-out forwards;
+        }
+        @keyframes fx2-spin {
+            0%   { opacity: 1; transform: translate(-50%,-50%) scale(1.3) rotate(0deg); }
+            100% { opacity: 0; transform: translate(-50%,-50%) scale(0.4) rotate(360deg); }
+        }
+        .fx2-spark {
+            position: fixed; pointer-events: none; z-index: 9998;
+            width: 5px; height: 5px; border-radius: 50%; background: #ffd700;
+            animation: fx2-spark-out 0.55s ease-out forwards;
+        }
+        @keyframes fx2-spark-out {
+            0%   { opacity: 1; transform: translate(-50%,-50%) scale(1); }
+            100% { opacity: 0; transform: translate(calc(-50% + var(--sx)), calc(-50% + var(--sy))) scale(0); }
+        }
+
+        /* M3 - Trail */
+        .fx3-orb {
+            position: fixed; pointer-events: none; z-index: 9999;
+            font-size: 1.3em;
+            animation: fx3-fade 1.1s ease-out forwards;
+        }
+        @keyframes fx3-fade {
+            0% { opacity: 1; transform: translate(-50%,-50%) scale(1.1); }
+            100% { opacity: 0; transform: translate(-50%,-50%) scale(0.5); }
+        }
+        .fx3-dot {
+            position: fixed; pointer-events: none; z-index: 9997;
+            width: 7px; height: 7px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,215,0,0.9), transparent);
+            transform: translate(-50%,-50%);
+            animation: fx3-dot-fade 0.4s ease-out forwards;
+        }
+        @keyframes fx3-dot-fade {
+            0% { opacity: 0.8; transform: translate(-50%,-50%) scale(1); }
+            100% { opacity: 0; transform: translate(-50%,-50%) scale(0.1); }
+        }
+
+        /* M4 - Ghost pulse */
+        .fx4-orb {
+            position: fixed; pointer-events: none; z-index: 9999;
+            font-size: 1.5em; opacity: 0.85;
+            animation: fx4-ghost 1s ease-in-out forwards;
+        }
+        @keyframes fx4-ghost {
+            0%   { opacity: 0.9; transform: translate(-50%,-50%) scale(1.2); }
+            50%  { opacity: 0.7; transform: translate(-50%,-50%) scale(1.0); }
+            100% { opacity: 0;   transform: translate(-50%,-50%) scale(0.3); }
+        }
+        .fx4-ring {
+            position: fixed; pointer-events: none; z-index: 9996;
+            width: 28px; height: 28px; border-radius: 50%;
+            border: 2px solid rgba(255,215,0,0.7);
+            transform: translate(-50%,-50%);
+            animation: fx4-ring-expand 0.6s ease-out forwards;
+        }
+        @keyframes fx4-ring-expand {
+            0%   { opacity: 0.9; transform: translate(-50%,-50%) scale(0.5); }
+            100% { opacity: 0;   transform: translate(-50%,-50%) scale(3); }
+        }
+
+        /* M5 - Coin flip */
+        .fx5-orb {
+            position: fixed; pointer-events: none; z-index: 9999;
+            font-size: 1.4em;
+            animation: fx5-flip 0.95s cubic-bezier(.4,0,.6,1) forwards;
+        }
+        @keyframes fx5-flip {
+            0%   { opacity:1; transform: translate(-50%,-50%) scale(1.2) rotateY(0deg); }
+            33%  { transform: translate(-50%,-50%) scale(1) rotateY(120deg) translateY(-10px); }
+            66%  { transform: translate(-50%,-50%) scale(0.9) rotateY(240deg) translateY(-5px); }
+            100% { opacity:0; transform: translate(-50%,-50%) scale(0.4) rotateY(360deg); }
+        }
+
+        /* M6 - Shockwave */
+        .fx6-orb {
+            position: fixed; pointer-events: none; z-index: 9999;
+            font-size: 1.4em;
+            animation: fx6-out 1s cubic-bezier(.1,.7,.3,1) forwards;
+        }
+        @keyframes fx6-out {
+            0%   { opacity:1; transform: translate(-50%,-50%) scale(1.4); }
+            15%  { transform: translate(-50%,-50%) scale(0.8); }
+            100% { opacity:0; transform: translate(-50%,-50%) scale(0.35); }
+        }
+        .fx6-wave {
+            position: fixed; pointer-events: none; z-index: 9996;
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,140,0,0.7);
+            transform: translate(-50%,-50%);
+            animation: fx6-wave-expand 0.45s ease-out forwards;
+        }
+        @keyframes fx6-wave-expand {
+            0%   { opacity:0.9; transform: translate(-50%,-50%) scale(1); }
+            100% { opacity:0;   transform: translate(-50%,-50%) scale(7); }
+        }
+
+        /* M7 - Meteor */
+        .fx7-orb {
+            position: fixed; pointer-events: none; z-index: 9999;
+            font-size: 1.3em;
+            filter: drop-shadow(0 0 9px rgba(255,140,0,0.9));
+            animation: fx7-fade 0.75s ease-in forwards;
+        }
+        @keyframes fx7-fade {
+            0%   { opacity:1; transform: translate(-50%,-50%) scale(1.2) rotate(-15deg); }
+            100% { opacity:0; transform: translate(-50%,-50%) scale(0.4) rotate(5deg); }
+        }
+        .fx7-tail {
+            position: fixed; pointer-events: none; z-index: 9997;
+            height: 3px; border-radius: 4px;
+            background: linear-gradient(to right, rgba(255,160,0,0.8), transparent);
+            transform: translateY(-50%);
+            animation: fx7-tail-fade 0.35s ease-out forwards;
+        }
+        @keyframes fx7-tail-fade {
+            0% { opacity: 0.9; }
+            100% { opacity: 0; }
+        }
+
+        /* M8 - Jelly (viaja até o inventário) */
+        .fx8-orb {
+            position: fixed; pointer-events: none; z-index: 9999;
+            font-size: 1.5em;
+            animation: fx8-jelly 1.1s cubic-bezier(.3,1.4,.6,1) forwards;
+        }
+        @keyframes fx8-jelly {
+            0%   { opacity:1; transform: translate(-50%,-50%) scale(1.3,0.7); }
+            20%  { transform: translate(-50%,-50%) scale(0.8,1.25) translateY(-8px); }
+            50%  { transform: translate(-50%,-50%) scale(1.1,0.9) translateY(-3px); }
+            80%  { transform: translate(-50%,-50%) scale(0.95,1.05); }
+            100% { opacity:0; transform: translate(-50%,-50%) scale(0.35,0.35); }
+        }
+
+        /* M8.1 - Jelly Bounce in-place (pula e some no próprio trabalhador) */
+        .fx81-orb {
+            position: fixed; pointer-events: none; z-index: 9999;
+            font-size: 1.6em;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+            animation: fx81-jump 0.75s cubic-bezier(.3,1.5,.5,1) forwards;
+        }
+        @keyframes fx81-jump {
+            0%   { opacity:1;   transform: translate(-50%,-50%) scale(1.4, 0.65) translateY(6px); }
+            18%  {              transform: translate(-50%,-50%) scale(0.75, 1.35) translateY(-32px); }
+            38%  {              transform: translate(-50%,-50%) scale(1.15, 0.88) translateY(-48px); }
+            55%  {              transform: translate(-50%,-50%) scale(0.9,  1.12) translateY(-38px); }
+            70%  { opacity:1;   transform: translate(-50%,-50%) scale(1.05, 0.96) translateY(-20px); }
+            85%  { opacity:0.6; transform: translate(-50%,-50%) scale(0.95, 1.04) translateY(-10px); }
+            100% { opacity:0;   transform: translate(-50%,-50%) scale(0.5,  0.5)  translateY(0px); }
+        }
+        /* sombra que encolhe enquanto sobe */
+        .fx81-shadow {
+            position: fixed; pointer-events: none; z-index: 9997;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.25);
+            transform: translate(-50%, -50%);
+            animation: fx81-shadow-anim 0.75s cubic-bezier(.3,1.5,.5,1) forwards;
+        }
+        @keyframes fx81-shadow-anim {
+            0%   { opacity:0.5; width:28px; height:8px; }
+            38%  { opacity:0.2; width:10px; height:3px; }
+            70%  { opacity:0.3; width:18px; height:5px; }
+            100% { opacity:0;   width:4px;  height:2px; }
+        }
+
+        /* M9 - Galaxy spiral */
+        .fx9-orb {
+            position: fixed; pointer-events: none; z-index: 9999;
+            font-size: 1.3em;
+            animation: fx9-spiral 1.2s ease-in-out forwards;
+        }
+        @keyframes fx9-spiral {
+            0%   { opacity:1; transform: translate(-50%,-50%) scale(1) rotate(0deg); }
+            100% { opacity:0; transform: translate(-50%,-50%) scale(0.3) rotate(540deg); }
+        }
+        .fx9-star {
+            position: fixed; pointer-events: none; z-index: 9998;
+            font-size: 0.7em; color: #ffd700;
+            transform: translate(-50%,-50%);
+            animation: fx9-star-out 0.7s ease-out forwards;
+        }
+        @keyframes fx9-star-out {
+            0%   { opacity:1; transform: translate(-50%,-50%) scale(1); }
+            100% { opacity:0; transform: translate(calc(-50% + var(--sx)), calc(-50% + var(--sy))) scale(0.2); }
+        }
+
+        /* M10 - HUD Label */
+        .fx10-pill {
+            position: fixed; pointer-events: none; z-index: 9999;
+            display: flex; align-items: center; gap: 5px;
+            background: linear-gradient(135deg, rgba(20,40,70,0.9), rgba(10,25,50,0.95));
+            border: 1px solid rgba(100,200,255,0.4);
+            border-radius: 20px;
+            padding: 4px 10px 4px 6px;
+            font-size: 0.8em; font-weight: 700; color: #aaddff;
+            box-shadow: 0 0 14px rgba(80,180,255,0.25), inset 0 1px 0 rgba(255,255,255,0.1);
+            white-space: nowrap;
+            transform: translate(-50%,-50%);
+            animation: fx10-fade 1.1s cubic-bezier(.2,.7,.3,1) forwards;
+        }
+        .fx10-pill .fx10-icon { font-size: 1.3em; }
+        @keyframes fx10-fade {
+            0%   { opacity:0; transform: translate(-50%,-50%) scale(0.6) translateY(4px); }
+            15%  { opacity:1; transform: translate(-50%,-50%) scale(1) translateY(0); }
+            80%  { opacity:0.9; }
+            100% { opacity:0; transform: translate(-50%,-50%) scale(0.7) translateY(-8px); }
+        }
+    </style>
+</head>
+<body>
+
+<h1>🏗️ Worker Collection FX</h1>
+<p class="subtitle">10 modelos de ícone flutuante: Trabalhador → Inventário · Clique nos botões para ver</p>
+
+<div class="demo-wrap">
+
+    <!-- SIDEBAR MOCK (source = workerStatRow, target = qlInventoryBtn) -->
+    <div class="sidebar-mock">
+        <div class="sidebar-title-mock">📋 SIDEBAR</div>
+
+        <div class="stat-row"><span class="stat-label">📦 Espaços:</span><span class="stat-value">12/24</span></div>
+        <div class="stat-row"><span class="stat-label">🏆 Nível:</span><span class="stat-value">28/300</span></div>
+        <div class="stat-row highlight" id="workerStatRow">
+            <span class="stat-label">👷 Trabalhadores:</span>
+            <span class="stat-value">3/5</span>
+        </div>
+
+        <div class="worker-section-label">⚙️ Ativos</div>
+        <div class="worker-row"><span class="worker-icon">🌲</span><span class="worker-label">João · Madeira</span><span class="worker-count">×1</span></div>
+        <div class="worker-row"><span class="worker-icon">⛏️</span><span class="worker-label">Maria · Minério</span><span class="worker-count">×1</span></div>
+        <div class="worker-row"><span class="worker-icon">🌿</span><span class="worker-label">Pedro · Ervas</span><span class="worker-count">×1</span></div>
+
+        <div class="ql-section-label">⚡ ATALHOS</div>
+        <div class="ql-area">
+            <div class="ql-btn" id="qlInventoryBtn">📦<br>Inv.</div>
+            <div class="ql-btn">🏡<br>Prop.</div>
+            <div class="ql-btn">👤<br>Char.</div>
+            <div class="ql-btn">🐲<br>Pets</div>
+        </div>
+    </div>
+
+    <!-- 10 EXAMPLES -->
+    <div class="examples-panel">
+
+        <div class="example-card">
+            <div class="example-title">Modelo 1 — Arco Parabólico</div>
+            <div class="example-desc">Ícone viaja em curva suave do trabalhador ao inventário. Clássico e legível.</div>
+            <div class="demo-stage">
+                <div class="demo-source"><span>👷</span>Worker</div>
+                <div class="demo-arrow">──🌲──▶</div>
+                <div class="demo-target"><span>📦</span>Inventário</div>
+            </div>
+            <button class="trigger-btn" onclick="spawnM1()">▶ Simular Coleta</button>
+        </div>
+
+        <div class="example-card">
+            <div class="example-title">Modelo 2 — Sparkle Burst ✨</div>
+            <div class="example-desc">Ícone gira com faíscas douradas explodindo ao redor enquanto viaja.</div>
+            <div class="demo-stage">
+                <div class="demo-source"><span>👷</span>Worker</div>
+                <div class="demo-arrow">── ✨ ──▶</div>
+                <div class="demo-target"><span>📦</span>Inventário</div>
+            </div>
+            <button class="trigger-btn" onclick="spawnM2()">▶ Simular Coleta</button>
+        </div>
+
+        <div class="example-card">
+            <div class="example-title">Modelo 3 — Rastro de Partículas</div>
+            <div class="example-desc">Ícone deixa uma trilha de pontos dourados pelo caminho percorrido.</div>
+            <div class="demo-stage">
+                <div class="demo-source"><span>👷</span>Worker</div>
+                <div class="demo-arrow">·····▶</div>
+                <div class="demo-target"><span>📦</span>Inventário</div>
+            </div>
+            <button class="trigger-btn" onclick="spawnM3()">▶ Simular Coleta</button>
+        </div>
+
+        <div class="example-card">
+            <div class="example-title">Modelo 4 — Ghost Pulse ◎</div>
+            <div class="example-desc">Ícone semitransparente com anel de onda expansiva ao partir. Etéreo.</div>
+            <div class="demo-stage">
+                <div class="demo-source"><span>👷</span>Worker</div>
+                <div class="demo-arrow">── ◎ ──▶</div>
+                <div class="demo-target"><span>📦</span>Inventário</div>
+            </div>
+            <button class="trigger-btn" onclick="spawnM4()">▶ Simular Coleta</button>
+        </div>
+
+        <div class="example-card">
+            <div class="example-title">Modelo 5 — Coin Flip 🔄</div>
+            <div class="example-desc">Ícone executa flip 3D (rotação Y) enquanto se desloca. Dinâmico.</div>
+            <div class="demo-stage">
+                <div class="demo-source"><span>👷</span>Worker</div>
+                <div class="demo-arrow">── 🔄 ──▶</div>
+                <div class="demo-target"><span>📦</span>Inventário</div>
+            </div>
+            <button class="trigger-btn" onclick="spawnM5()">▶ Simular Coleta</button>
+        </div>
+
+        <div class="example-card">
+            <div class="example-title">Modelo 6 — Shockwave 💥</div>
+            <div class="example-desc">Onda de choque laranja se expande do ponto de origem ao lançar o ícone.</div>
+            <div class="demo-stage">
+                <div class="demo-source"><span>👷</span>Worker</div>
+                <div class="demo-arrow">── 💥 ──▶</div>
+                <div class="demo-target"><span>📦</span>Inventário</div>
+            </div>
+            <button class="trigger-btn" onclick="spawnM6()">▶ Simular Coleta</button>
+        </div>
+
+        <div class="example-card">
+            <div class="example-title">Modelo 7 — Meteoro ☄️</div>
+            <div class="example-desc">Voa em linha reta com rastro de fogo. Rápido e impactante.</div>
+            <div class="demo-stage">
+                <div class="demo-source"><span>👷</span>Worker</div>
+                <div class="demo-arrow">── ☄️ ──▶</div>
+                <div class="demo-target"><span>📦</span>Inventário</div>
+            </div>
+            <button class="trigger-btn" onclick="spawnM7()">▶ Simular Coleta</button>
+        </div>
+
+        <div class="example-card">
+            <div class="example-title">Modelo 8 — Jelly Bounce 🟡</div>
+            <div class="example-desc">Animação gelatinosa squash & stretch viajando ao inventário.</div>
+            <div class="demo-stage">
+                <div class="demo-source"><span>👷</span>Worker</div>
+                <div class="demo-arrow">── 🟡 ──▶</div>
+                <div class="demo-target"><span>📦</span>Inventário</div>
+            </div>
+            <button class="trigger-btn" onclick="spawnM8()">▶ Simular Coleta</button>
+        </div>
+
+        <div class="example-card" style="border-color: rgba(255,215,0,0.3); background: rgba(20,32,50,0.95);">
+            <div class="example-title" style="color:#ffd700;">Modelo 8.1 — Jelly Bounce In-Place ⭐🟡</div>
+            <div class="example-desc">Pula no próprio trabalhador com squash & stretch + sombra e some. Não precisa ir ao inventário — quem está olhando os workers entende imediatamente.</div>
+            <div class="demo-stage" style="justify-content:center;">
+                <div class="demo-source" style="color:#ffd700; font-size:0.85em;">
+                    <span style="font-size:2em;">👷</span>
+                    Trabalhador
+                    <span style="font-size:1.5em; margin-top:4px;">🌲 ↑ pula ↑ some</span>
+                </div>
+            </div>
+            <button class="trigger-btn" style="border-color:rgba(255,215,0,0.5); color:#ffd700;" onclick="spawnM81()">▶ Simular Coleta In-Place</button>
+        </div>
+
+        <div class="example-card" style="border-color: rgba(255,153,68,0.35); background: rgba(22,30,44,0.97);">
+            <div class="example-title" style="color:#ff9944;">Modelo 8.2 — Jelly Bounce Clean 🟡</div>
+            <div class="example-desc">Igual ao Modelo 8: jelly viajando do trabalhador até o inventário. Sem flash ao chegar — só vai e pronto.</div>
+            <div class="demo-stage">
+                <div class="demo-source"><span>👷</span>Worker</div>
+                <div class="demo-arrow">── 🟡 ──▶</div>
+                <div class="demo-target"><span>📦</span>Inventário</div>
+            </div>
+            <button class="trigger-btn" style="border-color:rgba(255,153,68,0.5); color:#ff9944;" onclick="spawnM82()">▶ Simular Coleta</button>
+        </div>
+
+        <div class="example-card">
+            <div class="example-title">Modelo 9 — Espiral Galáxia 🌀</div>
+            <div class="example-desc">Gira em espiral com mini-estrelas saindo ao redor. Visual mágico.</div>
+            <div class="demo-stage">
+                <div class="demo-source"><span>👷</span>Worker</div>
+                <div class="demo-arrow">── 🌀 ──▶</div>
+                <div class="demo-target"><span>📦</span>Inventário</div>
+            </div>
+            <button class="trigger-btn" onclick="spawnM9()">▶ Simular Coleta</button>
+        </div>
+
+        <div class="example-card">
+            <div class="example-title">Modelo 10 — HUD Label ⭐ (Recomendado)</div>
+            <div class="example-desc">Pill holográfica com ícone + nome + quantidade. Mais informativo e premium.</div>
+            <div class="demo-stage">
+                <div class="demo-source"><span>👷</span>Worker</div>
+                <div class="demo-arrow">── 🏷️ ──▶</div>
+                <div class="demo-target"><span>📦</span>Inventário</div>
+            </div>
+            <button class="trigger-btn" onclick="spawnM10()">▶ Simular Coleta</button>
+        </div>
+
+    </div>
+</div>
+
+<div class="legend">
+    <h3>📋 Recursos simulados (ciclo a cada clique)</h3>
+    <ul>
+        <li>🌲 Madeira</li><li>⛏️ Minério</li><li>🌿 Erva</li><li>🐟 Peixe</li>
+        <li>🪨 Pedra</li><li>🍄 Cogumelo</li><li>💎 Gema</li><li>🪵 Tronco</li>
+    </ul>
+</div>
+
+<script>
+    const resources = [
+        { icon:'🌲', name:'Madeira' }, { icon:'⛏️', name:'Minério' },
+        { icon:'🌿', name:'Erva' },   { icon:'🐟', name:'Peixe' },
+        { icon:'🪨', name:'Pedra' },  { icon:'🍄', name:'Cogumelo' },
+        { icon:'💎', name:'Gema' },   { icon:'🪵', name:'Tronco' }
+    ];
+    let resIdx = 0;
+    function nextRes() {
+        const r = resources[resIdx];
+        resIdx = (resIdx + 1) % resources.length;
+        return r;
+    }
+
+    function getSrc() {
+        const r = document.getElementById('workerStatRow').getBoundingClientRect();
+        return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+    }
+    function getDst() {
+        const r = document.getElementById('qlInventoryBtn').getBoundingClientRect();
+        return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+    }
+
+    function fly(el, src, dst, dur, arcHeight, cb) {
+        const t0 = performance.now();
+        function tick(now) {
+            const t = Math.min((now - t0) / dur, 1);
+            const ease = t < 0.5 ? 2*t*t : -1+(4-2*t)*t;
+            const arc = -(arcHeight || 55) * Math.sin(Math.PI * t);
+            el.style.left = (src.x + (dst.x - src.x) * ease) + 'px';
+            el.style.top  = (src.y + (dst.y - src.y) * ease + arc) + 'px';
+            if (t < 1) requestAnimationFrame(tick);
+            else { if(cb) cb(); }
+        }
+        requestAnimationFrame(tick);
+    }
+
+    // Straight line fly (for Meteor)
+    function flyLine(el, src, dst, dur, cb) {
+        const t0 = performance.now();
+        function tick(now) {
+            const t = Math.min((now - t0) / dur, 1);
+            el.style.left = (src.x + (dst.x - src.x) * t) + 'px';
+            el.style.top  = (src.y + (dst.y - src.y) * t) + 'px';
+            if (t < 1) requestAnimationFrame(tick);
+            else { if(cb) cb(); }
+        }
+        requestAnimationFrame(tick);
+    }
+
+    function flashInventory() {
+        const btn = document.getElementById('qlInventoryBtn');
+        btn.style.transition = 'none';
+        btn.style.background = 'rgba(255,215,0,0.45)';
+        btn.style.borderColor = 'rgba(255,215,0,0.9)';
+        btn.style.transform = 'scale(1.18)';
+        setTimeout(() => {
+            btn.style.transition = 'all 0.3s ease';
+            btn.style.background = '';
+            btn.style.borderColor = '';
+            btn.style.transform = '';
+        }, 200);
+    }
+
+    function mk(cls, icon, extra) {
+        const el = document.createElement('div');
+        el.className = cls;
+        el.textContent = icon || '';
+        if (extra) Object.assign(el.style, extra);
+        document.body.appendChild(el);
+        return el;
+    }
+
+    // M1 - Parabolic arc
+    function spawnM1() {
+        const res = nextRes(), src = getSrc(), dst = getDst();
+        const el = mk('fx1-orb', res.icon);
+        el.style.left = src.x+'px'; el.style.top = src.y+'px';
+        fly(el, src, dst, 920, 55, () => { flashInventory(); el.remove(); });
+    }
+
+    // M2 - Sparkle burst
+    function spawnM2() {
+        const res = nextRes(), src = getSrc(), dst = getDst();
+        for (let i = 0; i < 7; i++) {
+            const sp = document.createElement('div');
+            sp.className = 'fx2-spark';
+            const angle = (i/7)*Math.PI*2;
+            sp.style.left = src.x+'px'; sp.style.top = src.y+'px';
+            sp.style.setProperty('--sx', Math.cos(angle)*40+'px');
+            sp.style.setProperty('--sy', Math.sin(angle)*40+'px');
+            document.body.appendChild(sp);
+            setTimeout(() => sp.remove(), 600);
+        }
+        const el = mk('fx2-orb', res.icon);
+        el.style.left = src.x+'px'; el.style.top = src.y+'px';
+        fly(el, src, dst, 880, 55, () => { flashInventory(); el.remove(); });
+    }
+
+    // M3 - Trail
+    function spawnM3() {
+        const res = nextRes(), src = getSrc(), dst = getDst();
+        const el = mk('fx3-orb', res.icon);
+        el.style.left = src.x+'px'; el.style.top = src.y+'px';
+        const tid = setInterval(() => {
+            const d = document.createElement('div');
+            d.className = 'fx3-dot';
+            d.style.left = el.style.left; d.style.top = el.style.top;
+            document.body.appendChild(d);
+            setTimeout(() => d.remove(), 420);
+        }, 55);
+        fly(el, src, dst, 1100, 55, () => { clearInterval(tid); flashInventory(); el.remove(); });
+    }
+
+    // M4 - Ghost pulse
+    function spawnM4() {
+        const res = nextRes(), src = getSrc(), dst = getDst();
+        const ring = document.createElement('div');
+        ring.className = 'fx4-ring';
+        ring.style.left = src.x+'px'; ring.style.top = src.y+'px';
+        document.body.appendChild(ring);
+        setTimeout(() => ring.remove(), 700);
+        const el = mk('fx4-orb', res.icon);
+        el.style.left = src.x+'px'; el.style.top = src.y+'px';
+        fly(el, src, dst, 1000, 50, () => { flashInventory(); el.remove(); });
+    }
+
+    // M5 - Coin flip
+    function spawnM5() {
+        const res = nextRes(), src = getSrc(), dst = getDst();
+        const el = mk('fx5-orb', res.icon);
+        el.style.left = src.x+'px'; el.style.top = src.y+'px';
+        fly(el, src, dst, 950, 45, () => { flashInventory(); el.remove(); });
+    }
+
+    // M6 - Shockwave
+    function spawnM6() {
+        const res = nextRes(), src = getSrc(), dst = getDst();
+        for (let i = 0; i < 2; i++) {
+            setTimeout(() => {
+                const w = document.createElement('div');
+                w.className = 'fx6-wave';
+                w.style.left = src.x+'px'; w.style.top = src.y+'px';
+                document.body.appendChild(w);
+                setTimeout(() => w.remove(), 500);
+            }, i*120);
+        }
+        const el = mk('fx6-orb', res.icon);
+        el.style.left = src.x+'px'; el.style.top = src.y+'px';
+        fly(el, src, dst, 1000, 50, () => { flashInventory(); el.remove(); });
+    }
+
+    // M7 - Meteor (straight line)
+    function spawnM7() {
+        const res = nextRes(), src = getSrc(), dst = getDst();
+        const el = mk('fx7-orb', res.icon);
+        el.style.left = src.x+'px'; el.style.top = src.y+'px';
+        const tid = setInterval(() => {
+            const tail = document.createElement('div');
+            tail.className = 'fx7-tail';
+            tail.style.left = (parseFloat(el.style.left) - 24) + 'px';
+            tail.style.top  = el.style.top;
+            tail.style.width = '26px';
+            document.body.appendChild(tail);
+            setTimeout(() => tail.remove(), 360);
+        }, 45);
+        flyLine(el, src, dst, 740, () => { clearInterval(tid); flashInventory(); el.remove(); });
+    }
+
+    // M8 - Jelly (voa ao inventário)
+    function spawnM8() {
+        const res = nextRes(), src = getSrc(), dst = getDst();
+        const el = mk('fx8-orb', res.icon);
+        el.style.left = src.x+'px'; el.style.top = src.y+'px';
+        fly(el, src, dst, 1100, 60, () => { flashInventory(); el.remove(); });
+    }
+
+    // M8.1 - Jelly Bounce in-place (pula e some no próprio trabalhador)
+    function spawnM81() {
+        const res = nextRes(), src = getSrc();
+        const shadow = document.createElement('div');
+        shadow.className = 'fx81-shadow';
+        shadow.style.left = src.x + 'px';
+        shadow.style.top  = (src.y + 14) + 'px';
+        document.body.appendChild(shadow);
+        setTimeout(() => shadow.remove(), 800);
+        const el = mk('fx81-orb', res.icon);
+        el.style.left = src.x + 'px';
+        el.style.top  = src.y + 'px';
+        setTimeout(() => el.remove(), 800);
+    }
+
+    // M8.2 - Jelly Bounce Clean: viaja ao inventário sem flash ao chegar
+    function spawnM82() {
+        const res = nextRes(), src = getSrc(), dst = getDst();
+        const el = mk('fx8-orb', res.icon);
+        el.style.left = src.x + 'px';
+        el.style.top  = src.y + 'px';
+        fly(el, src, dst, 1100, 60, () => { el.remove(); });
+    }
+
+    // M9 - Galaxy spiral
+    function spawnM9() {
+        const res = nextRes(), src = getSrc(), dst = getDst();
+        const stars = ['✦','✧','✵','★','✺'];
+        for (let i = 0; i < 5; i++) {
+            const angle = (i/5)*Math.PI*2;
+            const s = document.createElement('div');
+            s.className = 'fx9-star';
+            s.textContent = stars[i];
+            s.style.left = src.x+'px'; s.style.top = src.y+'px';
+            s.style.setProperty('--sx', Math.cos(angle)*48+'px');
+            s.style.setProperty('--sy', Math.sin(angle)*48+'px');
+            document.body.appendChild(s);
+            setTimeout(() => s.remove(), 800);
+        }
+        const el = mk('fx9-orb', res.icon);
+        el.style.left = src.x+'px'; el.style.top = src.y+'px';
+        fly(el, src, dst, 1200, 55, () => { flashInventory(); el.remove(); });
+    }
+
+    // M10 - HUD Label pill
+    function spawnM10() {
+        const res = nextRes(), src = getSrc(), dst = getDst();
+        const amt = Math.floor(Math.random()*3)+1;
+        const el = document.createElement('div');
+        el.className = 'fx10-pill';
+        el.innerHTML = `<span class="fx10-icon">${res.icon}</span> +${amt} ${res.name}`;
+        el.style.left = src.x+'px'; el.style.top = src.y+'px';
+        document.body.appendChild(el);
+        fly(el, src, dst, 1100, 50, () => { flashInventory(); el.remove(); });
+    }
+</script>
+</body>
+</html>
