@@ -9097,9 +9097,49 @@ body::before {
 @keyframes fx82-jelly {
     0%   { opacity: 1; transform: translate(-50%,-50%) scale(1.3,0.7); }
     20%  { transform: translate(-50%,-50%) scale(0.8,1.25) translateY(-8px); }
-    50%  { transform: translate(-50%,-50%) scale(1.1,0.9) translateY(-3px); }
-    80%  { transform: translate(-50%,-50%) scale(0.95,1.05); }
-    100% { opacity: 0; transform: translate(-50%,-50%) scale(0.35,0.35); }
+/* ===== O GRANDE OBSERVATÓRIO — DUPLA VISUALIZAÇÃO & BARS BI-COLOR ===== */
+.observatory-mode-btn {
+    padding: 8px 18px;
+    border-radius: 20px;
+    border: none;
+    font-weight: bold;
+    font-family: 'Outfit', sans-serif;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.observatory-mode-btn.active-cards {
+    background: linear-gradient(135deg, #aa44ff, #7722cc);
+    color: #ffffff;
+    box-shadow: 0 0 12px rgba(170, 68, 255, 0.4);
+}
+
+.observatory-mode-btn.active-charts {
+    background: linear-gradient(135deg, #00ccff, #0088cc);
+    color: #ffffff;
+    box-shadow: 0 0 12px rgba(0, 204, 255, 0.4);
+}
+
+.observatory-bicolor-track {
+    height: 22px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 11px;
+    overflow: hidden;
+    display: flex;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+}
+
+.observatory-bar-active {
+    background: linear-gradient(90deg, #33cc66, #44ff88);
+    height: 100%;
+    transition: width 0.5s ease;
+}
+
+.observatory-bar-afk {
+    background: linear-gradient(90deg, #8844ff, #bb66ff);
+    height: 100%;
+    transition: width 0.5s ease;
 }
 
 

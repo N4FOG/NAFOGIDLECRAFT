@@ -1,7 +1,64 @@
-// ============================================
-// STATS-UI.JS
-// UI para Estatísticas em Tempo Real
-// ============================================
+// Estado da Interface do Dashboard de Performance
+window.dashboardTimeRange = window.dashboardTimeRange || 'live'; // 'live', '2h', '1d', '7d', '20d', '30d'
+window.dashboardViewMode = window.dashboardViewMode || 'charts'; // 'cards' ou 'charts'
+
+function setDashboardTimeRange(range) {
+    window.dashboardTimeRange = range;
+    
+    // Atualiza a iluminação visual ativa dos botões no DOM
+    const timeButtons = {
+        'live': 'btnTimeLive',
+        '2h': 'btnTime2h',
+        '1d': 'btnTime1d',
+        '7d': 'btnTime7d',
+        '20d': 'btnTime20d',
+        '30d': 'btnTime30d'
+    };
+    
+    for (const [key, btnId] of Object.entries(timeButtons)) {
+        const btn = document.getElementById(btnId);
+        if (btn) {
+            if (key === range) {
+                btn.style.background = 'linear-gradient(135deg, #0099ff, #0055cc)';
+                btn.style.borderColor = '#66ccff';
+                btn.style.color = '#ffffff';
+                btn.style.fontWeight = 'bold';
+                btn.style.boxShadow = '0 0 12px rgba(0, 153, 255, 0.4)';
+            } else {
+                btn.style.background = 'rgba(0,0,0,0.3)';
+                btn.style.borderColor = 'rgba(255,255,255,0.15)';
+                btn.style.color = '#ccc';
+                btn.style.fontWeight = 'normal';
+                btn.style.boxShadow = 'none';
+            }
+        }
+    }
+    
+    // Atualiza rótulo de período na interface
+    const labelEl = document.getElementById('statRangeLabel');
+    if (labelEl) {
+        const labels = {
+            'live': 'Sessão Ao Vivo',
+            '2h': 'Últimas 2 Horas',
+            '1d': 'Últimas 24 Horas (1 Dia)',
+            '7d': 'Últimos 7 Dias',
+            '20d': 'Últimos 20 Dias',
+            '30d': 'Últimos 30 Dias'
+        };
+        labelEl.textContent = labels[range] || range;
+    }
+    
+    renderStatsGraphs();
+    updateStatsUI();
+}
+
+function setDashboardViewMode(mode) {
+    window.dashboardViewMode = mode;
+    const cardsEl = document.getElementById('statsCardsContainer');
+    const chartsEl = document.getElementById('statsChartsContainer');
+    if (cardsEl) cardsEl.style.display = mode === 'cards' ? 'grid' : 'none';
+    if (chartsEl) chartsEl.style.display = mode === 'charts' ? 'grid' : 'none';
+}
 
 /**
  * Abre o modal de estatísticas e renderiza gráficos
@@ -21,37 +78,40 @@ function openStatsModal() {
     
     modal.style.display = 'flex';
     
-    // Renderiza os gráficos
+    // Renderiza e destaca botão selecionado
     setTimeout(() => {
+        setDashboardTimeRange(window.dashboardTimeRange || 'live');
+        setDashboardViewMode(window.dashboardViewMode || 'charts');
         renderStatsGraphs();
         updateStatsUI();
     }, 100);
 }
 
 /**
- * Renderiza todos os gráficos de linha
+ * Renderiza todos os gráficos de linha com filtro de intervalo temporal selecionado
  */
 function renderStatsGraphs() {
-    const data = getStatsData();
+    const range = window.dashboardTimeRange || 'live';
+    const data = typeof getFilteredStatsData === 'function' ? getFilteredStatsData(range) : getStatsData();
     
-    if (data.goldPerHour.length > 0) {
-        drawLineChart('chartGoldPerHour', data.timestamps, data.goldPerHour, '#44ff44', '#00cc00');
+    if (data.goldPerHour && data.goldPerHour.length > 0) {
+        drawLineChart('chartGoldPerHour', data.timestamps, data.goldPerHour, '#44ff44', '#00cc00', data.isOffline);
     }
-    if (data.xpPerHour.length > 0) {
-        drawLineChart('chartXpPerHour', data.timestamps, data.xpPerHour, '#ffdd44', '#ffaa00');
+    if (data.xpPerHour && data.xpPerHour.length > 0) {
+        drawLineChart('chartXpPerHour', data.timestamps, data.xpPerHour, '#ffdd44', '#ffaa00', data.isOffline);
     }
-    if (data.itemsCrafted.length > 0) {
-        drawLineChart('chartItemsCrafted', data.timestamps, data.itemsCrafted, '#ff88cc', '#ff4488');
+    if (data.itemsCrafted && data.itemsCrafted.length > 0) {
+        drawLineChart('chartItemsCrafted', data.timestamps, data.itemsCrafted, '#ff88cc', '#ff4488', data.isOffline);
     }
-    if (data.itemsGathered.length > 0) {
-        drawLineChart('chartItemsGathered', data.timestamps, data.itemsGathered, '#88ffcc', '#00ff88');
+    if (data.itemsGathered && data.itemsGathered.length > 0) {
+        drawLineChart('chartItemsGathered', data.timestamps, data.itemsGathered, '#88ffcc', '#00ff88', data.isOffline);
     }
 }
 
 /**
- * Desenha um gráfico de linha no canvas com visual otimizado
+ * Desenha um gráfico de linha no canvas com suporte a linhas pontilhadas para períodos AFK/offline
  */
-function drawLineChart(canvasId, timestamps, values, lineColor, fillColor) {
+function drawLineChart(canvasId, timestamps, values, lineColor, fillColor, isOfflineArray) {
     const canvas = document.getElementById(canvasId);
     if (!canvas) return;
     
@@ -75,7 +135,7 @@ function drawLineChart(canvasId, timestamps, values, lineColor, fillColor) {
         ctx.fillStyle = 'rgba(255,255,255,0.3)';
         ctx.font = '14px Outfit';
         ctx.textAlign = 'center';
-        ctx.fillText('Sem dados ainda...', width / 2, height / 2);
+        ctx.fillText('Sem dados ainda para este período...', width / 2, height / 2);
         return;
     }
     
@@ -93,6 +153,7 @@ function drawLineChart(canvasId, timestamps, values, lineColor, fillColor) {
     // Desenha grid de fundo com linhas mais suaves
     ctx.strokeStyle = 'rgba(255,255,255,0.04)';
     ctx.lineWidth = 1;
+    ctx.setLineDash([]);
     for (let i = 0; i <= 5; i++) {
         const y = padding + (graphHeight / 5) * i;
         ctx.beginPath();
@@ -115,7 +176,7 @@ function drawLineChart(canvasId, timestamps, values, lineColor, fillColor) {
     const points = values.map((value, idx) => {
         const x = padding + (idx / Math.max(values.length - 1, 1)) * graphWidth;
         const y = height - padding - ((value - paddedMin) / paddedRange) * graphHeight;
-        return { x, y, value };
+        return { x, y, value, offline: isOfflineArray ? isOfflineArray[idx] : false };
     });
     
     // Desenha gradiente de preenchimento
@@ -146,33 +207,32 @@ function drawLineChart(canvasId, timestamps, values, lineColor, fillColor) {
     ctx.closePath();
     ctx.fill();
     
-    // Desenha linha principal com sombra
-    ctx.shadowColor = lineColor;
-    ctx.shadowBlur = 8;
-    ctx.strokeStyle = lineColor;
+    // Desenha linhas com suporte a segmentos pontilhados para períodos AFK
+    ctx.shadowBlur = 0;
     ctx.lineWidth = 2.5;
     ctx.lineJoin = 'round';
     ctx.lineCap = 'round';
-    ctx.beginPath();
     
-    points.forEach((p, i) => {
-        if (i === 0) {
-            ctx.moveTo(p.x, p.y);
+    for (let i = 1; i < points.length; i++) {
+        const p1 = points[i - 1];
+        const p2 = points[i];
+        
+        ctx.beginPath();
+        ctx.moveTo(p1.x, p1.y);
+        ctx.lineTo(p2.x, p2.y);
+        
+        if (p2.offline || p1.offline) {
+            ctx.strokeStyle = '#bb66ff'; // Linha Roxo AFK
+            ctx.setLineDash([6, 4]);     // Traço pontilhado
         } else {
-            const prevP = points[i - 1];
-            const midX = (prevP.x + p.x) / 2;
-            ctx.quadraticCurveTo(prevP.x, prevP.y, midX, (prevP.y + p.y) / 2);
-            if (i === points.length - 1) {
-                ctx.quadraticCurveTo(midX, (prevP.y + p.y) / 2, p.x, p.y);
-            }
+            ctx.strokeStyle = lineColor;
+            ctx.setLineDash([]);        // Traço sólido
         }
-    });
-    ctx.stroke();
+        ctx.stroke();
+    }
+    ctx.setLineDash([]);
     
-    // Remove sombra para pontos
-    ctx.shadowBlur = 0;
-    
-    // Desenha pontos com destaque no último
+    // Desenha pontos nos vértices
     points.forEach((p, i) => {
         const isLast = i === points.length - 1;
         const radius = isLast ? 5 : 3;
@@ -183,8 +243,8 @@ function drawLineChart(canvasId, timestamps, values, lineColor, fillColor) {
         ctx.arc(p.x, p.y, radius + 1, 0, Math.PI * 2);
         ctx.fill();
         
-        // Ponto colorido
-        ctx.fillStyle = lineColor;
+        // Ponto colorido (Roxo se AFK, cor normal se ativo)
+        ctx.fillStyle = p.offline ? '#bb66ff' : lineColor;
         ctx.beginPath();
         ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
         ctx.fill();
@@ -211,19 +271,20 @@ function drawLineChart(canvasId, timestamps, values, lineColor, fillColor) {
         ctx.fillText(formattedValue, padding - 8, y);
     }
     
-    // Labels do eixo X com timestamps
+    // Labels do eixo X com timestamps (formatados segundo o range selecionado)
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
+    const rangeMode = window.dashboardTimeRange || 'live';
+    const isLongTerm = ['7d', '20d', '30d'].includes(rangeMode);
     
     const labelCount = Math.min(5, timestamps.length);
     for (let i = 0; i < labelCount; i++) {
         const idx = Math.floor((timestamps.length - 1) * (i / (labelCount - 1)));
         if (timestamps[idx] && points[idx]) {
             const date = new Date(timestamps[idx]);
-            const time = date.toLocaleTimeString('pt-BR', { 
-                hour: '2-digit', 
-                minute: '2-digit' 
-            });
+            const time = isLongTerm ? 
+                date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) :
+                date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
             ctx.fillText(time, points[idx].x, height - padding + 8);
         }
     }
@@ -246,37 +307,48 @@ function drawLineChart(canvasId, timestamps, values, lineColor, fillColor) {
  * Atualiza os valores de texto do painel de estatísticas
  */
 function updateStatsUI() {
+    const rangeMode = window.dashboardTimeRange || 'live';
+    const rangeData = typeof getFilteredStatsData === 'function' ? getFilteredStatsData(rangeMode) : getStatsData();
     const stats = getAggregateStats();
-    const data = getStatsData();
     
-    // Calcula totais ganhos desde abertura do modal
-    const sessionGold = window.statsSessionStart ? 
-        (gameState.gold || 0) - window.statsSessionStart.gold : 0;
-    const sessionXP = window.statsSessionStart ? 
-        calculateTotalXP() - window.statsSessionStart.totalXP : 0;
-    const sessionTime = window.statsSessionStart ? 
-        (Date.now() - window.statsSessionStart.timestamp) / 1000 / 60 : 0; // em minutos
+    // Sumarização do período filtrado
+    const rangeGoldSum = (rangeData.goldPerHour || []).reduce((a, b) => a + (b || 0), 0);
+    const rangeXpSum = (rangeData.xpPerHour || []).reduce((a, b) => a + (b || 0), 0);
+    const rangeCraftsSum = (rangeData.itemsCrafted || []).reduce((a, b) => a + (b || 0), 0);
+    const rangeGatheredSum = (rangeData.itemsGathered || []).reduce((a, b) => a + (b || 0), 0);
     
-    // Atualiza cards de resumo com totais da sessão
+    // Atualiza cards de resumo com totais do período selecionado
     const goldEl = document.getElementById('statGoldPerHour');
     if (goldEl) {
-        goldEl.textContent = formatNumber(Math.max(0, sessionGold));
+        goldEl.textContent = formatNumber(Math.max(0, rangeGoldSum));
     }
     
     const xpEl = document.getElementById('statXpPerHour');
     if (xpEl) {
-        xpEl.textContent = formatNumber(Math.max(0, sessionXP));
+        xpEl.textContent = formatNumber(Math.max(0, rangeXpSum));
     }
     
     // Mostra recordes nos labels "Máx"
-    document.getElementById('statGoldMax').textContent = formatNumber(stats.maxGoldPerHour) + '/h';
-    document.getElementById('statXpMax').textContent = formatNumber(stats.maxXpPerHour) + '/h';
+    const maxGold = rangeData.goldPerHour && rangeData.goldPerHour.length > 0 ? Math.max(...rangeData.goldPerHour) : stats.maxGoldPerHour;
+    const maxXp = rangeData.xpPerHour && rangeData.xpPerHour.length > 0 ? Math.max(...rangeData.xpPerHour) : stats.maxXpPerHour;
     
-    document.getElementById('statItemsCrafted').textContent = data.itemsCrafted.length > 0 ? data.itemsCrafted[data.itemsCrafted.length - 1] : 0;
-    document.getElementById('statItemsCraftedTotal').textContent = formatNumber(stats.totalItemsCrafted);
+    const statGoldMaxEl = document.getElementById('statGoldMax');
+    if (statGoldMaxEl) statGoldMaxEl.textContent = formatNumber(maxGold) + '/h';
     
-    document.getElementById('statItemsGathered').textContent = data.itemsGathered.length > 0 ? data.itemsGathered[data.itemsGathered.length - 1] : 0;
-    document.getElementById('statItemsGatheredTotal').textContent = formatNumber(stats.totalItemsGathered);
+    const statXpMaxEl = document.getElementById('statXpMax');
+    if (statXpMaxEl) statXpMaxEl.textContent = formatNumber(maxXp) + '/h';
+    
+    const statCraftedEl = document.getElementById('statItemsCrafted');
+    if (statCraftedEl) statCraftedEl.textContent = formatNumber(rangeCraftsSum);
+    
+    const statCraftedTotalEl = document.getElementById('statItemsCraftedTotal');
+    if (statCraftedTotalEl) statCraftedTotalEl.textContent = formatNumber(stats.totalItemsCrafted);
+    
+    const statGatheredEl = document.getElementById('statItemsGathered');
+    if (statGatheredEl) statGatheredEl.textContent = formatNumber(rangeGatheredSum);
+    
+    const statGatheredTotalEl = document.getElementById('statItemsGatheredTotal');
+    if (statGatheredTotalEl) statGatheredTotalEl.textContent = formatNumber(stats.totalItemsGathered);
     
     // Atualiza atividade
     document.getElementById('statWorkersActive').textContent = Math.round(stats.avgWorkersActive);

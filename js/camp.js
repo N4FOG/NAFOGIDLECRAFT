@@ -762,6 +762,11 @@
         }
 
         function showOfflineProductionPopup(secs, collected, forgeInfo) {
+            // Sincroniza ganhos offline de forma interpolada no Observatório (sem spikes no gráfico)
+            if (typeof recordOfflineGainsToStats === 'function') {
+                recordOfflineGainsToStats(secs, collected);
+            }
+
             const modal = document.getElementById('offlineProductionModal');
             if (!modal) return;
 

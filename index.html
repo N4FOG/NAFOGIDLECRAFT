@@ -3690,10 +3690,30 @@
             </div>
             <div class="modal-body" style="padding:20px; display:flex; flex-direction:column; gap:20px;">
                 
+                <!-- BARRA DE SELEÇÃO DE TEMPO E MODO DE VISUALIZAÇÃO -->
+                <div style="background:rgba(0,0,0,0.3); border:1px solid rgba(100,200,255,0.25); border-radius:10px; padding:14px; display:flex; flex-direction:column; gap:12px; align-items:center;">
+                    <div style="font-size:0.85em; color:#aaa; font-weight:bold; letter-spacing:0.5px;">🕒 SELECIONE O INTERVALO DE ANÁLISE:</div>
+                    <div style="display:flex; gap:6px; flex-wrap:wrap; justify-content:center;">
+                        <button id="btnTimeLive" onclick="setDashboardTimeRange('live')" class="btn-sm" style="padding:6px 14px; border-radius:15px; border:1px solid rgba(100,200,255,0.4); background:rgba(0,150,255,0.2); color:#66ccff; font-weight:bold; cursor:pointer;">⚡ Ao Vivo</button>
+                        <button id="btnTime2h" onclick="setDashboardTimeRange('2h')" class="btn-sm" style="padding:6px 14px; border-radius:15px; border:1px solid rgba(255,255,255,0.15); background:rgba(0,0,0,0.3); color:#ccc; cursor:pointer;">⏱️ 2 Horas</button>
+                        <button id="btnTime1d" onclick="setDashboardTimeRange('1d')" class="btn-sm" style="padding:6px 14px; border-radius:15px; border:1px solid rgba(255,255,255,0.15); background:rgba(0,0,0,0.3); color:#ccc; cursor:pointer;">📅 1 Dia (24h)</button>
+                        <button id="btnTime7d" onclick="setDashboardTimeRange('7d')" class="btn-sm" style="padding:6px 14px; border-radius:15px; border:1px solid rgba(255,255,255,0.15); background:rgba(0,0,0,0.3); color:#ccc; cursor:pointer;">🗓️ 7 Dias</button>
+                        <button id="btnTime20d" onclick="setDashboardTimeRange('20d')" class="btn-sm" style="padding:6px 14px; border-radius:15px; border:1px solid rgba(255,255,255,0.15); background:rgba(0,0,0,0.3); color:#ccc; cursor:pointer;">📊 20 Dias</button>
+                        <button id="btnTime30d" onclick="setDashboardTimeRange('30d')" class="btn-sm" style="padding:6px 14px; border-radius:15px; border:1px solid rgba(255,215,0,0.4); background:rgba(255,215,0,0.15); color:#ffd700; font-weight:bold; cursor:pointer;">🏆 30 Dias</button>
+                    </div>
+
+                    <!-- Alternador de Modo: Cards vs Gráficos -->
+                    <div style="display:flex; gap:10px; margin-top:4px;">
+                        <button onclick="setDashboardViewMode('charts')" class="btn-sm" style="padding:6px 16px; border-radius:6px; border:1px solid rgba(68,255,136,0.4); background:rgba(68,255,136,0.15); color:#44ff88; font-weight:bold; cursor:pointer;">📊 Visão Analítica (Gráficos Canvas)</button>
+                        <button onclick="setDashboardViewMode('cards')" class="btn-sm" style="padding:6px 16px; border-radius:6px; border:1px solid rgba(187,102,255,0.4); background:rgba(187,102,255,0.15); color:#dd88ff; font-weight:bold; cursor:pointer;">📋 Visão Sintética (Cards KPI)</button>
+                    </div>
+                </div>
+
                 <!-- Seção 1: Visão Geral -->
                 <div style="background:linear-gradient(135deg, rgba(50,20,80,0.2), rgba(20,20,60,0.2)); border:2px solid rgba(150,100,255,0.4); border-radius:12px; padding:18px;">
-                    <div style="font-size:1.2em; color:#dd88ff; font-weight:bold; margin-bottom:15px; display:flex; align-items:center; gap:8px;">
-                        ⚡ Visão Geral - Sessão Atual
+                    <div style="font-size:1.15em; color:#dd88ff; font-weight:bold; margin-bottom:15px; display:flex; justify-content:space-between; align-items:center;">
+                        <span>⚡ Visão Geral do Período</span>
+                        <span id="statRangeLabel" style="font-size:0.85em; color:#66ccff; font-weight:bold; background:rgba(0,150,255,0.15); padding:4px 10px; border-radius:12px; border:1px solid rgba(100,200,255,0.3);">Sessão Ao Vivo</span>
                     </div>
                     <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:12px;">
                         <div style="background:rgba(68,255,68,0.08); border:1px solid rgba(68,255,68,0.3); border-radius:8px; padding:12px; text-align:center;">
@@ -3730,7 +3750,7 @@
                 </div>
 
                 <!-- Seção 2: Gráficos de Tendência -->
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+                <div id="statsChartsContainer" style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
                     <div style="background:rgba(0,0,0,0.3); border:1px solid rgba(68,255,68,0.3); border-radius:8px; padding:14px;">
                         <div style="font-size:0.95em; color:#44ff44; font-weight:bold; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
                             <span>💰 Ouro por Hora</span>
